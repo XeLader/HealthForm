@@ -1,0 +1,20 @@
+{% extends 'form/base.html' %}
+
+{% block content %}
+    <article class="post">
+        <aside class="actions">
+	{% if user.is_authenticated %}
+            <a class="btn btn-secondary" href="{% url 'report_edit' pk=report.pk %}">
+                {% include './icons/pencil-fill.svg' %}
+            </a>
+	{% endif %}        
+	</aside>
+        {% if report.create_date %}
+            <time class="date">
+                {{ report.create_date }}
+            </time>
+        {% endif %}
+        <h2>{{ report.title }}</h2>
+        <p>{{ report.text|linebreaksbr }}</p>
+    </article>
+{% endblock %}

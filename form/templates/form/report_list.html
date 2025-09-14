@@ -1,0 +1,16 @@
+{% extends 'form/base.html' %}
+
+{% block content %}
+
+<header>
+    <h1><a href="/">Reports</a></h1>
+</header>
+
+{% for form in forms %}
+    <article>
+        <time>created: {{ form.created_date }}</time>
+        <h2><a href="{% url 'report_detail' pk=form.pk %}">{{ form.title }}</a></h2>
+        <p>{{ form.text|linebreaksbr }}</p>
+    </article>
+{% endfor %}
+{% endblock %}
