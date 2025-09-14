@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
-from .models import Report
+from .models import Report, Biochemistry
 from .forms import ReportForm 
 
 # Create your views here.
@@ -12,7 +12,8 @@ def report_list(request):
 
 def report_detail(request, pk):
 	report = get_object_or_404(Report, pk = pk)
-	return render(request, 'form/report_detail.html', {'report':report})
+	biochems = Biochemistry.objects.filter(patient = report.patient)
+	return render(request, 'form/report_detail.html', {'report':report, 'biochems':biochems})
 
 def report_new(request):
     if request.method == "POST":

@@ -16,5 +16,96 @@
         {% endif %}
         <h2>{{ report.title }}</h2>
         <p>{{ report.text|linebreaksbr }}</p>
-    </article>
+
+	<h3>1. Данные пациента</h3>
+	<p>Ф.И.О. <u>{{report.patient.full_name}}<u> </p>
+	<p>Рост: <u>{{report.patient.growth}}<u> </p>
+	<p>Вес: <u>{{report.patient.weight}}<u> </p>
+	
+	<h3>2. Жалобы</h3>
+	<p>{{report.complaints}}</p>
+	
+	<h3>3. Анамнез заболевания</h3>
+	<p>{{report.anamnesis}}</p>
+	
+	<h3>4. Диетологический анамнез</h3>
+	<p> <b>Тип питания:</b> {{report.get_diet_display}}</p>
+	<p> <b>Количество приёмов пищи в день:</b> {{report.get_dmealscount_display}}</p>
+	<p> <b>Перекусы:</b> {{report.get_snacks_display}}</p>
+	<p> <b>Предпочтения:</b> {{report.get_preference_display}}</p>
+	
+	<h3>5. Наследственность</h3>
+	<p> <b>Сердечно‑сосудистые заболевания:</b> {{report.get_cardiovascular_display}}</p>
+	<p> <b>Онкологические заболевания:</b> {{report.get_oncological_display}}</p>
+	<p> <b>Сахарный диабет: </b> {{report.get_diabetes_display}}</p>
+	<p> <b>Заболевания щитовидной железы:</b> {{report.get_thyroid_display}}</p>
+	<p> <b>Аутоиммунные заболевания: </b> {{report.get_autoimmune_display}}</p>
+	<p> <b>Аллергические заболевания: </b> {{report.get_allergic_display}}</p>
+	
+	<h3>8. Лабораторные и инструментальные показатели</h3>
+	<p><b>8.1 Биохимия</b></p>
+	
+	<table style="width:100%">
+  <tr>
+    <th>Показатель</th>
+    <th>Ед. изм.</th>
+    <th>Референсные значения</th>
+    {% for biochem in biochems %}
+    <th>{{ biochem.created_date }}</th>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td>АлАТ </td>
+    <td>Ед/л</td>
+    <td>♂ < 41; ♀ < 33</td>
+    {% for biochem in biochems %}
+    <th>{{ biochem.alat }}</th>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td>АсАТ </td>
+    <td>Ед/л</td>
+    <td>♂ < 41; ♀ < 33</td>
+    {% for biochem in biochems %}
+    <th>{{ biochem.asat }}</th>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td>ЛДГ </td>
+    <td>Ед/л</td>
+    <td>♂ < 41; ♀ < 33</td>
+    {% for biochem in biochems %}
+    <th>{{ biochem.ldh }}</th>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td>КФК </td>
+    <td>Ед/л</td>
+    <td>♂ < 41; ♀ < 33</td>
+    {% for biochem in biochems %}
+    <th>{{ biochem.cpk }}</th>
+    {% endfor %}
+  </tr>
+</table>
+	
+	
+	
+	<h3>11. Назначения</h3>
+	<table style="width:100%">
+	<tr>
+    <th>Препарат</th>
+    <th>Дозировка</th>
+    <th>режим</th>
+    <th>длительность</th>
+    <th>комментарий</th>
+  </tr>
+  <tr>
+    <td>{{report.prescription.medicine.title}} </td>
+    <td>{{report.prescription.dosage}}</td>
+    <td>{{report.prescription.regime}}</td>
+    <td>{{report.prescription.duration}}</td>
+    <td>{{report.prescription.comment}}</td>
+  </tr>
+	</table>
+</article>
 {% endblock %}

@@ -9,6 +9,8 @@ class Patient(models.Model):
 	growth = models.IntegerField()
 	weight = models.DecimalField(max_digits = 10, decimal_places=3)
 
+	def __str__(self):
+		return self.full_name
 
 class Biochemistry(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
@@ -30,7 +32,8 @@ class Prescription(models.Model):
     regime = models.CharField(max_length=200)
     duration = models.CharField(max_length = 200)
     comment = models.TextField()
-
+    def __str__(self):
+        return  self.medicine.title
 
 class Report(models.Model):
     NUTR_TYPE = {
