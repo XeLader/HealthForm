@@ -1,0 +1,32 @@
+{% extends 'form/base.html' %}
+
+{% block content %}
+
+    <div class = "listblock">
+    		<a href="{% url 'patient_new' %}" class="top-menu">
+        		{% include './icons/file-earmark-plus.svg' %}
+    			</a>
+    <h2> Пациенты </h2>
+     <ol>
+     {% for patient in patients %}
+    <li><a href="{% url 'patient_detail' pk=patient.pk %}">{{ patient.full_name }}</a></li>
+     {% endfor %}
+    </ol> 
+    <a href="{% url 'patient_list' %}">Показать всех</a>
+    </div>
+    
+    <div class = "listblock">
+        		<a href="{% url 'report_new' %}" class="top-menu">
+        		{% include './icons/file-earmark-plus.svg' %}
+    			</a>
+    <h2> Приёмы </h2>
+     <ol>
+     {% for form in reports %}
+    <li><a href="{% url 'report_detail' pk=form.pk %}">{{ form.title }}</a>
+    <div>{{ form.text }} </div>
+    </li>
+     {% endfor %}
+    </ol> 
+    <a href="{% url 'report_list' %}">Показать всех</a>
+    </div>
+{% endblock %}

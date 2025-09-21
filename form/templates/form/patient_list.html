@@ -1,0 +1,23 @@
+{% extends 'form/base.html' %}
+
+{% block content %}
+
+
+<div class = "listblock">
+    		<a href="{% url 'patient_new' %}" class="top-menu">
+        		{% include './icons/file-earmark-plus.svg' %}
+    			</a>
+    <h2> Пациенты </h2>
+     <ol>
+     {% for form in patients %}
+    <li>
+      <a href="{% url 'patient_detail' pk=form.pk %}">{{ form.full_name }}</a>
+        <p>Рост: {{ form.growth }} см<br>
+           Вес: {{ form.weight }} кг
+        </p>
+    </li>
+     {% endfor %}
+    </ol> 
+    </div>
+    
+{% endblock %}

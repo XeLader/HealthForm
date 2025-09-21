@@ -1,0 +1,218 @@
+{% extends 'form/base.html' %}
+
+{% block content %}
+    <article class="post">
+        <aside class="actions">
+	{% if user.is_authenticated %}
+            <a class="btn btn-secondary" href="{% url 'patient_edit' pk=patient.pk %}">
+                {% include './icons/pencil-fill.svg' %}
+            </a>
+	{% endif %}        
+	</aside>
+	
+<div class = "listblock">
+	<h2>1. Данные пациента</h2>
+	<p>Ф.И.О. <u>{{patient.full_name}}<u> </p>
+	<p>Рост: <u>{{patient.growth}}<u> </p>
+	<p>Вес: <u>{{patient.weight}}<u> </p>
+	
+</div>
+
+<div class = "listblock">
+
+	<h2>2. Лабораторные и инструментальные показатели</h2>
+	<p><b>2.1 Биохимия</b></p>
+	<table style="width:100%">
+  <tr>
+    <th>Показатель</th>
+    <th>Ед. изм.</th>
+    <th>Референсные значения</th>
+    {% for biochem in biochems %}
+    <th>{{ biochem.created_date }}</th>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td>АлАТ </td>
+    <td>Ед/л</td>
+    <td>♂ < 41; ♀ < 33</td>
+    {% for biochem in biochems %}
+    <th>{{ biochem.alat }}</th>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td>АсАТ </td>
+    <td>Ед/л</td>
+    <td>♂ < 41; ♀ < 33</td>
+    {% for biochem in biochems %}
+    <th>{{ biochem.asat }}</th>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td>ЛДГ </td>
+    <td>Ед/л</td>
+    <td>♂ < 41; ♀ < 33</td>
+    {% for biochem in biochems %}
+    <th>{{ biochem.ldh }}</th>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td>КФК </td>
+    <td>Ед/л</td>
+    <td>♂ < 41; ♀ < 33</td>
+    {% for biochem in biochems %}
+    <th>{{ biochem.cpk }}</th>
+    {% endfor %}
+  </tr>
+</table>
+
+<p><b>2.2 Белковый обмен</b></p>
+
+	<table style="width:100%">
+  <tr>
+    <th>Показатель</th>
+    <th>Ед. изм.</th>
+    <th>Референсные значения</th>
+    {% for protein in proteins %}
+    <th>{{ protein.created_date }}</th>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td>Гамма‑ГТ</td>
+    <td>Ед/л</td>
+    <td>♂ < 55; ♀ < 38</td>
+    {% for protein in proteins %}
+    <th>{{ protein.gammaGT }}</th>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td>Общий белок </td>
+    <td>г/л</td>
+    <td>64–83</td>
+    {% for protein in proteins %}
+    <th>{{ protein.ttlProtein }}</th>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td>Альбумин </td>
+    <td>г/л</td>
+    <td>35–52</td>
+    {% for protein in proteins %}
+    <th>{{ protein.albumin }}</th>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td>Щелочная фосфатаза </td>
+    <td>Ед/л</td>
+    <td>30–120</td>
+    {% for protein in proteins %}
+    <th>{{ protein.phosphatase }}</th>
+    {% endfor %}
+  </tr>
+  
+  <tr>
+    <td>Мочевина </td>
+    <td>ммоль/л</td>
+    <td>2,5–8,3</td>
+    {% for protein in proteins %}
+    <th>{{ protein.urea }}</th>
+    {% endfor %}
+  </tr>
+  
+  
+  <tr>
+    <td>Креатинин </td>
+    <td>мкмоль/л</td>
+    <td>♂ 62–115; ♀ 53–97</td>
+    {% for protein in proteins %}
+    <th>{{ protein.creatinine }}</th>
+    {% endfor %}
+  </tr>
+  
+  
+  <tr>
+    <td>Мочевая кислота </td>
+    <td>мкмоль/л</td>
+    <td>♂ 210–420; ♀ 150–350</td>
+    {% for protein in proteins %}
+    <th>{{ protein.uricAcid }}</th>
+    {% endfor %}
+  </tr>
+  
+    <tr>
+    <td>α1‑глобулины </td>
+    <td>Ед/л</td>
+    <td>2–5</td>
+    {% for protein in proteins %}
+    <th>{{ protein.alpha1Globulins }}</th>
+    {% endfor %}
+  </tr>
+  
+    <tr>
+    <td>α2‑глобулины </td>
+    <td>%</td>
+    <td>7–13</td>
+    {% for protein in proteins %}
+    <th>{{ protein.alpha2Globulins }}</th>
+    {% endfor %}
+  </tr>
+  
+    <tr>
+    <td>β1‑глобулины </td>
+    <td>%</td>
+    <td>4–7</td>
+    {% for protein in proteins %}
+    <th>{{ protein.beta1Globulins }}</th>
+    {% endfor %}
+  </tr>
+  
+  
+    <tr>
+    <td>β2‑глобулины </td>
+    <td>%</td>
+    <td>3–6</td>
+    {% for protein in proteins %}
+    <th>{{ protein.beta2Globulins }}</th>
+    {% endfor %}
+  </tr>
+  
+  
+    <tr>
+    <td>γ‑глобулины </td>
+    <td>%</td>
+    <td>12–22</td>
+    {% for biochem in biochems %}
+    <th>{{ protein.gammaGlobulins }}</th>
+    {% endfor %}
+  </tr>
+  
+</table>
+</div>
+
+	<div class = "listblock">
+	<a class="btn btn-secondary" href="{% url 'prescription_new' pk=patient.pk %}" style="float: right;">
+                {% include './icons/file-earmark-plus.svg' %}
+            </a>
+	<h3>3. Назначения</h3>
+	<table style="width:100%">
+	<tr>
+    <th>Препарат</th>
+    <th>Дозировка</th>
+    <th>режим</th>
+    <th>длительность</th>
+    <th>комментарий</th>
+  </tr>
+  {% for prescription in prescriptions %}
+  <tr>
+    <td>{{prescription.medicine.title}} </td>
+    <td>{{prescription.dosage}}</td>
+    <td>{{prescription.regime}}</td>
+    <td>{{prescription.duration}}</td>
+    <td>{{prescription.comment}}</td>
+  </tr>
+    {% endfor %}
+
+	</table>
+	
+	</div>
+</article>
+{% endblock %}

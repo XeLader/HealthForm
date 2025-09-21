@@ -1,9 +1,26 @@
 .page-header {
-    background-color: #C25100;
+    background-color: #038fd6;
     margin-top: 0;
     margin-bottom: 40px;
     padding: 20px 20px 20px 40px;
 }
+
+
+.quicksand-serif {
+  font-family: "Quicksand", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+}
+
+
+.oswald-serif {
+  font-family: "Oswald", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 300;
+  font-style: normal;
+}
+
 
 .page-header h1,
 .page-header h1 a,
@@ -18,7 +35,10 @@ h1,
 h2,
 h3,
 h4 {
-    font-family: 'Lobster', cursive;
+    font-family: "Oswald", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 300;
+  font-style: normal;
 }
 
 .date {
@@ -69,3 +89,12 @@ h4 {
     color: #FFFFFF;
     background-color: #C25100;
 }
+
+.listblock {
+    width: 70%;
+    background-color: #dcdef2;
+    margin-top: 0;
+    margin-bottom: 100px;
+    padding: 10px 10px 10px 10px;
+    max-width: 1200px;
+    }

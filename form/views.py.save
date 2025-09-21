@@ -1,0 +1,7 @@
+from django.shortcuts import render
+
+# Create your views here.
+def report_list(request):
+    forms = Form.objects.filter(def report_list(request):
+    return render(request, 'form/report_list.html',{}
+    return render(request, 'form/report_list.html',{})
