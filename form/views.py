@@ -1,8 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
-from .models import Report, Biochemistry, Patient, Prescription, ProteinMetabolism
-from .forms import ReportForm, PatientForm, PrescriptionForm
+from .models import *
+from .forms import *
 
 # Create your views here.
 
@@ -109,3 +109,98 @@ def prescription_new(request, pk):
     else:
         form = PrescriptionForm()
     return render(request, 'form/report_edit.html', {'form': form})
+
+@login_required()
+def biochemistry_new(request, pk):
+    if request.method == "POST":
+        form = BiochemistryForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.create_date = timezone.now()
+            post.save()
+            return redirect('patient_detail', pk=post.patient.pk)
+    else:
+        form = BiochemistryForm()
+    return render(request, 'form/report_edit.html', {'form': form})
+    
+@login_required()
+def proteinmetabolism_new(request, pk):
+    if request.method == "POST":
+        form = ProteinMetabolismForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.create_date = timezone.now()
+            post.save()
+            return redirect('patient_detail', pk=post.patient.pk)
+    else:
+        form = ProteinMetabolismForm()
+    return render(request, 'form/report_edit.html', {'form': form})
+    
+    
+    
+@login_required()
+def lipidmetabolism_new(request, pk):
+    if request.method == "POST":
+        form = LipidMetabolismForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.create_date = timezone.now()
+            post.save()
+            return redirect('patient_detail', pk=post.patient.pk)
+    else:
+        form = LipidMetabolismForm()
+    return render(request, 'form/report_edit.html', {'form': form})
+    
+    
+    
+    
+    
+@login_required()
+def carbohydratemetabolism_new(request, pk):
+    if request.method == "POST":
+        form = CarbohydrateMetabolismForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.create_date = timezone.now()
+            post.save()
+            return redirect('patient_detail', pk=post.patient.pk)
+    else:
+        form = CarbohydrateMetabolismForm()
+    return render(request, 'form/report_edit.html', {'form': form})
+    
+    
+    
+@login_required()
+def ironmetabolism_new(request, pk):
+    if request.method == "POST":
+        form = IronMetabolismForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.create_date = timezone.now()
+            post.save()
+            return redirect('patient_detail', pk=post.patient.pk)
+    else:
+        form = IronMetabolismForm()
+    return render(request, 'form/report_edit.html', {'form': form})
+    
+    
+    
+@login_required()
+def micronutrients_new(request, pk):
+    if request.method == "POST":
+        form = MicronutrientsForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.create_date = timezone.now()
+            post.save()
+            return redirect('patient_detail', pk=post.patient.pk)
+    else:
+        form = MicronutrientsForm()
+    return render(request, 'form/report_edit.html', {'form': form})
+    

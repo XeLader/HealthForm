@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Report, Patient, Prescription
+from .models import *
 
 class ReportForm(forms.ModelForm):
     class Meta:
@@ -23,3 +23,37 @@ class PrescriptionForm(forms.ModelForm):
     class Meta:
         model = Prescription
         fields = ('patient', 'medicine', 'dosage' ,'regime', 'duration')
+        
+        
+class BiochemistryForm(forms.ModelForm):
+    class Meta:
+        model = Biochemistry
+        fields = ('patient', 'alat', 'asat', 'ldh' ,'cpk')
+        
+        
+class ProteinMetabolismForm(forms.ModelForm):
+    class Meta:
+        model = ProteinMetabolism
+        fields = ('patient', 'gammaGT', 'ttlProtein', 'albumin' ,'phosphatase', 'urea', 'creatinine', 'uricAcid', 'alpha1Globulins', 'alpha2Globulins', 'beta1Globulins', 'beta2Globulins', 'gammaGlobulins')
+        
+        
+class LipidMetabolismForm(forms.ModelForm):
+    class Meta:
+        model = LipidMetabolism
+        fields = ('patient', 'ttlBilirubin', 'drctBilirubin' ,'indrctBilirubin', 'ttlCholesterol', 'LDL', 'VLDL', 'HDL' ,'Triglycerides')
+        
+class CarbohydrateMetabolismForm(forms.ModelForm):
+    class Meta:
+        model = CarbohydrateMetabolism
+        fields = ('patient', 'fastingGlucose', 'glycatedHemoglobin')
+        
+class IronMetabolismForm(forms.ModelForm):
+    class Meta:
+        model = IronMetabolism
+        fields = ('patient', 'serumIron', 'ferritin' ,'transferrin', 'TIBC', 'transferrinSat')
+        
+        
+class MicronutrientsForm(forms.ModelForm):
+    class Meta:
+        model = Micronutrients
+        fields = ('patient', 'copper', 'zinc' ,'magnesium', 'ttlCalcium', 'potassium', 'sodium', 'chloride')

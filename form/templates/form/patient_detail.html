@@ -21,8 +21,15 @@
 <div class = "listblock">
 
 	<h2>2. Лабораторные и инструментальные показатели</h2>
-	<p><b>2.1 Биохимия</b></p>
-	<table style="width:100%">
+	<div class = "resultsTable">
+	<p><b>2.1 Биохимия</b>
+		<a class="btn btn-secondary" href="{% url 'biochemistry_new' pk=patient.pk %}" style="float: right;">
+                {% include './icons/file-earmark-plus.svg' %}
+    </a>
+	</p>
+
+		{% if biochems %}
+	<table style="width:100%" onload="readyMark()">
   <tr>
     <th>Показатель</th>
     <th>Ед. изм.</th>
@@ -31,12 +38,15 @@
     <th>{{ biochem.created_date }}</th>
     {% endfor %}
   </tr>
-  <tr>
+  <tr id='row'>
     <td>АлАТ </td>
-    <td>Ед/л</td>
-    <td>♂ < 41; ♀ < 33</td>
+    <td><select id="biochemUnits" onchange="changeBioUnits()">
+   <option value="std">Ед/л</option>
+   <option value="alt" selected>мккат/л</option>
+</select></td>
+    <td id="ref">♂ < 41; ♀ < 33</td>
     {% for biochem in biochems %}
-    <th>{{ biochem.alat }}</th>
+    <th id="val" data="{{ biochem.alat }}">{{ biochem.alat }}</th>
     {% endfor %}
   </tr>
   <tr>
@@ -64,9 +74,17 @@
     {% endfor %}
   </tr>
 </table>
+{% endif %}
+</div>
 
-<p><b>2.2 Белковый обмен</b></p>
+<p>
+  <b>2.2 Белковый обмен</b>
+	<a class="btn btn-secondary" href="{% url 'proteinmetabolism_new' pk=patient.pk %}" style="float: right;">
+                {% include './icons/file-earmark-plus.svg' %}
+  </a>
+</p>
 
+  {% if protein%}
 	<table style="width:100%">
   <tr>
     <th>Показатель</th>
@@ -108,7 +126,6 @@
     <th>{{ protein.phosphatase }}</th>
     {% endfor %}
   </tr>
-  
   <tr>
     <td>Мочевина </td>
     <td>ммоль/л</td>
@@ -117,8 +134,6 @@
     <th>{{ protein.urea }}</th>
     {% endfor %}
   </tr>
-  
-  
   <tr>
     <td>Креатинин </td>
     <td>мкмоль/л</td>
@@ -127,8 +142,6 @@
     <th>{{ protein.creatinine }}</th>
     {% endfor %}
   </tr>
-  
-  
   <tr>
     <td>Мочевая кислота </td>
     <td>мкмоль/л</td>
@@ -136,8 +149,7 @@
     {% for protein in proteins %}
     <th>{{ protein.uricAcid }}</th>
     {% endfor %}
-  </tr>
-  
+  </tr> 
     <tr>
     <td>α1‑глобулины </td>
     <td>Ед/л</td>
@@ -155,7 +167,6 @@
     <th>{{ protein.alpha2Globulins }}</th>
     {% endfor %}
   </tr>
-  
     <tr>
     <td>β1‑глобулины </td>
     <td>%</td>
@@ -163,9 +174,7 @@
     {% for protein in proteins %}
     <th>{{ protein.beta1Globulins }}</th>
     {% endfor %}
-  </tr>
-  
-  
+  </tr>  
     <tr>
     <td>β2‑глобулины </td>
     <td>%</td>
@@ -173,9 +182,7 @@
     {% for protein in proteins %}
     <th>{{ protein.beta2Globulins }}</th>
     {% endfor %}
-  </tr>
-  
-  
+  </tr> 
     <tr>
     <td>γ‑глобулины </td>
     <td>%</td>
@@ -183,9 +190,9 @@
     {% for biochem in biochems %}
     <th>{{ protein.gammaGlobulins }}</th>
     {% endfor %}
-  </tr>
-  
+  </tr> 
 </table>
+{% endif %}
 </div>
 
 	<div class = "listblock">
@@ -215,4 +222,38 @@
 	
 	</div>
 </article>
+
+<script>
+function changeBioUnits() {
+  var x = document.getElementById("biochemUnits").value;
+  var row = document.getElementById("row");
+  if (x == "std")
+  {
+    document.getElementById("ref").innerHTML = "♂ < 41; ♀ < 33";
+    for (var i = 3, col; col = row.cells[i]; i++) { 
+         var val = parseFloat(col.getAttribute("data").replace(",", "."));
+         col.innerHTML = val.toFixed(2);
+    }
+  }
+  else
+  {
+    document.getElementById("ref").innerHTML = "♂ < 0,68; ♀ < 0,55";
+        for (var i = 3, col; col = row.cells[i]; i++) { 
+         var val = parseFloat(col.getAttribute("data").replace(",", "."));
+         col.innerHTML = (val*0.0167).toFixed(2);
+    }
+  }
+}
+
+(function(){
+  console.log("Iload")
+  var row = document.getElementById("row");
+  for (var i = 3, col; col = row.cells[i]; i++) { 
+      var val = parseFloat(col.getAttribute("data").replace(",", "."));
+      if (val > 41)
+         col.style.color="red";
+  }
+})();
+</script>
+
 {% endblock %}
