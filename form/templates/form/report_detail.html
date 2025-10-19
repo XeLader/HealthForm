@@ -18,7 +18,7 @@
         <p>{{ report.text|linebreaksbr }}</p>
 <div class = "listblock">
 	<h3>1. Данные пациента</h3>
-	<p>Ф.И.О. <u>{{report.patient.full_name}}<u> </p>
+	<p>Ф.И.О. <a href="{% url 'patient_detail' pk=report.patient.pk %}">{{report.patient.full_name}}</a> </p>
 	<p>Рост: <u>{{report.patient.growth}}<u> </p>
 	<p>Вес: <u>{{report.patient.weight}}<u> </p>
 </div>

@@ -51,7 +51,7 @@ class LipidMetabolism(models.Model):
 class CarbohydrateMetabolism(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True, default = 0)
     created_date = models.DateTimeField(default=timezone.now)
-    fastingGlucose = models.DecimalField("verbose_name = Глюкоза (натощак)", max_digits = 10, decimal_places=7) 
+    fastingGlucose = models.DecimalField(verbose_name = "Глюкоза (натощак)", max_digits = 10, decimal_places=7) 
     glycatedHemoglobin = models.DecimalField(verbose_name = "Гликированный гемоглобин", max_digits = 10, decimal_places=7)
 
 class IronMetabolism(models.Model):
@@ -73,7 +73,7 @@ class Micronutrients(models.Model):
     magnesium = models.DecimalField(verbose_name = "Магний", max_digits = 10, decimal_places=7)
     ttlCalcium = models.DecimalField(verbose_name = "Кальций общий", max_digits = 10, decimal_places=7)
     potassium = models.DecimalField(verbose_name = "Калий", max_digits = 10, decimal_places=7)
-    sodium = models.DecimalField(verbose_name = "Калий", max_digits = 10, decimal_places=7)
+    sodium = models.DecimalField(verbose_name = "Натрий", max_digits = 10, decimal_places=7)
     chloride = models.DecimalField(verbose_name = "Хлор", max_digits = 10, decimal_places=7)
 
 

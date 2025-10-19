@@ -13,6 +13,17 @@ class ReportForm(forms.ModelForm):
         'insp_Lymph', 'insp_Thyroid', 'insp_Abdomen', 'insp_Liver', 'insp_Liver_protudes', 'insp_Musculoskeletal', 'insp_Other',
         'next_date')
         
+class ReportFormForPatient(forms.ModelForm):
+    class Meta:
+        model = Report
+        fields = ('title', 'text', 'complaints', 'anamnesis', 'diet', 'mealscount', 'snacks', 'pref_Meat', 'pref_Fish',
+        'pref_Dair', 'pref_Eggs', 'pref_Vegs', 'pref_Frut', 'pref_Groa', 'pref_Swet',
+        'pref_Fast', 'pref_Cofe', 'pref_Alco', 'intol_Lact', 'intol_Glut' ,'intol_Nuts' ,'intol_Sea' ,'intol_Other',
+        'cardiovascular', 'oncological', 'diabetes', 'thyroid', 'autoimmune',
+        'allergic', 'foodAllergy', 'medicineAllergy', 'seasonalAllergy', 'contactAllergy', 'noAllergy', 'insp_General', 'insp_Body', 'insp_Skin',
+        'insp_Lymph', 'insp_Thyroid', 'insp_Abdomen', 'insp_Liver', 'insp_Liver_protudes', 'insp_Musculoskeletal', 'insp_Other',
+        'next_date')
+        
         
 class PatientForm(forms.ModelForm):
     class Meta:
@@ -57,3 +68,47 @@ class MicronutrientsForm(forms.ModelForm):
     class Meta:
         model = Micronutrients
         fields = ('patient', 'copper', 'zinc' ,'magnesium', 'ttlCalcium', 'potassium', 'sodium', 'chloride')
+        
+        
+class InflammatoryMarkersForm(forms.ModelForm):
+    class Meta:
+        model = InflammatoryMarkers
+        fields = ('patient', 'cReactiveProtein', 'fibrinogen' ,'ASLO', 'homocysteine')
+        
+        
+class AllergiesInfectionsForm(forms.ModelForm):
+    class Meta:
+        model = AllergiesInfections
+        fields = ('patient', 'ttlIgE', 'IgA' ,'IgM', 'IgG', 'antiCandida', 'antiParasitic')
+        
+        
+class ThyroidFunctionForm(forms.ModelForm):
+    class Meta:
+        model = ThyroidFunction
+        fields = ('patient', 'TSH', 'freeT4' ,'freeT3', 'totalT4', 'totalT3', 'reverseT3', 'TPOAb', 'TgAb')
+
+                
+class HematologyForm(forms.ModelForm):
+    class Meta:
+        model = Hematology
+        fields = ('patient', 'hemoglobin', 'hematocrit' ,'redBloodCells', 'MCV', 'RDW', 'MCH', 'MCHC')
+
+        
+class PlateletsForm(forms.ModelForm):
+    class Meta:
+        model = Platelets
+        fields = ('patient', 'platelets', 'MPV' ,'PCT', 'PDW')
+        
+        
+class LeukocytesForm(forms.ModelForm):
+    class Meta:
+        model = Leukocytes
+        fields = ('patient', 'leukocytes', 'neutrophilsPer' ,'neutrophilsAbs', 'lymphocytesPer', 'lymphocytesAbs', 'monocytesPer', 'monocytesAbs', 'eosinophilsPer', 'eosinophilsAbs', 'basophilsPer', 'basophilsAbs', 'ESR')
+        
+        
+class HormonalLevelsForm(forms.ModelForm):
+    class Meta:
+        model = HormonalLevels
+        fields = ('patient', 'FSH', 'LH' ,'estradiol', 'progesterone', 'ttlTestosterone', 'freeTestosterone', 'DHT', 'DHEASulfate', 'SHBG', 'prolactin', 'PSA')
+        
+

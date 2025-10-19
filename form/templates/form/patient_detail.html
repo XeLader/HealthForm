@@ -2,16 +2,18 @@
 
 {% block content %}
     <article class="post">
-        <aside class="actions">
+
+	
+<div class = "listblock">
+	<aside class="actions">
 	{% if user.is_authenticated %}
-            <a class="btn btn-secondary" href="{% url 'patient_edit' pk=patient.pk %}">
+            <a class="btn btn-secondary" href="{% url 'patient_edit' pk=patient.pk %}" style="float: right;">
                 {% include './icons/pencil-fill.svg' %}
             </a>
 	{% endif %}        
 	</aside>
-	
-<div class = "listblock">
 	<h2>1. Данные пациента</h2>
+	        
 	<p>Ф.И.О. <u>{{patient.full_name}}<u> </p>
 	<p>Рост: <u>{{patient.growth}}<u> </p>
 	<p>Вес: <u>{{patient.weight}}<u> </p>
@@ -19,8 +21,31 @@
 </div>
 
 <div class = "listblock">
+  <aside class="actions">
+		  <a class="btn btn-secondary" href="{% url 'report_new_for_patient' pk=patient.pk %}" style="float: right;">
+                {% include './icons/file-earmark-plus.svg' %}
+      </a>      
+	</aside>
+	<h2>2. Приёмы</h2>
+	        
+	{% if reports %}
+	<table style="width:100%;">
+  
+    {% for report in reports %}
+    <tr>
+      <td> <a href="{% url 'report_detail' pk=report.pk %}">{{ report.created_date }} </a></td>
+      <td>{{ report.title }}</td>
+    </tr>
+    {% endfor %} 
+  </table>
+  {% endif %}
+
+</div>
+
+<div class = "listblock">
 
 	<h2>2. Лабораторные и инструментальные показатели</h2>
+	
 	<div class = "resultsTable">
 	<p><b>2.1 Биохимия</b>
 		<a class="btn btn-secondary" href="{% url 'biochemistry_new' pk=patient.pk %}" style="float: right;">
@@ -29,177 +54,776 @@
 	</p>
 
 		{% if biochems %}
-	<table style="width:100%" onload="readyMark()">
+	<table style="width:100%;" onload="readyMark()">
   <tr>
     <th>Показатель</th>
     <th>Ед. изм.</th>
     <th>Референсные значения</th>
     {% for biochem in biochems %}
-    <th>{{ biochem.created_date }}</th>
+      <th>{{ biochem.created_date }}</th>
     {% endfor %}
   </tr>
   <tr id='row'>
-    <td>АлАТ </td>
-    <td><select id="biochemUnits" onchange="changeBioUnits()">
-   <option value="std">Ед/л</option>
-   <option value="alt" selected>мккат/л</option>
-</select></td>
-    <td id="ref">♂ < 41; ♀ < 33</td>
-    {% for biochem in biochems %}
-    <th id="val" data="{{ biochem.alat }}">{{ biochem.alat }}</th>
-    {% endfor %}
+    <td>АлАТ</td>
+    <td>
+      <select class="unit-switch">
+        <option value="std" data-factor="1" data-unit="Ед/л" selected>Ед/л</option>
+        <option value="alt" data-factor="0.0167" data-unit="мккат/л">мккат/л</option>
+      </select>
+    </td>
+    <td class="ref" data-std="♂ &lt; 41; ♀ &lt; 33 (Ед/л)"
+              data-alt="♂ &lt; 0,68; ♀ &lt; 0,55 (мккат/л)">♂ &lt; 0,68; ♀ &lt; 0,55</td>
+  {% for rec in biochems %}
+    <th class="val" data="{{ rec.alat }}">{{ rec.alat }}</th>
+  {% endfor %}
   </tr>
-  <tr>
+  <tr id='row'>
     <td>АсАТ </td>
-    <td>Ед/л</td>
-    <td>♂ < 41; ♀ < 33</td>
+    <td>
+      <select class="unit-switch">
+        <option value="std" data-factor="1" data-unit="Ед/л" selected>Ед/л</option>
+        <option value="alt" data-factor="0.0167" data-unit="мккат/л">мккат/л</option>
+      </select>
+    </td>
+    <td class="ref" data-std="♂ 8-40; ♀ 8–32;"
+              data-alt="♂ 0.13-0.67; ♀ 0.13-0.53">♂ 8-40; ♀ 8–32</td>
     {% for biochem in biochems %}
-    <th>{{ biochem.asat }}</th>
+      <th class="val" data="{{ biochem.asat }}">{{ biochem.asat }}</th>
     {% endfor %}
   </tr>
-  <tr>
+  
+  <tr id='row'>
     <td>ЛДГ </td>
-    <td>Ед/л</td>
-    <td>♂ < 41; ♀ < 33</td>
+    <td>
+      <select class="unit-switch">
+        <option value="std" data-factor="1" data-unit="Ед/л" selected>Ед/л</option>
+        <option value="alt" data-factor="0.0167" data-unit="мккат/л">мккат/л</option>
+      </select>
+    </td>
+    <td class="ref" data-std="135–225"
+              data-alt="2.25–3.76">135–225</td>
     {% for biochem in biochems %}
-    <th>{{ biochem.ldh }}</th>
+      <th class="val" data="{{ biochem.ldh  }}">{{ biochem.ldh  }}</th>
     {% endfor %}
   </tr>
-  <tr>
+
+  <tr id='row'>
     <td>КФК </td>
-    <td>Ед/л</td>
-    <td>♂ < 41; ♀ < 33</td>
+    <td>
+      <select class="unit-switch">
+        <option value="std" data-factor="1" data-unit="Ед/л" selected>Ед/л</option>
+        <option value="alt" data-factor="0.0167" data-unit="мккат/л">мккат/л</option>
+      </select>
+    </td>
+    <td class="ref" data-std="♂ &lt; 195; ♀ &lt; 167"
+              data-alt="♂ &lt; 3.26; ♀ &lt; 2.79">♂ < 195; ♀ < 167</td>
     {% for biochem in biochems %}
-    <th>{{ biochem.cpk }}</th>
+      <th class="val" data="{{ biochem.cpk  }}">{{ biochem.cpk  }}</th>
     {% endfor %}
   </tr>
 </table>
 {% endif %}
-</div>
 
-<p>
+<p class="resultP">
   <b>2.2 Белковый обмен</b>
 	<a class="btn btn-secondary" href="{% url 'proteinmetabolism_new' pk=patient.pk %}" style="float: right;">
                 {% include './icons/file-earmark-plus.svg' %}
   </a>
 </p>
 
-  {% if protein%}
-	<table style="width:100%">
+ {% if proteins %}
+<table style="width:100%">
   <tr>
     <th>Показатель</th>
     <th>Ед. изм.</th>
     <th>Референсные значения</th>
-    {% for protein in proteins %}
-    <th>{{ protein.created_date }}</th>
+    {% for rec in proteins %}
+      <th>{{ rec.created_date }}</th>
     {% endfor %}
   </tr>
+
+  <tr id="row">
+    <td>Гамма-ГТ</td>
+    <td>
+      <select class="unit-switch">
+        <option value="std" data-factor="1" data-unit="Ед/л" selected>Ед/л</option>
+        <option value="alt" data-factor="0.0167" data-unit="мккат/л">мккат/л</option>
+      </select>
+    </td>
+    <td id="ref">♂ &lt; 55; ♀ &lt; 38</td>
+    {% for rec in proteins %}<th class="val" data="{{ rec.gammaGT }}">{{ rec.gammaGT }}</th>{% endfor %}
+  </tr>
+  <tr id="row">
+    <td>Общий белок</td>
+    
+    <td>
+      <select class="unit-switch">
+        <option value="std" data-factor="1" data-unit="г/л" selected>г/л</option>
+        <option value="alt" data-factor="0.1" data-unit="г/дл">г/дл</option>
+      </select>
+    </td>
+    
+    <td id="ref">64–83</td>
+    {% for rec in proteins %}<th class="val" data="{{ rec.ttlProtein }}">{{ rec.ttlProtein }}</th>{% endfor %}
+  </tr>
+  <tr id="row">
+    <td>Альбумин</td>
+    <td>
+      <select class="unit-switch">
+        <option value="std" data-factor="1" data-unit="г/л" selected>г/л</option>
+        <option value="alt" data-factor="0.1" data-unit="г/дл">г/дл</option>
+      </select>
+    </td>
+    <td id="ref">35–52</td>
+    {% for rec in proteins %}<th class="val" data="{{ rec.albumin }}">{{ rec.albumin }}</th>{% endfor %}
+  </tr>
+  <tr id="row">
+    <td>Щелочная фосфатаза</td>
+    <td>
+      <select class="unit-switch">
+        <option value="std" data-factor="1" data-unit="Ед/л" selected>Ед/л</option>
+        <option value="alt" data-factor="0.0167" data-unit="мккат/л">мккат/л</option>
+      </select>
+    </td>
+    <td id="ref">30–120</td>
+    {% for rec in proteins %}<th class="val" data="{{ rec.phosphatase }}">{{ rec.phosphatase }}</th>{% endfor %}
+  </tr>
+  <tr id="row">
+    <td>Мочевина</td>
+    
+    <td>
+      <select class="unit-switch">
+        <option value="std" data-factor="1" data-unit="ммоль/л" selected>ммоль/л</option>
+        <option value="alt" data-factor="6.0" data-unit="мг/дл">мг/дл</option>
+      </select>
+    </td>
+    
+    <td id="ref">2,5–8,3</td>
+    {% for rec in proteins %}<th class="val" data="{{ rec.urea }}">{{ rec.urea }}</th>{% endfor %}
+  </tr>
+  <tr id="row">
+    <td>Креатинин</td>
+    <td>
+      <select class="unit-switch">
+        <option value="std" data-factor="1" data-unit="мкмоль/л" selected>мкмоль/л</option>
+        <option value="alt" data-factor="0.0113" data-unit="мг/дл">мг/дл</option>
+      </select>
+    </td>
+    <td id="ref">♂ 62–115; ♀ 53–97</td>
+    {% for rec in proteins %}<th class="val" data="{{ rec.creatinine }}">{{ rec.creatinine }}</th>{% endfor %}
+  </tr>
+  <tr id="row">
+    <td>Мочевая кислота</td>
+    
+    <td>
+      <select class="unit-switch">
+        <option value="std" data-factor="1" data-unit="мкмоль/л" selected>мкмоль/л</option>
+        <option value="alt" data-factor="0.0168" data-unit="мг/дл">мг/дл</option>
+      </select>
+    </td>
+    
+    <td id="ref">♂ 210–420; ♀ 150–350</td>
+    {% for rec in proteins %}<th class="val" data="{{ rec.uricAcid }}">{{ rec.uricAcid }}</th>{% endfor %}
+  </tr>
+  <tr id="row">
+    <td>α1-глобулины</td><td>%</td><td id="ref">2–5</td>
+    {% for rec in proteins %}<th class="val" data="{{ rec.alpha1Globulins }}">{{ rec.alpha1Globulins }}</th>{% endfor %}
+  </tr>
+  <tr id="row">
+    <td>α2-глобулины</td><td>%</td><td id="ref">7–13</td>
+    {% for rec in proteins %}<th class="val" data="{{ rec.alpha2Globulins }}">{{ rec.alpha2Globulins }}</th>{% endfor %}
+  </tr>
+  <tr id="row">
+    <td>β1-глобулины</td><td>%</td><td id="ref">4–7</td>
+    {% for rec in proteins %}<th class="val" data="{{ rec.beta1Globulins }}">{{ rec.beta1Globulins }}</th>{% endfor %}
+  </tr>
+  <tr id="row">
+    <td>β2-глобулины</td><td>%</td><td id="ref">3–6</td>
+    {% for rec in proteins %}<th class="val" data="{{ rec.beta2Globulins }}">{{ rec.beta2Globulins }}</th>{% endfor %}
+  </tr>
+  <tr id="row">
+    <td>γ-глобулины</td><td>%</td><td id="ref">12–22</td>
+    {% for rec in proteins %}<th class="val" data="{{ rec.gammaGlobulins }}">{{ rec.gammaGlobulins }}</th>{% endfor %}
+  </tr>
+</table>
+{% endif %}
+
+
+
+  <p  class="resultP"><b>2.3 Липидный обмен</b>
+		<a class="btn btn-secondary" href="{% url 'lipidmetabolism_new' pk=patient.pk %}" style="float: right;">
+                {% include './icons/file-earmark-plus.svg' %}
+    </a>
+	</p>
+	
+	{% if lipids %}
+<table style="width:100%">
   <tr>
-    <td>Гамма‑ГТ</td>
-    <td>Ед/л</td>
-    <td>♂ < 55; ♀ < 38</td>
-    {% for protein in proteins %}
-    <th>{{ protein.gammaGT }}</th>
-    {% endfor %}
+    <th>Показатель</th><th>Ед. изм.</th><th>Референсные значения</th>
+    {% for rec in lipids %}<th>{{ rec.created_date }}</th>{% endfor %}
   </tr>
-  <tr>
-    <td>Общий белок </td>
-    <td>г/л</td>
-    <td>64–83</td>
-    {% for protein in proteins %}
-    <th>{{ protein.ttlProtein }}</th>
-    {% endfor %}
+  <tr id="row"><td>Общий билирубин</td>
+  <td>
+    <select class="unit-switch">
+      <option value="std" data-factor="1" data-unit="мкмоль/л" selected>мкмоль/л</option>
+      <option value="alt" data-factor="0.0585" data-unit="мг/дл">мг/дл</option>
+    </select>
+  </td>
+  <td id="ref">5–21</td>
+    {% for rec in lipids %}<th class="val" data="{{ rec.ttlBilirubin }}">{{ rec.ttlBilirubin }}</th>{% endfor %}
   </tr>
-  <tr>
-    <td>Альбумин </td>
-    <td>г/л</td>
-    <td>35–52</td>
-    {% for protein in proteins %}
-    <th>{{ protein.albumin }}</th>
-    {% endfor %}
+  <tr id="row"><td>Прямой билирубин</td>
+  <td>
+    <select class="unit-switch">
+      <option value="std" data-factor="1" data-unit="мкмоль/л" selected>мкмоль/л</option>
+      <option value="alt" data-factor="0.0585" data-unit="мг/дл">мг/дл</option>
+    </select>
+  </td>
+  <td id="ref">0–5</td>
+    {% for rec in lipids %}<th class="val" data="{{ rec.drctBilirubin }}">{{ rec.drctBilirubin }}</th>{% endfor %}
   </tr>
-  <tr>
-    <td>Щелочная фосфатаза </td>
-    <td>Ед/л</td>
-    <td>30–120</td>
-    {% for protein in proteins %}
-    <th>{{ protein.phosphatase }}</th>
-    {% endfor %}
+  <tr id="row"><td>Непрямой билирубин</td>
+  <td>
+    <select class="unit-switch">
+      <option value="std" data-factor="1" data-unit="мкмоль/л" selected>мкмоль/л</option>
+      <option value="alt" data-factor="0.0585" data-unit="мг/дл">мг/дл</option>
+    </select>
+  </td>
+  <td id="ref">5–17</td>
+    {% for rec in lipids %}<th class="val" data="{{ rec.indrctBilirubin }}">{{ rec.indrctBilirubin }}</th>{% endfor %}
   </tr>
-  <tr>
-    <td>Мочевина </td>
-    <td>ммоль/л</td>
-    <td>2,5–8,3</td>
-    {% for protein in proteins %}
-    <th>{{ protein.urea }}</th>
-    {% endfor %}
-  </tr>
-  <tr>
-    <td>Креатинин </td>
-    <td>мкмоль/л</td>
-    <td>♂ 62–115; ♀ 53–97</td>
-    {% for protein in proteins %}
-    <th>{{ protein.creatinine }}</th>
-    {% endfor %}
-  </tr>
-  <tr>
-    <td>Мочевая кислота </td>
-    <td>мкмоль/л</td>
-    <td>♂ 210–420; ♀ 150–350</td>
-    {% for protein in proteins %}
-    <th>{{ protein.uricAcid }}</th>
-    {% endfor %}
-  </tr> 
-    <tr>
-    <td>α1‑глобулины </td>
-    <td>Ед/л</td>
-    <td>2–5</td>
-    {% for protein in proteins %}
-    <th>{{ protein.alpha1Globulins }}</th>
-    {% endfor %}
-  </tr>
+  <tr id="row"><td>Холестерин общий</td>
   
-    <tr>
-    <td>α2‑глобулины </td>
-    <td>%</td>
-    <td>7–13</td>
-    {% for protein in proteins %}
-    <th>{{ protein.alpha2Globulins }}</th>
-    {% endfor %}
+  <td>
+      <select class="unit-switch">
+        <option value="std" data-factor="1" data-unit="ммоль/л" selected>ммоль/л</option>
+        <option value="alt" data-factor="38.67" data-unit="мг/дл">мг/дл</option>
+      </select>
+    </td>
+  
+  <td id="ref">&lt; 5,0</td>
+    {% for rec in lipids %}<th class="val" data="{{ rec.ttlCholesterol }}">{{ rec.ttlCholesterol }}</th>{% endfor %}
   </tr>
-    <tr>
-    <td>β1‑глобулины </td>
-    <td>%</td>
-    <td>4–7</td>
-    {% for protein in proteins %}
-    <th>{{ protein.beta1Globulins }}</th>
-    {% endfor %}
-  </tr>  
-    <tr>
-    <td>β2‑глобулины </td>
-    <td>%</td>
-    <td>3–6</td>
-    {% for protein in proteins %}
-    <th>{{ protein.beta2Globulins }}</th>
-    {% endfor %}
-  </tr> 
-    <tr>
-    <td>γ‑глобулины </td>
-    <td>%</td>
-    <td>12–22</td>
-    {% for biochem in biochems %}
-    <th>{{ protein.gammaGlobulins }}</th>
-    {% endfor %}
-  </tr> 
+  <tr id="row"><td>ЛПНП</td>
+  <td>
+    <select class="unit-switch">
+      <option value="std" data-factor="1" data-unit="ммоль/л" selected>ммоль/л</option>
+      <option value="alt" data-factor="38.67" data-unit="мг/дл">мг/дл</option>
+    </select>
+  </td>
+  <td id="ref">&lt; 3,0</td>
+    {% for rec in lipids %}<th class="val" data="{{ rec.LDL }}">{{ rec.LDL }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>ЛПОНП</td>
+  <td>
+    <select class="unit-switch">
+      <option value="std" data-factor="1" data-unit="ммоль/л" selected>ммоль/л</option>
+      <option value="alt" data-factor="38.67" data-unit="мг/дл">мг/дл</option>
+    </select>
+  </td>
+  <td id="ref">&lt; 1,7</td>
+    {% for rec in lipids %}<th class="val" data="{{ rec.VLDL }}">{{ rec.VLDL }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>ЛПВП</td>
+  <td>
+    <select class="unit-switch">
+      <option value="std" data-factor="1" data-unit="ммоль/л" selected>ммоль/л</option>
+      <option value="alt" data-factor="38.67" data-unit="мг/дл">мг/дл</option>
+    </select>
+  </td>
+  <td id="ref">&gt; 1,0 (♂), &gt; 1,2 (♀)</td>
+    {% for rec in lipids %}<th class="val" data="{{ rec.HDL }}">{{ rec.HDL }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Триглицериды</td>
+  
+  <td>
+    <select class="unit-switch">
+      <option value="std" data-factor="1" data-unit="ммоль/л" selected>ммоль/л</option>
+      <option value="alt" data-factor="88.57" data-unit="мг/дл">мг/дл</option>
+    </select>
+  </td>
+  
+  <td id="ref">&lt; 1,7</td>
+    {% for rec in lipids %}<th class="val" data="{{ rec.Triglycerides }}">{{ rec.Triglycerides }}</th>{% endfor %}
+  </tr>
+</table>
+{% endif %}
+
+	
+	
+	<p  class="resultP"><b>2.4 Углеводный обмен</b>
+		<a class="btn btn-secondary" href="{% url 'ironmetabolism_new' pk=patient.pk %}" style="float: right;">
+                {% include './icons/file-earmark-plus.svg' %}
+    </a>
+	</p>
+	
+	{% if carbohydrates %}
+<table style="width:100%">
+  <tr>
+    <th>Показатель</th><th>Ед. изм.</th><th>Референсные значения</th>
+    {% for rec in carbohydrates %}<th>{{ rec.created_date }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Глюкоза (натощак)</td>
+  <td>
+    <select class="unit-switch">
+      <option value="std" data-factor="1" data-unit="ммоль/л" selected>ммоль/л</option>
+      <option value="alt" data-factor="18.018" data-unit="мг/дл">мг/дл</option>
+    </select>
+  </td>
+  <td id="ref">3,9–5,9</td>
+    {% for rec in carbohydrates %}<th class="val" data="{{ rec.fastingGlucose }}">{{ rec.fastingGlucose }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Гликированный гемоглобин</td><td>%</td><td id="ref">&lt; 5,7</td>
+    {% for rec in carbohydrates %}<th class="val" data="{{ rec.glycatedHemoglobin }}">{{ rec.glycatedHemoglobin }}</th>{% endfor %}
+  </tr>
+</table>
+{% endif %}
+
+	
+	
+	<p  class="resultP"><b>2.5 Обмен железа</b>
+		<a class="btn btn-secondary" href="{% url 'ironmetabolism_new' pk=patient.pk %}" style="float: right;">
+                {% include './icons/file-earmark-plus.svg' %}
+    </a>
+	</p>
+	
+	{% if irons %}
+<table style="width:100%">
+  <tr>
+    <th>Показатель</th><th>Ед. изм.</th><th>Референсные значения</th>
+    {% for rec in irons %}<th>{{ rec.created_date }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Сывороточное железо</td>
+  <td>
+    <select class="unit-switch">
+      <option value="std" data-factor="1" data-unit="мкмоль/л" selected>мкмоль/л</option>
+      <option value="alt" data-factor="5.585" data-unit="мкг/дл">мкг/дл</option>
+    </select>
+  </td>
+  <td id="ref">♂ 11,6–31,3; ♀ 9,5–30,2</td>
+    {% for rec in irons %}<th class="val" data="{{ rec.serumIron }}">{{ rec.serumIron }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Ферритин</td><td>мкг/л</td><td id="ref">♂ 30–400; ♀ 15–150</td>
+    {% for rec in irons %}<th class="val" data="{{ rec.ferritin }}">{{ rec.ferritin }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Трансферрин</td>  
+  <td>
+    <select class="unit-switch">
+      <option value="std" data-factor="1" data-unit="г/л" selected>г/л</option>
+      <option value="alt" data-factor="100" data-unit="мг/дл">мг/дл</option>
+    </select>
+  </td><td id="ref">2,0–3,6</td>
+    {% for rec in irons %}<th class="val" data="{{ rec.transferrin }}">{{ rec.transferrin }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>ОЖСС</td>
+  <td>
+    <select class="unit-switch">
+      <option value="std" data-factor="1" data-unit="мкмоль/л" selected>мкмоль/л</option>
+      <option value="alt" data-factor="5.585" data-unit="мкг/дл">мкг/дл</option>
+    </select>
+  </td>
+  <td id="ref">45–72</td>
+    {% for rec in irons %}<th class="val" data="{{ rec.TIBC }}">{{ rec.TIBC }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Насыщение трансферрина</td><td>%</td><td id="ref">15–45</td>
+    {% for rec in irons %}<th class="val" data="{{ rec.transferrinSat }}">{{ rec.transferrinSat }}</th>{% endfor %}
+  </tr>
+</table>
+{% endif %}
+
+	
+	<p  class="resultP"><b>2.6 Микроэлементы</b>
+		<a class="btn btn-secondary" href="{% url 'micronutrients_new' pk=patient.pk %}" style="float: right;">
+                {% include './icons/file-earmark-plus.svg' %}
+    </a>
+	</p>
+	
+	{% if micros %}
+<table style="width:100%">
+  <tr>
+    <th>Показатель</th><th>Ед. изм.</th><th>Референсные значения</th>
+    {% for rec in micros %}<th>{{ rec.created_date }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Медь</td>
+  <td>
+    <select class="unit-switch">
+      <option value="std" data-factor="1" data-unit="мкмоль/л" selected>мкмоль/л</option>
+      <option value="alt" data-factor="6.35" data-unit="мкг/дл">мкг/дл</option>
+    </select>
+  </td>
+  <td id="ref">11–24</td>
+    {% for rec in micros %}<th class="val" data="{{ rec.copper }}">{{ rec.copper }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Цинк</td>
+  <td>
+    <select class="unit-switch">
+      <option value="std" data-factor="1" data-unit="мкмоль/л" selected>мкмоль/л</option>
+      <option value="alt" data-factor="6.54" data-unit="мкг/дл">мкг/дл</option>
+    </select>
+  </td>
+  <td id="ref">12–24</td>
+    {% for rec in micros %}<th class="val" data="{{ rec.zinc }}">{{ rec.zinc }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Магний</td>
+  <td>
+    <select class="unit-switch">
+      <option value="std" data-factor="1" data-unit="ммоль/л" selected>ммоль/л</option>
+      <option value="alt" data-factor="2.43" data-unit="мкг/дл">мкг/дл</option>
+    </select>
+  </td>
+  <td id="ref">0,66–1,07</td>
+    {% for rec in micros %}<th class="val" data="{{ rec.magnesium }}">{{ rec.magnesium }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Кальций общий</td>
+  <td>
+    <select class="unit-switch">
+      <option value="std" data-factor="1" data-unit="ммоль/л" selected>ммоль/л</option>
+      <option value="alt" data-factor="4.00" data-unit="мкг/дл">мкг/дл</option>
+    </select>
+  </td>
+  <td id="ref">2,15–2,55</td>
+    {% for rec in micros %}<th class="val" data="{{ rec.ttlCalcium }}">{{ rec.ttlCalcium }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Калий</td><td>ммоль/л</td><td id="ref">3,5–5,1</td>
+    {% for rec in micros %}<th class="val" data="{{ rec.potassium }}">{{ rec.potassium }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Натрий</td><td>ммоль/л</td><td id="ref">136–145</td>
+    {% for rec in micros %}<th class="val" data="{{ rec.sodium }}">{{ rec.sodium }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Хлор</td><td>ммоль/л</td><td id="ref">98–107</td>
+    {% for rec in micros %}<th class="val" data="{{ rec.chloride }}">{{ rec.chloride }}</th>{% endfor %}
+  </tr>
+</table>
+{% endif %}
+
+	
+	<p  class="resultP"><b>2.7 Маркеры воспаления</b>
+		<a class="btn btn-secondary" href="{% url 'inflammatorymarkers_new' pk=patient.pk %}" style="float: right;">
+                {% include './icons/file-earmark-plus.svg' %}
+    </a>
+	</p>
+	
+	{% if inflamms %}
+<table style="width:100%">
+  <tr>
+    <th>Показатель</th><th>Ед. изм.</th><th>Референсные значения</th>
+    {% for rec in inflamms %}<th>{{ rec.created_date }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>C-реактивный белок</td><td>мг/л</td><td id="ref">&lt; 5</td>
+    {% for rec in inflamms %}<th class="val" data="{{ rec.cReactiveProtein }}">{{ rec.cReactiveProtein }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Фибриноген</td><td>г/л</td><td id="ref">2–4</td>
+    {% for rec in inflamms %}<th class="val" data="{{ rec.fibrinogen }}">{{ rec.fibrinogen }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>АСЛО</td><td>МЕ/мл</td><td id="ref">&lt; 200</td>
+    {% for rec in inflamms %}<th class="val" data="{{ rec.ASLO }}">{{ rec.ASLO }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Гомоцистеин</td><td>мкмоль/л</td><td id="ref">&lt; 10</td>
+    {% for rec in inflamms %}<th class="val" data="{{ rec.homocysteine }}">{{ rec.homocysteine }}</th>{% endfor %}
+  </tr>
+</table>
+{% endif %}
+
+	
+	<p  class="resultP"><b>2.8 Аллергия и инфекция</b>
+		<a class="btn btn-secondary" href="{% url 'allergiesinfections_new' pk=patient.pk %}" style="float: right;">
+                {% include './icons/file-earmark-plus.svg' %}
+    </a>
+	</p>
+	
+	{% if allergies %}
+<table style="width:100%">
+  <tr>
+    <th>Показатель</th><th>Ед. изм.</th><th>Референсные значения</th>
+    {% for rec in allergies %}<th>{{ rec.created_date }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>IgE общий</td><td>МЕ/мл</td><td id="ref">&lt; 100</td>
+    {% for rec in allergies %}<th class="val" data="{{ rec.ttlIgE }}">{{ rec.ttlIgE }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>IgA</td><td>г/л</td><td id="ref">0,7–4,0</td>
+    {% for rec in allergies %}<th class="val" data="{{ rec.IgA }}">{{ rec.IgA }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>IgM</td><td>г/л</td><td id="ref">0,4–2,3</td>
+    {% for rec in allergies %}<th class="val" data="{{ rec.IgM }}">{{ rec.IgM }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>IgG</td><td>г/л</td><td id="ref">7–16</td>
+    {% for rec in allergies %}<th class="val" data="{{ rec.IgG }}">{{ rec.IgG }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Антитела к Candida</td><td>—</td><td id="ref">отрицательно</td>
+    {% for rec in allergies %}<th class="val" data="{{ rec.antiCandida }}">{{ rec.antiCandida }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Антитела к Aspergillus</td><td>—</td><td id="ref">отрицательно</td>
+    {% for rec in allergies %}<th class="val" data="{{ rec.antiAspergillus }}">{{ rec.antiAspergillus }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Антитела к паразитам</td><td>—</td><td id="ref">отрицательно</td>
+    {% for rec in allergies %}<th class="val" data="{{ rec.antiParasitic }}">{{ rec.antiParasitic }}</th>{% endfor %}
+  </tr>
+</table>
+{% endif %}
+
+	
+	<p  class="resultP"><b>2.9 Функция щитовидной железы</b>
+		<a class="btn btn-secondary" href="{% url 'thyroidfunction_new' pk=patient.pk %}" style="float: right;">
+                {% include './icons/file-earmark-plus.svg' %}
+    </a>
+	</p>
+	
+	{% if thyroids %}
+<table style="width:100%">
+  <tr>
+    <th>Показатель</th><th>Ед. изм.</th><th>Референсные значения</th>
+    {% for rec in thyroids %}<th>{{ rec.created_date }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>ТТГ</td><td>мЕд/л</td><td id="ref">0,4–4,0</td>
+    {% for rec in thyroids %}<th class="val" data="{{ rec.TSH }}">{{ rec.TSH }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Т4 свободный</td>
+  <td>
+    <select class="unit-switch">
+      <option value="std" data-factor="1" data-unit="пмоль/л" selected>пмоль/л</option>
+      <option value="alt" data-factor="0.0777" data-unit="нг/дл">нг/дл</option>
+    </select>
+  </td>
+  <td id="ref">9–22</td>
+    {% for rec in thyroids %}<th class="val" data="{{ rec.freeT4 }}">{{ rec.freeT4 }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Т3 свободный</td>
+  <td>
+    <select class="unit-switch">
+      <option value="std" data-factor="1" data-unit="пмоль/л" selected>пмоль/л</option>
+      <option value="alt" data-factor="0.651" data-unit="нг/дл">нг/дл</option>
+    </select>
+  </td>
+  <td id="ref">2,6–5,7</td>
+    {% for rec in thyroids %}<th class="val" data="{{ rec.freeT3 }}">{{ rec.freeT3 }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Т4 общий</td>
+  <td>
+    <select class="unit-switch">
+      <option value="std" data-factor="1" data-unit="нмоль/л" selected>нмоль/л</option>
+      <option value="alt" data-factor="0.078" data-unit="мкг/дл">мкг/дл</option>
+    </select>
+  </td>
+  <td id="ref">70–150</td>
+    {% for rec in thyroids %}<th class="val" data="{{ rec.totalT4 }}">{{ rec.totalT4 }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Т3 общий</td>
+  <td>
+    <select class="unit-switch">
+      <option value="std" data-factor="1" data-unit="нмоль/л" selected>нмоль/л</option>
+      <option value="alt" data-factor="65" data-unit="нг/дл">нг/дл</option>
+    </select>
+  </td>
+  <td id="ref">1,2–3,4</td>
+    {% for rec in thyroids %}<th class="val" data="{{ rec.totalT3 }}">{{ rec.totalT3 }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Реверсивный Т3</td><td>пг/мл</td><td id="ref">9–25</td>
+    {% for rec in thyroids %}<th class="val" data="{{ rec.reverseT3 }}">{{ rec.reverseT3 }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>АТ к ТПО</td><td>Ед/мл</td><td id="ref">&lt; 35</td>
+    {% for rec in thyroids %}<th class="val" data="{{ rec.TPOAb }}">{{ rec.TPOAb }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>АТ к ТГ</td><td>Ед/мл</td><td id="ref">&lt; 115</td>
+    {% for rec in thyroids %}<th class="val" data="{{ rec.TgAb }}">{{ rec.TgAb }}</th>{% endfor %}
+  </tr>
+</table>
+{% endif %}
+	
+	
+	<p  class="resultP"><b>2.10 Гематология (эритроцитарное звено)</b>
+		<a class="btn btn-secondary" href="{% url 'hematology_new' pk=patient.pk %}" style="float: right;">
+                {% include './icons/file-earmark-plus.svg' %}
+    </a>
+	</p>
+	
+	{% if hematologies %}
+<table style="width:100%">
+  <tr>
+    <th>Показатель</th><th>Ед. изм.</th><th>Референсные значения</th>
+    {% for rec in hematologies %}<th>{{ rec.created_date }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Гемоглобин</td><td>г/л</td><td id="ref">♂ 130–170; ♀ 120–150</td>
+    {% for rec in hematologies %}<th class="val" data="{{ rec.hemoglobin }}">{{ rec.hemoglobin }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Гематокрит</td><td>%</td><td id="ref">♂ 40–50; ♀ 36–46</td>
+    {% for rec in hematologies %}<th class="val" data="{{ rec.hematocrit }}">{{ rec.hematocrit }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Эритроциты</td><td>× 10^12/л</td><td id="ref">♂ 4,0–5,1; ♀ 3,7–4,7</td>
+    {% for rec in hematologies %}<th class="val" data="{{ rec.redBloodCells }}">{{ rec.redBloodCells }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>MCV (средний объём)</td><td>фл</td><td id="ref">80–100</td>
+    {% for rec in hematologies %}<th class="val" data="{{ rec.MCV }}">{{ rec.MCV }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>RDW (ширина распределения)</td><td>%</td><td id="ref">11,5–14,5</td>
+    {% for rec in hematologies %}<th class="val" data="{{ rec.RDW }}">{{ rec.RDW }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>MCH (среднее содержание Hb)</td><td>пг</td><td id="ref">27–34</td>
+    {% for rec in hematologies %}<th class="val" data="{{ rec.MCH }}">{{ rec.MCH }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>MCHC (средняя концентрация Hb)</td><td>г/л</td><td id="ref">320–360</td>
+    {% for rec in hematologies %}<th class="val" data="{{ rec.MCHC }}">{{ rec.MCHC }}</th>{% endfor %}
+  </tr>
+</table>
+{% endif %}
+
+	
+	
+	<p  class="resultP"><b>2.11 Тромбоцитарное звено</b>
+		<a class="btn btn-secondary" href="{% url 'platelets_new' pk=patient.pk %}" style="float: right;">
+                {% include './icons/file-earmark-plus.svg' %}
+    </a>
+	</p>
+	
+	{% if platelets %}
+<table style="width:100%">
+  <tr>
+    <th>Показатель</th><th>Ед. изм.</th><th>Референсные значения</th>
+    {% for rec in platelets %}<th>{{ rec.created_date }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Тромбоциты</td><td>× 10^9/л</td><td id="ref">150–400</td>
+    {% for rec in platelets %}<th class="val" data="{{ rec.platelets }}">{{ rec.platelets }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>MPV (средний объём тромбоцитов)</td><td>фл</td><td id="ref">7,4–10,4</td>
+    {% for rec in platelets %}<th class="val" data="{{ rec.MPV }}">{{ rec.MPV }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>PCT (тромбокрит)</td><td>%</td><td id="ref">0,11–0,28</td>
+    {% for rec in platelets %}<th class="val" data="{{ rec.PCT }}">{{ rec.PCT }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>PDW (ширина распределения)</td><td>%</td><td id="ref">10–17</td>
+    {% for rec in platelets %}<th class="val" data="{{ rec.PDW }}">{{ rec.PDW }}</th>{% endfor %}
+  </tr>
+</table>
+{% endif %}
+
+	
+	<p  class="resultP"><b>2.12 Лейкоцитарное звено</b>
+		<a class="btn btn-secondary" href="{% url 'leukocytes_new' pk=patient.pk %}" style="float: right;">
+                {% include './icons/file-earmark-plus.svg' %}
+    </a>
+	</p>
+	
+	{% if leukocytes %}
+<table style="width:100%">
+  <tr>
+    <th>Показатель</th><th>Ед. изм.</th><th>Референсные значения</th>
+    {% for rec in leukocytes %}<th>{{ rec.created_date }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Лейкоциты</td><td>× 10^9/л</td><td id="ref">4,0–9,0</td>
+    {% for rec in leukocytes %}<th class="val" data="{{ rec.leukocytes }}">{{ rec.leukocytes }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Нейтрофилы (%)</td><td>%</td><td id="ref">40–70</td>
+    {% for rec in leukocytes %}<th class="val" data="{{ rec.neutrophilsPer }}">{{ rec.neutrophilsPer }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Нейтрофилы (абс.)</td><td>× 10^9/л</td><td id="ref">1,5–6,3</td>
+    {% for rec in leukocytes %}<th class="val" data="{{ rec.neutrophilsAbs }}">{{ rec.neutrophilsAbs }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Лимфоциты (%)</td><td>%</td><td id="ref">19–37</td>
+    {% for rec in leukocytes %}<th class="val" data="{{ rec.lymphocytesPer }}">{{ rec.lymphocytesPer }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Лимфоциты (абс.)</td><td>× 10^9/л</td><td id="ref">1,0–4,8</td>
+    {% for rec in leukocytes %}<th class="val" data="{{ rec.lymphocytesAbs }}">{{ rec.lymphocytesAbs }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Моноциты (%)</td><td>%</td><td id="ref">3–11</td>
+    {% for rec in leukocytes %}<th class="val" data="{{ rec.monocytesPer }}">{{ rec.monocytesPer }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Моноциты (абс.)</td><td>× 10^9/л</td><td id="ref">0,09–0,6</td>
+    {% for rec in leukocytes %}<th class="val" data="{{ rec.monocytesAbs }}">{{ rec.monocytesAbs }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Эозинофилы (%)</td><td>%</td><td id="ref">0–5</td>
+    {% for rec in leukocytes %}<th class="val" data="{{ rec.eosinophilsPer }}">{{ rec.eosinophilsPer }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Эозинофилы (абс.)</td><td>× 10^9/л</td><td id="ref">0–0,45</td>
+    {% for rec in leukocytes %}<th class="val" data="{{ rec.eosinophilsAbs }}">{{ rec.eosinophilsAbs }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Базофилы (%)</td><td>%</td><td id="ref">0–1</td>
+    {% for rec in leukocytes %}<th class="val" data="{{ rec.basophilsPer }}">{{ rec.basophilsPer }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Базофилы (абс.)</td><td>× 10^9/л</td><td id="ref">0–0,1</td>
+    {% for rec in leukocytes %}<th class="val" data="{{ rec.basophilsAbs }}">{{ rec.basophilsAbs }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>СОЭ</td><td>мм/ч</td><td id="ref">♂ &lt; 15; ♀ &lt; 20</td>
+    {% for rec in leukocytes %}<th class="val" data="{{ rec.ESR }}">{{ rec.ESR }}</th>{% endfor %}
+  </tr>
+</table>
+{% endif %}
+
+	
+		<p  class="resultP"><b>2.13 Гормональный фон<b>
+		<a class="btn btn-secondary" href="{% url 'hormonallevels_new' pk=patient.pk %}" style="float: right;">
+                {% include './icons/file-earmark-plus.svg' %}
+    </a>
+	</p>
+
+{% if hormons %}
+<table style="width:100%">
+  <tr>
+    <th>Показатель</th><th>Ед. изм.</th><th>Референсные значения*</th>
+    {% for rec in hormons %}<th>{{ rec.created_date }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>ФСГ</td><td>мМЕ/мл</td><td id="ref">♂ 1–10; ♀ 2–15†</td>
+    {% for rec in hormons %}<th class="val" data="{{ rec.FSH }}">{{ rec.FSH }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>ЛГ</td><td>мМЕ/мл</td><td id="ref">♂ 2–10; ♀ 2–150†</td>
+    {% for rec in hormons %}<th class="val" data="{{ rec.LH }}">{{ rec.LH }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Эстрадиол</td><td>пг/мл</td><td id="ref">♂ 11–44; ♀ зависит от фазы†</td>
+    {% for rec in hormons %}<th class="val" data="{{ rec.estradiol }}">{{ rec.estradiol }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Прогестерон</td><td>нг/мл</td><td id="ref">♂ &lt; 1; ♀ 3–30 (лют.)</td>
+    {% for rec in hormons %}<th class="val" data="{{ rec.progesterone }}">{{ rec.progesterone }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Тестостерон общий</td>
+  <td>
+    <select class="unit-switch">
+      <option value="std" data-factor="1" data-unit="нмоль/л" selected>нмоль/л</option>
+      <option value="alt" data-factor="28.84" data-unit="нг/дл">мкг/дл</option>
+    </select>
+  </td>
+  <td id="ref">♂ 10–30; ♀ 0,5–3,0</td>
+    {% for rec in hormons %}<th class="val" data="{{ rec.ttlTestosterone }}">{{ rec.ttlTestosterone }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Тестостерон свободный</td>
+  <td>
+    <select class="unit-switch">
+      <option value="std" data-factor="1" data-unit="пг/мл" selected>пг/мл</option>
+      <option value="alt" data-factor="3.47" data-unit="пмоль/л">пмоль/л</option>
+    </select>
+  </td>
+  <td id="ref">♂ 174–900; ♀ 4–30</td>
+    {% for rec in hormons %}<th class="val" data="{{ rec.freeTestosterone }}">{{ rec.freeTestosterone }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>ДГТ</td>
+  <td>
+    <select class="unit-switch">
+      <option value="std" data-factor="1" data-unit="нг/дл" selected>нг/дл</option>
+      <option value="alt" data-factor="0.0344" data-unit="нмоль/л">нмоль/л</option>
+    </select>
+  </td>
+  <td id="ref">♂ 30–85; ♀ 8–20</td>
+    {% for rec in hormons %}<th class="val" data="{{ rec.DHT }}">{{ rec.DHT }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>ДГЭА-сульфат</td><td>мкг/дл</td><td id="ref">♂ 160–449; ♀ 34–430</td>
+    {% for rec in hormons %}<th class="val" data="{{ rec.DHEASulfate }}">{{ rec.DHEASulfate }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>ГСПГ</td><td>нмоль/л</td><td id="ref">♂ 10–57; ♀ 18–114</td>
+    {% for rec in hormons %}<th class="val" data="{{ rec.SHBG }}">{{ rec.SHBG }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>Пролактин</td><td>мМЕ/л</td><td id="ref">80–500</td>
+    {% for rec in hormons %}<th class="val" data="{{ rec.prolactin }}">{{ rec.prolactin }}</th>{% endfor %}
+  </tr>
+  <tr id="row"><td>ПСА</td><td>нг/мл</td><td id="ref">&lt; 4 (муж.)</td>
+    {% for rec in hormons %}<th class="val" data="{{ rec.PSA }}">{{ rec.PSA }}</th>{% endfor %}
+  </tr>
 </table>
 {% endif %}
 </div>
 
-	<div class = "listblock">
 	<a class="btn btn-secondary" href="{% url 'prescription_new' pk=patient.pk %}" style="float: right;">
                 {% include './icons/file-earmark-plus.svg' %}
             </a>
 	<h3>3. Назначения</h3>
+	
+	<div class = "resultsTable" style="width:100%" >
 	<table style="width:100%">
 	<tr>
     <th>Препарат</th>
@@ -219,39 +843,54 @@
     {% endfor %}
 
 	</table>
-	
-	</div>
+</div>
+</div>
 </article>
 
 <script>
-function changeBioUnits() {
-  var x = document.getElementById("biochemUnits").value;
-  var row = document.getElementById("row");
-  if (x == "std")
-  {
-    document.getElementById("ref").innerHTML = "♂ < 41; ♀ < 33";
-    for (var i = 3, col; col = row.cells[i]; i++) { 
-         var val = parseFloat(col.getAttribute("data").replace(",", "."));
-         col.innerHTML = val.toFixed(2);
-    }
-  }
-  else
-  {
-    document.getElementById("ref").innerHTML = "♂ < 0,68; ♀ < 0,55";
-        for (var i = 3, col; col = row.cells[i]; i++) { 
-         var val = parseFloat(col.getAttribute("data").replace(",", "."));
-         col.innerHTML = (val*0.0167).toFixed(2);
-    }
-  }
-}
-
 (function(){
-  console.log("Iload")
-  var row = document.getElementById("row");
-  for (var i = 3, col; col = row.cells[i]; i++) { 
-      var val = parseFloat(col.getAttribute("data").replace(",", "."));
-      if (val > 41)
-         col.style.color="red";
+  function formatNum(x){
+    if (x === null || x === undefined || x === "" || isNaN(x)) return "";
+    return Number(x).toLocaleString('ru-RU', { maximumFractionDigits: 2 });
+  }
+
+  function applyUnits(sel){
+    const row = sel.closest('tr');
+    const opt = sel.selectedOptions[0];
+    const factor = parseFloat(opt.dataset.factor || "1");
+    const unitLabel = opt.dataset.unit || "";
+
+    // Значения (в базе лежит std)
+    row.querySelectorAll('th.val').forEach(cell=>{
+      const base = parseFloat(cell.getAttribute('data'));
+      if (isNaN(base)) { cell.textContent = cell.getAttribute('data'); return; }
+      cell.textContent = formatNum(base * factor);
+    });
+
+    // Единицы
+    const ucell = row.querySelector('td.unit-label');
+    if (ucell) ucell.textContent = unitLabel;
+
+    // Референсы
+    const ref = row.querySelector('td.ref');
+    if (ref){
+      const txt = (sel.value === 'alt') ? (ref.getAttribute('data-alt') || ref.textContent)
+                                        : (ref.getAttribute('data-std') || ref.textContent);
+      if (txt) ref.textContent = txt;
+    }
+  }
+
+  function initUnitControls(){
+    document.querySelectorAll('select.unit-switch').forEach(sel=>{
+      sel.addEventListener('change', ()=>applyUnits(sel));
+      applyUnits(sel); // первичная отрисовка под выбранную опцию
+    });
+  }
+
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', initUnitControls);
+  } else {
+    initUnitControls();
   }
 })();
 </script>

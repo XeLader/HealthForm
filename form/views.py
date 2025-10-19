@@ -30,10 +30,41 @@ def patient_list(request):
 @login_required()
 def patient_detail(request, pk):
     patient = get_object_or_404(Patient, pk = pk)
+    reports = Report.objects.filter(patient = patient).order_by('created_date')
+    
     biochems = Biochemistry.objects.filter(patient = patient)
     proteins = ProteinMetabolism.objects.filter(patient = patient)
+    lipids = LipidMetabolism.objects.filter(patient = patient)
+    carbohydrates = CarbohydrateMetabolism.objects.filter(patient = patient)
+    irons = IronMetabolism.objects.filter(patient = patient)
+    micros = Micronutrients.objects.filter(patient = patient)
+    inflamms = InflammatoryMarkers.objects.filter(patient = patient)
+    allergies = AllergiesInfections.objects.filter(patient = patient)
+    thyroids = ThyroidFunction.objects.filter(patient = patient)
+    hematologies = Hematology.objects.filter(patient = patient)
+    platelets = Platelets.objects.filter(patient = patient)
+    leukocytes = Leukocytes.objects.filter(patient = patient)
+    hormons = HormonalLevels.objects.filter(patient = patient)
+    
     prescriptions = Prescription.objects.filter(patient = patient)
-    return render(request, 'form/patient_detail.html',{'patient':patient, 'biochems': biochems, 'proteins':proteins , 'prescriptions': prescriptions,})
+    return render(request, 'form/patient_detail.html',
+        {'patient':patient, 
+        'reports':reports,
+        'biochems': biochems, 
+        'proteins':proteins , 
+        'lipids':lipids,
+        'carbohydrates':carbohydrates,
+        'irons':irons,
+        'micros':micros,
+        'inflamms':inflamms,
+        'allergies':allergies,
+        'thyroids':thyroids,
+        'hematologies':hematologies,
+        'platelets':platelets,
+        'leukocytes':leukocytes,
+        'hormons':hormons,
+        'prescriptions': prescriptions,
+        })
 
 @login_required()
 def report_detail(request, pk):
@@ -51,8 +82,24 @@ def report_new(request):
             post.create_date = timezone.now()
             post.save()
             return redirect('report_detail', pk=post.pk)
+
     else:
         form = ReportForm()
+    return render(request, 'form/report_edit.html', {'form': form})
+    
+    
+def report_new_for_patient(request, pk):
+    if request.method == "POST":
+        form = ReportFormForPatient(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.patient = get_object_or_404(Patient, pk=pk)
+            post.author = request.user
+            post.create_date = timezone.now()
+            post.save()
+            return redirect('patient_detail', pk=pk)
+    else:
+        form = ReportFormForPatient()
     return render(request, 'form/report_edit.html', {'form': form})
     
 @login_required()
@@ -202,5 +249,123 @@ def micronutrients_new(request, pk):
             return redirect('patient_detail', pk=post.patient.pk)
     else:
         form = MicronutrientsForm()
+    return render(request, 'form/report_edit.html', {'form': form})
+    
+    
+    
+@login_required()
+def inflammatorymarkers_new(request, pk):
+    if request.method == "POST":
+        form = InflammatoryMarkersForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.create_date = timezone.now()
+            post.save()
+            return redirect('patient_detail', pk=post.patient.pk)
+    else:
+        form = InflammatoryMarkersForm()
+    return render(request, 'form/report_edit.html', {'form': form})
+    
+    
+    
+@login_required()
+def allergiesinfections_new(request, pk):
+    if request.method == "POST":
+        form = AllergiesInfectionsForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.create_date = timezone.now()
+            post.save()
+            return redirect('patient_detail', pk=post.patient.pk)
+    else:
+        form = AllergiesInfectionsForm()
+    return render(request, 'form/report_edit.html', {'form': form})
+    
+    
+    
+    
+@login_required()
+def thyroidfunction_new(request, pk):
+    if request.method == "POST":
+        form = ThyroidFunctionForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.create_date = timezone.now()
+            post.save()
+            return redirect('patient_detail', pk=post.patient.pk)
+    else:
+        form = ThyroidFunctionForm()
+    return render(request, 'form/report_edit.html', {'form': form})
+    
+    
+    
+    
+    
+@login_required()
+def hematology_new(request, pk):
+    if request.method == "POST":
+        form = HematologyForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.create_date = timezone.now()
+            post.save()
+            return redirect('patient_detail', pk=post.patient.pk)
+    else:
+        form = HematologyForm()
+    return render(request, 'form/report_edit.html', {'form': form})
+    
+    
+    
+    
+    
+@login_required()
+def platelets_new(request, pk):
+    if request.method == "POST":
+        form = PlateletsForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.create_date = timezone.now()
+            post.save()
+            return redirect('patient_detail', pk=post.patient.pk)
+    else:
+        form = PlateletsForm()
+    return render(request, 'form/report_edit.html', {'form': form})
+    
+    
+    
+    
+@login_required()
+def leukocytes_new(request, pk):
+    if request.method == "POST":
+        form = LeukocytesForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.create_date = timezone.now()
+            post.save()
+            return redirect('patient_detail', pk=post.patient.pk)
+    else:
+        form = LeukocytesForm()
+    return render(request, 'form/report_edit.html', {'form': form})
+    
+    
+    
+@login_required()
+def hormonallevels_new(request, pk):
+    if request.method == "POST":
+        form = HormonalLevelsForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.create_date = timezone.now()
+            post.save()
+            return redirect('patient_detail', pk=post.patient.pk)
+    else:
+        form = HormonalLevelsForm()
     return render(request, 'form/report_edit.html', {'form': form})
     
