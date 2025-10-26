@@ -1,6 +1,9 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
+from django.views import View
+from django.urls import reverse
+from django.db import transaction
 from .models import *
 from .forms import *
 
@@ -31,6 +34,7 @@ def patient_list(request):
 def patient_detail(request, pk):
     patient = get_object_or_404(Patient, pk = pk)
     reports = Report.objects.filter(patient = patient).order_by('created_date')
+    surveys = Questionnaire.objects.filter(patient = patient).order_by('created_at')
     
     biochems = Biochemistry.objects.filter(patient = patient)
     proteins = ProteinMetabolism.objects.filter(patient = patient)
@@ -50,6 +54,7 @@ def patient_detail(request, pk):
     return render(request, 'form/patient_detail.html',
         {'patient':patient, 
         'reports':reports,
+        'surveys':surveys,
         'biochems': biochems, 
         'proteins':proteins , 
         'lipids':lipids,
@@ -369,3 +374,229 @@ def hormonallevels_new(request, pk):
         form = HormonalLevelsForm()
     return render(request, 'form/report_edit.html', {'form': form})
     
+
+
+SURVEY_SESSION_KEY = "survey_state"  # будем ключевать по токену
+
+# ---- утилиты (как раньше, но без patient_id в URL) ----
+def get_active_questionnaire():
+    return QuestionnaireTemplate.objects.latest("code")
+
+def build_section_order(qt: QuestionnaireTemplate):
+    sections = (SectionTemplate.objects
+             .filter(template=qt)
+             .order_by("order"))
+    order = []
+    for s in sections:
+        order.append(s.id)
+    return order
+
+def get_choices_by_key(key: str):
+    if not key:  # дефолтная бинарная шкала
+        return [(0, "нет"), (8, "да")]
+    k = key.lower()
+    if k in ("08"):
+        return [(0, "нет"), (8, "да")]
+    if k in ("01"):
+        return [(0, "нет"), (1, "да")]
+    if k in ("0148"):
+        return [(0, "нет/редко"), (1, "иногда"), (4, "часто"), (8, "очень часто")]
+    return [(0, "нет"), (8, "да")]
+
+def build_dynamic_form(section: SectionTemplate):
+    qs = (QuestionTemplate.objects
+          .filter(section=section)
+          .order_by("order", "id"))
+    class SectionForm(forms.Form): pass
+    for q in qs:
+        name = f"q_{q.id}"
+        choices = get_choices_by_key(q.scale)
+        field = forms.TypedChoiceField(
+            label=q.text,
+            choices=choices,
+            widget=forms.RadioSelect,
+            required=getattr(q, "required", True),
+            coerce=int,
+        )
+        SectionForm.base_fields[name] = field
+    return SectionForm
+
+def load_state(request, token_str):
+    state = request.session.get(SURVEY_SESSION_KEY, {})
+    return state.get(token_str, {"cursor": 0, "answers": {}, "order": None})
+
+def save_state(request, token_str, state):
+    all_state = request.session.get(SURVEY_SESSION_KEY, {})
+    all_state[token_str] = state
+    request.session[SURVEY_SESSION_KEY] = all_state
+    request.session.modified = True
+
+def get_valid_invite_or_404(token):
+    invite = get_object_or_404(Questionnaire, token=token)
+    if not invite.is_valid():
+        # 404 вместо «вышла дата/использовано» — чтобы не палить детали
+        raise Http404("Invite is not valid")
+    return invite
+
+# ---- приватный (для врача/сотрудника): создать приглашение и показать ссылку ----
+class CreateSurveyInviteView(View):
+    # добавьте @permission_required / @login_required по своей системе
+    def post(self, request, pk):
+        patient = get_object_or_404(Patient, pk=pk)
+        qt = get_active_questionnaire()
+        invite = Questionnaire.objects.create(
+            patient=patient,
+            template=qt
+        )
+        public_url = request.build_absolute_uri(
+            reverse("survey_run_public", kwargs={"token": str(invite.token)})
+        )
+        # здесь можете отправить SMS/Email, а пока просто покажем
+        return render(request, "survey/invite_created.html", {
+            "patient": patient,
+            "public_url": public_url,
+            "token": invite.token,
+        })
+
+    def get(self, request, pk):
+        # по GET можно показать подтверждение/кнопку «создать ссылку»
+        patient = get_object_or_404(Patient, pk=pk)
+        return render(request, "survey/invite_confirm.html", {
+            "patient": patient,
+        })
+
+
+# ---- публичный мастер по токену ----
+class PublicSurveySectionView(View):
+    template_name = "survey/section_public.html"
+
+    def get(self, request, token):
+        invite = get_valid_invite_or_404(token)
+        qt = invite.template
+        token_key = str(invite.token)
+
+        state = load_state(request, token_key)
+        order = state.get("order") or build_section_order(qt)
+        state["order"] = order
+        save_state(request, token_key, state)
+
+        if not order:
+            return render(request, self.template_name, {"empty": True})
+
+        cursor = max(0, min(state.get("cursor", 0), len(order)-1))
+        section_id = order[cursor]
+        section = get_object_or_404(SectionTemplate, id=section_id)
+
+        FormCls = build_dynamic_form(section)
+        # префилл
+        initial = {}
+        for q in QuestionTemplate.objects.filter(section=section):
+            key = f"q_{q.id}"
+            if key in state["answers"]:
+                initial[key] = state["answers"][key]
+        form = FormCls(initial=initial)
+
+        return render(request, self.template_name, {
+            # НИЧЕГО персонального о пациенте!
+            "questionnaire": qt,
+            "section": section,
+            "form": form,
+            "cursor": cursor,
+            "total": len(order),
+            "is_first": cursor == 0,
+            "is_last": cursor == len(order)-1,
+            "token": token,  # нужен для action’ов кнопок
+        })
+
+    def post(self, request, token):
+        invite = get_valid_invite_or_404(token)
+        qt = invite.template
+        token_key = str(invite.token)
+
+        state = load_state(request, token_key)
+        order = state.get("order") or build_section_order(qt)
+
+        cursor = max(0, min(state.get("cursor", 0), len(order)-1))
+        section_id = order[cursor]
+        section = get_object_or_404(SectionTemplate, id=section_id)
+
+        FormCls = build_dynamic_form(section)
+        form = FormCls(request.POST)
+        if form.is_valid():
+            # сохранить в session
+            for name, value in form.cleaned_data.items():
+                state["answers"][name] = value
+
+            if "prev" in request.POST and cursor > 0:
+                state["cursor"] = cursor - 1
+            elif "next" in request.POST and cursor < len(order)-1:
+                state["cursor"] = cursor + 1
+            elif "finish" in request.POST and cursor == len(order)-1:
+                save_state(request, token_key, state)
+                return redirect("survey_finish_public", token=str(invite.token))
+
+            save_state(request, token_key, state)
+            return redirect("survey_run_public", token=str(invite.token))
+
+        return render(request, self.template_name, {
+            "questionnaire": qt,
+            "section": section,
+            "form": form,
+            "cursor": cursor,
+            "total": len(order),
+            "is_first": cursor == 0,
+            "is_last": cursor == len(order)-1,
+            "token": token,
+        })
+
+
+class PublicSurveyFinishView(View):
+    template_name = "survey/finish_public.html"
+
+    def get(self, request, token):
+        # простая страница-подтверждение перед отправкой
+        invite = get_valid_invite_or_404(token)
+        return render(request, self.template_name, {
+            # ничего личного
+            "questionnaire": invite.template,
+            "token": str(invite.token),
+            "confirm": True,
+        })
+
+    @transaction.atomic
+    def post(self, request, token):
+        invite = get_valid_invite_or_404(token)
+        qt = invite.template
+        token_key = str(invite.token)
+        state = load_state(request, token_key)
+        answers_map = state.get("answers", {})
+
+        to_create = []
+        for key, raw_value in answers_map.items():
+            try:
+                qid = int(key.split("_", 1)[1])
+            except Exception:
+                continue
+            q = QuestionTemplate.objects.filter(id=qid).select_related("section").first()
+            if not q:
+                continue
+            to_create.append(Answer(
+                questionnaire = invite,  # связь только на бэке
+                question=q,
+                score=raw_value,         # уже int
+            ))
+
+        if to_create:
+            Answer.objects.bulk_create(to_create, batch_size=200)
+
+        # по желанию одноразовость:
+        invite.mark_used()
+
+        # очистить сессию под этот токен
+        save_state(request, token_key, {"cursor": 0, "answers": {}, "order": state.get("order", [])})
+
+        return render(request, self.template_name, {
+            "questionnaire": qt,
+            "saved": len(to_create),
+            "done": True,
+        })

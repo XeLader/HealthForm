@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
@@ -337,3 +338,54 @@ class Report(models.Model):
     next_date = models.DateTimeField(default=timezone.now, verbose_name = "Следующий приём")
     def __str__(self):
         return self.title
+        
+        
+
+class QuestionnaireTemplate(models.Model):
+    code = models.CharField(max_length=64, unique=True)  # "v1_2025_10"
+    title = models.CharField(max_length=255)
+
+class SectionTemplate(models.Model):
+    template = models.ForeignKey(QuestionnaireTemplate, on_delete=models.CASCADE, related_name="sections")
+    order = models.PositiveIntegerField()
+    title = models.CharField(max_length=255)
+
+class QuestionTemplate(models.Model):
+    section = models.ForeignKey(SectionTemplate, on_delete=models.CASCADE, related_name="questions")
+    code = models.CharField(max_length=64)  # "Q1_03"
+    order = models.PositiveIntegerField()
+    text = models.TextField()
+    scale = models.CharField(max_length=16, default="0148")  # "0/1/4/8" или "0/8"
+    class Meta:
+        unique_together = ("section", "code")
+
+
+class Questionnaire(models.Model):
+    patient = models.ForeignKey("Patient", on_delete=models.CASCADE, related_name="questionnaires")
+    template = models.ForeignKey(QuestionnaireTemplate, on_delete=models.PROTECT)
+    token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    submitted_at = models.DateTimeField(null=True, blank=True)
+    #payload = models.JSONField(default=dict, blank=True)  # черновик
+    
+    def is_valid(self) -> bool:
+        if self.submitted_at:
+            return False
+        return True
+
+    def mark_used(self):
+        self.submitted_at = timezone.now()
+        self.save(update_fields=["submitted_at"])
+
+class Answer(models.Model):
+    questionnaire = models.ForeignKey(Questionnaire, on_delete=models.CASCADE, related_name="answers")
+    question = models.ForeignKey(QuestionTemplate, on_delete=models.PROTECT)
+    score = models.SmallIntegerField(null=True, blank=True)  # 0/1/4/8 и т.п.
+
+    class Meta:
+        unique_together = ("questionnaire", "question")
+        indexes = [
+            models.Index(fields=["questionnaire"]),
+            models.Index(fields=["question"]),
+        ]
+

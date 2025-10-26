@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Анкета</title>
+  <style>
+    body { font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; margin: 24px; }
+    .wrap { max-width: 800px; margin: 0 auto; }
+    .muted { color:#777; }
+    .section { font-size: 22px; font-weight: 600; margin: 12px 0 18px; }
+    .q { padding: 12px 0; border-bottom: 1px solid #eee; }
+    .nav { display: flex; gap: 8px; margin-top: 16px; }
+    button { padding: 10px 14px; border-radius: 8px; border: 1px solid #ddd; background: #fafafa; cursor: pointer; }
+    button[type=submit] { background: #0a7; color: #fff; border-color: #0a7; }
+    .counter { color:#999; font-size: 13px; margin-top: 8px; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="muted">{{ questionnaire.title }}</div>
+  <div class="section">{{ section.title }}</div>
+
+  <form method="post">
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="q">
+        <label><strong>{{ forloop.counter }}. {{ field.label }}</strong></label>
+        <div>{{ field }}</div>
+      </div>
+    {% endfor %}
+
+    <div class="nav">
+      {% if not is_first %}
+        <button name="prev" value="1" type="submit">← Назад</button>
+      {% endif %}
+      {% if is_last %}
+        <button name="finish" value="1" type="submit">Завершить</button>
+      {% else %}
+        <button name="next" value="1" type="submit">Далее →</button>
+      {% endif %}
+    </div>
+    <div class="counter">Секция {{ cursor|add:1 }} из {{ total }}</div>
+  </form>
+</div>
+</body>
+</html>
+

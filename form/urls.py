@@ -1,5 +1,10 @@
 from django.urls import path
 from . import views
+from .views import (
+    CreateSurveyInviteView,   # создаёт токен на карточке пациента (для врача/сотрудника)
+    PublicSurveySectionView,  # публичный мастер по токену
+    PublicSurveyFinishView,
+)
 
 urlpatterns = [
     path('', views.dashboard, name='dashboard'),
@@ -26,4 +31,9 @@ urlpatterns = [
     path('patient/<int:pk>/platelets/new', views.platelets_new, name='platelets_new'),
     path('patient/<int:pk>/leukocytes/new', views.leukocytes_new, name='leukocytes_new'),
     path('patient/<int:pk>/hormonallevels/new', views.hormonallevels_new, name='hormonallevels_new'),
+    
+    path("patient/<int:pk>/questionnaires/new/", CreateSurveyInviteView.as_view(), name="survey_invite_create"),
+    path("q/<uuid:token>/", PublicSurveySectionView.as_view(), name="survey_run_public"),
+    path("q/<uuid:token>/finish/", PublicSurveyFinishView.as_view(), name="survey_finish_public"),
 ]
+

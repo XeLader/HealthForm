@@ -22,6 +22,24 @@
 
 <div class = "listblock">
   <aside class="actions">
+		  <a class="btn btn-secondary" href="{% url 'survey_invite_create' pk=patient.pk %}" style="float: right;">
+                {% include './icons/file-earmark-plus.svg' %}
+      </a>      
+	</aside>
+<h2>Предприёмные анкеты</h2>
+	<table style="width:100%;">
+{% for survey in surveys %}
+    <tr>
+      <td> {{ survey.created_at}} </td>
+      <td>{{ survey.submitted_at }}</td>
+    </tr>
+{% endfor %} 
+  </table>
+</div>
+
+
+<div class = "listblock">
+  <aside class="actions">
 		  <a class="btn btn-secondary" href="{% url 'report_new_for_patient' pk=patient.pk %}" style="float: right;">
                 {% include './icons/file-earmark-plus.svg' %}
       </a>      

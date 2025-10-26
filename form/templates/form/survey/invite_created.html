@@ -1,0 +1,10 @@
+{% extends 'form/base.html' %}
+
+{% block content %}
+
+<div class = "listblock">
+	<h2>Анкета успешно создана!</h2>
+	<p>Ссылка для прохождении анкеты: <a href = "{% public_url %}">{% public_url %}</a></p>
+</div>
+
+{% endblock %}
