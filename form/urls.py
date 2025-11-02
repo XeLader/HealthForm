@@ -4,6 +4,7 @@ from .views import (
     CreateSurveyInviteView,   # создаёт токен на карточке пациента (для врача/сотрудника)
     PublicSurveySectionView,  # публичный мастер по токену
     PublicSurveyFinishView,
+    SurveyResultsView,
 )
 
 urlpatterns = [
@@ -35,5 +36,7 @@ urlpatterns = [
     path("patient/<int:pk>/questionnaires/new/", CreateSurveyInviteView.as_view(), name="survey_invite_create"),
     path("q/<uuid:token>/", PublicSurveySectionView.as_view(), name="survey_run_public"),
     path("q/<uuid:token>/finish/", PublicSurveyFinishView.as_view(), name="survey_finish_public"),
+    
+    path("patient/<int:pk>/questionnaires/<uuid:token>/results/", SurveyResultsView.as_view(), name="survey_results"),
 ]
 

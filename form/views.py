@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
+from django.db.models import Sum, Count
 from django.utils import timezone
 from django.views import View
 from django.urls import reverse
@@ -600,3 +601,99 @@ class PublicSurveyFinishView(View):
             "saved": len(to_create),
             "done": True,
         })
+        
+        
+class SurveyResultsView(View):
+    template_name = "survey/results.html"
+    
+    def classify_priority(total, low, high):
+        if low is None:
+            low = -10**9
+        if high is None:
+            high = 10**9
+
+        if total is None:
+            total = 0
+
+        if total < low:
+            return ("low",  "#14a44d", "низкий")
+        elif total >= high:
+            return ("high", "#dc4c64", "высокий")
+        else:
+            return ("mid",  "#e4a11b", "средний")
+
+
+    def get(self, request, pk, token):
+        patient = get_object_or_404(Patient, pk=pk)
+        invite = get_object_or_404(Questionnaire, token=token, patient=patient)
+
+        # Все ответы по этому приглашению
+        qs = (Answer.objects
+              .filter(questionnaire=invite)
+              .select_related("question__section"))
+
+        # Суммы по секциям
+        by_section = (qs
+            .values(
+                "question__section__id",
+                "question__section__title",
+                "question__section__description",
+                "question__section__low",
+                "question__section__height"
+            )
+            .annotate(
+                total=Sum("score"),
+                cnt=Count("id"),
+            )
+            .order_by("question__section__title")
+        )
+
+        sections = []
+        for row in by_section:
+            total      = row["total"] or 0
+            low_thr    = row.get("question__section__low")
+            height_thr = row.get("question__section__height")
+            section_id = row["question__section__id"]
+            section_title = row["question__section__title"]
+            section_description = row["question__section__description"]
+            count = row["cnt"] or 0
+            if height_thr is None:
+                height_thr = row.get("question__section__high")
+            pri_slug, pri_color, pri_label = SurveyResultsView.classify_priority(total, low_thr, height_thr)
+            sections.append({
+                "section_id": section_id,
+                "section_title": section_title,
+                "section_description": section_description,
+                "total": total,
+                "count": count,
+                "priority": {
+                    "slug": pri_slug,     # "low" / "mid" / "high"
+                    "label": pri_label,   
+                    "color": pri_color,   
+                    "low": low_thr,
+                    "high": height_thr,
+                },
+            })
+    
+        raw_answers = (qs
+            .values(
+                "question_id",
+                "question__text",
+                "question__section__title",
+                "score",
+            )
+            .order_by("question__section__id", "question_id")
+        )
+
+        ctx = {
+            "patient": patient,
+            "invite": invite,
+            "parts": sections,
+            "raw_answers": raw_answers,
+            "priority_palette": {
+                "low":  {"color": "#14a44d", "label": "низкий"},
+                "mid":  {"color": "#e4a11b", "label": "средний"},
+                "high": {"color": "#dc4c64", "label": "высокий"},
+            }
+        }
+        return render(request, self.template_name, ctx)

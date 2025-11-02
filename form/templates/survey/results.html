@@ -1,0 +1,84 @@
+{% extends 'form/base.html' %}
+
+{% block content %}
+
+  <title>Результаты анкеты</title>
+  <style>
+    body { font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; margin: 24px; }
+    .wrap { max-width: 1000px; margin: 0 auto; }
+    h2 { margin-top: 0; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    th, td { border: 1px solid #ddd; padding: 8px; }
+    th { background: #f7f7f7; text-align: left; }
+    .part { margin-top: 24px; }
+    .total { font-weight: 700; background: #fafafa; }
+    .muted { color:#777; font-size: 14px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .box { border: 1px solid #eee; border-radius: 8px; padding: 12px 16px; background: #fff; }
+  </style>
+<div class="wrap">
+  <h2>Результаты анкеты</h2>
+  <div class="muted">Пациент: {{ patient.full_name }} · Токен: {{ invite.token }}{% if invite.expires_at %} · Действует до: {{ invite.expires_at }}{% endif %}</div>
+
+  {% if parts %}
+      <div class="part">
+        <table>
+          <thead>
+            <tr>
+              <th>Секция</th>
+              <th style="width:160px;">Сумма баллов</th>
+              <th style="width:120px;">Ответов</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in parts %}
+            <tr>
+              <td>
+                <span style="display:inline-flex;align-items:center;gap:8px;">
+                <span title="{{ s.priority.label }}" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:{{ s.priority.color }};"></span>
+                    {{ s.section_description }}
+                      {% if s.priority.low != None or s.priority.high != None %}
+                      <span class="muted" style="margin-left:6px;">
+                      (пороги: низкий < {{ s.priority.low|default:"—" }}, высокий ≥ {{ s.priority.high|default:"—" }})
+                      </span>
+                      {% endif %}
+                </span>
+              </td>
+              <td style="font-weight:700;background:linear-gradient(to right, {{ s.priority.color }}22, transparent);">
+                {{ s.total }}
+              </td>
+              <td>{{ s.count }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+
+    <div class="part">
+      <h3>Ответы</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Секция</th>
+            <th>Вопрос</th>
+            <th style="width:120px;">Баллы</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in raw_answers %}
+            <tr>
+              <td>{{ r.question__section__title }}</td>
+              <td>{{ r.question__text }}</td>
+              <td>{{ r.score }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  {% else %}
+    <p>Для этого приглашения пока нет ответов.</p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,4 +1,6 @@
 {
+  "code": "v1_2025_10",
+  "title": "Входное анкетирование",
   "schema": {
     "option_scales": {
       "frequency_0_1_4_8": {
@@ -27,10 +29,14 @@
     {
       "id": "part3",
       "title": "Часть 3",
+      "description":"III. Эндокриная",
       "sections": [
         {
           "id": "part3A",
           "title": "Секция A",
+          "description":"А. Щитовидная железа",
+          "low":"16",
+          "height":"32",
           "questions": [
             {
               "id": "3A-1",
@@ -112,6 +118,9 @@
         {
           "id": "3B",
           "title": "Секция B",
+          "description":"В. Надпочечники",
+          "low":"8",
+          "height":"16",
           "questions": [
             {
               "id": "3B-1",

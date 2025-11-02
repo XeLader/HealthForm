@@ -29,10 +29,14 @@
     {
       "id": "part1",
       "title": "Часть 1",
+      "description":"I. ЖКТ",
       "sections": [
         {
           "id": "part1A",
           "title": "Секция A",
+          "description":"А. функция желудка",
+          "low":"4",
+          "height":"8",
           "questions": [
             {
               "id": "1A-1",
@@ -74,6 +78,9 @@
         {
           "id": "part1B",
           "title": "Секция B",
+          "description":"В. Воспаление желудка",
+	  "low":"4",
+          "height":"8",
           "questions": [
             {
               "id": "1B-1",
@@ -125,6 +132,9 @@
         {
           "id": "part1C",
           "title": "Секция C",
+          "description":"С. Тонкая кишка и поджелудочная ",
+          "low":"8",
+          "height":"16",
           "questions": [
             {
               "id": "1C-1",
@@ -181,6 +191,9 @@
         {
           "id": "part1D",
           "title": "Секция D",
+          "description":"D. Толстая кишка",
+          "low":"8",
+          "height":"16",
           "questions": [
             {
               "id": "1D-1",

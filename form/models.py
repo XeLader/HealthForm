@@ -349,6 +349,9 @@ class SectionTemplate(models.Model):
     template = models.ForeignKey(QuestionnaireTemplate, on_delete=models.CASCADE, related_name="sections")
     order = models.PositiveIntegerField()
     title = models.CharField(max_length=255)
+    description = models.CharField(max_length=255)
+    low = models.PositiveIntegerField()
+    height = models.PositiveIntegerField()
 
 class QuestionTemplate(models.Model):
     section = models.ForeignKey(SectionTemplate, on_delete=models.CASCADE, related_name="questions")

@@ -32,6 +32,9 @@
     <tr>
       <td> {{ survey.created_at}} </td>
       <td>{{ survey.submitted_at }}</td>
+      {% if survey.submitted_at %}
+      <td><a href="{% url 'survey_results' pk=patient.pk token=survey.token %}">Результат</a></td>
+      {% endif %}
     </tr>
 {% endfor %} 
   </table>

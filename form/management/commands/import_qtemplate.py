@@ -15,7 +15,6 @@ class Command(BaseCommand):
         tmpl, _ = QuestionnaireTemplate.objects.get_or_create(
             code=data["code"], defaults={"title": data["title"]})
 
-        # апдейт названия, если изменилось
         if tmpl.title != data["title"]:
             tmpl.title = data["title"]; tmpl.save(update_fields=["title"])
         for p in data["parts"]:
@@ -23,10 +22,21 @@ class Command(BaseCommand):
             for s in p["sections"]:
                 order_s += 1
                 section_title = p["title"] + ' ' + s["title"]
+                section_description =  p["description"] + ' ' + s["description"]
+                low = int(s["low"])
+                height = int(s["height"])
                 section, _ = SectionTemplate.objects.get_or_create(
-                    template=tmpl, order=order_s, defaults={"title": section_title})
-                if section.title != section_title:
-                    section.title = section_title; section.save(update_fields=["title"])
+                    template=tmpl, title=section_title, defaults={"order": order_s, "description":section_description, "low": low, "height": height,})
+                    
+                if section.order != order_s:
+                    section.order = order_s; section.save(update_fields=["order"])
+                if section.description != section_description:
+                    section.description = section_description
+                    section.save(update_fields=["description"])  
+                if section.low != low or section.height != height:
+                    section.low = low
+                    section.height = height
+                    section.save(update_fields=["low", "height"])
                 order = 0
                 for q in s["questions"]:
                     order += 1 

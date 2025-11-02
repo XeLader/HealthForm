@@ -1,4 +1,6 @@
 {
+  "code": "v1_2025_10",
+  "title": "Входное анкетирование",
   "schema": {
     "option_scales": {
       "frequency_0_1_4_8": {
@@ -27,10 +29,14 @@
     {
       "id": "part2",
       "title": "Часть 2",
+      "description":"II. Печень/ЖП",
       "sections": [
         {
           "id": "part2A",
           "title": "Секция (единая)",
+          "description":"Функция печение и желчного пузыря",
+          "low":"8",
+          "height":"16",
           "questions": [
             {
               "id": "2-1",
