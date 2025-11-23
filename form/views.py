@@ -91,10 +91,18 @@ def report_new(request):
 
     else:
         form = ReportForm()
-    return render(request, 'form/report_edit.html', {'form': form})
+        Preferable = ["pref_Meat", "pref_Fish", "pref_Dair", "pref_Dair", "pref_Eggs", "pref_Vegs", "pref_Frut", "pref_Groa", "pref_Swet", "pref_Fast", "pref_Cofe", "pref_Alco"]
+        Intolerances = ["intol_Lact", "intol_Glut", "intol_Nuts", "intol_Sea", "intol_Other"]
+        Allergies = ["foodAllergy", "medicineAllergy", "seasonalAllergy", "contactAllergy", "noAllergy"]
+    return render(request, 'form/report_edit.html', {
+                                            'form': form,
+                                            'prefs':Preferable,
+                                            'intols':Intolerances, 
+                                            'allergies': Allergies})
     
     
 def report_new_for_patient(request, pk):
+    patient = get_object_or_404(Patient, pk=pk)
     if request.method == "POST":
         form = ReportFormForPatient(request.POST)
         if form.is_valid():
@@ -106,7 +114,17 @@ def report_new_for_patient(request, pk):
             return redirect('patient_detail', pk=pk)
     else:
         form = ReportFormForPatient()
-    return render(request, 'form/report_edit.html', {'form': form})
+        Preferable = ["pref_Meat", "pref_Fish", "pref_Dair", "pref_Dair", "pref_Eggs", "pref_Vegs", "pref_Frut", "pref_Groa", "pref_Swet", "pref_Fast", "pref_Cofe", "pref_Alco"]
+        Intolerances = ["intol_Lact", "intol_Glut", "intol_Nuts", "intol_Sea", "intol_Other"]
+        Heredity = ["cardiovascular","oncological","diabetes","thyroid","autoimmune","allergic",]
+        Allergies = ["foodAllergy", "medicineAllergy", "seasonalAllergy", "contactAllergy", "noAllergy"]
+    return render(request, 'form/report_edit.html', {
+                                            'form': form,
+                                            'patient': patient,
+                                            'prefs':Preferable,
+                                            'intols':Intolerances, 
+                                            'herr':Heredity,
+                                            'allergies': Allergies})
     
 @login_required()
 def patient_new(request):

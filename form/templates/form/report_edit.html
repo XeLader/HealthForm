@@ -1,8 +1,383 @@
-{% extends 'form/base.html' %}
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Медицинская карта — приём</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      margin: 24px;
+      background: #f5f5f7;
+    }
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+    form {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px 24px 24px;
+      box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
+    }
 
-{% block content %}
-    <form method="POST" class="post-form">{% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="save btn btn-secondary">Save</button>
-    </form>
-{% endblock %}
+    .cards {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .card {
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+      padding: 16px 18px 18px;
+      background: #fafafa;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px 16px;
+    }
+
+    @media (max-width: 768px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .field label {
+      font-size: 14px;
+      color: #374151;
+      font-weight: 500;
+    }
+
+    .field input[type="text"],
+    .field input[type="number"],
+    .field input[type="date"],
+    .field textarea,
+    .field select {
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      padding: 6px 10px;
+      font: inherit;
+      background: #fff;
+    }
+
+    .field textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .help {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .errors {
+      color: #b91c1c;
+      font-size: 13px;
+      margin-top: 2px;
+    }
+
+    .checkbox-group {
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      padding: 8px 10px;
+      background: #fff;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+    .checkbox-group label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 400;
+      margin-bottom: 3px;
+    }
+
+    .actions {
+      margin-top: 18px;
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: 1px solid transparent;
+      padding: 8px 18px;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+  <h1>Приём пациента</h1>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="cards">
+
+      <div class="card">
+        <div class="card-title">Общие данные</div>
+        <div class="grid-2">
+          <div class="field">
+            {{ form.title.label_tag }}
+            {{ form.title }}
+            {% if form.title.errors %}<div class="errors">{{ form.title.errors }}</div>{% endif %}
+          </div>
+          <div class="field">
+            {{ form.text.label_tag }}
+            {{ form.text }}
+            {% if form.text.errors %}<div class="errors">{{ form.text.errors }}</div>{% endif %}
+          </div>
+          
+          <div class="field">
+            {{ form.next_date.label_tag }}
+            {{ form.next_date }}
+            {% if form.next_date.errors %}<div class="errors">{{ form.next_date.errors }}</div>{% endif %}
+          </div>
+        </div>
+      </div>
+
+      {# Блок 1: Данные пациента #}
+      <div class="card">
+        <div class="card-title">Данные пациента</div>
+        <div class="grid-2">
+          <div class="field">
+            {{ patient.full_name }}
+          </div>
+        </div>
+      </div>
+
+      {# Блок 2: жалобы и анамнез #}
+      <div class="card">
+        <div class="card-title">Жалобы и анамнез</div>
+        <div class="field">
+          {{ form.complaints.label_tag }}
+          {{ form.complaints }}
+          {% if form.complaints.errors %}<div class="errors">{{ form.complaints.errors }}</div>{% endif %}
+        </div>
+        <div class="field" style="margin-top:10px;">
+          {{ form.anamnesis.label_tag }}
+          {{ form.anamnesis }}
+          {% if form.anamnesis.errors %}<div class="errors">{{ form.anamnesis.errors }}</div>{% endif %}
+        </div>
+      </div>
+
+      {# Блок 3: Диетологический анамнез #}
+      <div class="card">
+      <div class="card-title">Диетологический анамнез</div>
+        <div class="grid-1">
+          <div class="field">
+            <div class="field" style="margin-top:10px;">
+              {{ form.diet.label_tag }}
+              {{ form.diet }}
+              {% if form.diet.errors %}<div class="errors">{{ form.diet.errors }}</div>{% endif %}
+            </div>
+          </div>
+          <div class="field">
+            {{ form.mealscount.label_tag }}
+            {{ form.mealscount }}
+            {% if form.mealscount.errors %}<div class="errors">{{ form.mealscount.errors }}</div>{% endif %}
+          </div>
+          <div class="field">
+            {{ form.snacks.label_tag }}
+            {{ form.snacks }}
+            {% if form.snacks.errors %}<div class="errors">{{ form.snacks.errors }}</div>{% endif %}
+          </div>
+          
+          <div class="field">
+            <label>Предпочтения</label>
+            <div class="checkbox-group">
+            {% for field in form %}
+              {% if field.name in prefs %}
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.errors %}<div class="errors">{{ field.errors }}</div>{% endif %}
+              {% endif %}
+            {% endfor %}
+            </div>
+          </div>
+          
+          <div class="field">
+            <label>Наличие непереносимости:</label>
+            <div class="checkbox-group">
+            {% for field in form %}
+              {% if field.name in intols %}
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.errors %}<div class="errors">{{ field.errors }}</div>{% endif %}
+              {% endif %}
+            {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {# Блок 4: Наследственность #}
+      <div class="card">
+        <div class="card-title">Укажите наличие заболеваний у ближайших родственников (отметьте подходящее):</div>
+
+        <div class="grid-2">
+          <div class="field">
+            {% for field in form %}
+              {% if field.name in herr %}
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.errors %}<div class="errors">{{ field.errors }}</div>{% endif %}
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      
+      
+      {# Блок 5: Аллергологический анамнез #}
+      <div class="card">
+        <div class="card-title">Аллергологический анамнез:</div>
+        <div class="grid-1">
+          
+            {% for field in form %}
+              {% if field.name in allergies %}
+              <div class="field">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.errors %}<div class="errors">{{ field.errors }}</div>{% endif %}
+              </div>
+              {% endif %}
+            {% endfor %}
+         
+        </div>
+      </div>
+      
+      
+        {# Блок 6: Данные осмотра #}
+      <div class="card">
+        <div class="card-title">Данные осмотра:</div>
+
+        <div class="grid-2">
+           <div class="field">
+            {{ form.insp_General.label_tag }}
+            {{ form.insp_General }}
+            {% if form.insp_General.errors %}<div class="errors">{{ form.insp_General.errors }}</div>{% endif %}
+          </div>
+          
+          <div class="field">
+            {{ form.insp_Body.label_tag }}
+            {{ form.insp_Body }}
+            {% if form.insp_Body.errors %}<div class="errors">{{ form.insp_Body.errors }}</div>{% endif %}
+          </div>
+          
+          
+          <div class="field">
+            <label>{{ form.insp_skin.label }}</label>
+            <div class="checkbox-group">
+              {{ form.insp_skin }}
+            </div>
+            {% if form.insp_skin.errors %}<div class="errors">{{ form.insp_skin.errors }}</div>{% endif %}
+            {% if form.insp_skin.help_text %}<div class="help">{{ form.insp_skin.help_text }}</div>{% endif %}
+          </div>
+
+          <div class="field">
+            <label>{{ form.insp_lymph.label }}</label>
+            <div class="checkbox-group">
+              {{ form.insp_lymph }}
+            </div>
+            {% if form.insp_lymph.errors %}<div class="errors">{{ form.insp_lymph.errors }}</div>{% endif %}
+            {% if form.insp_lymph.help_text %}<div class="help">{{ form.insp_lymph.help_text }}</div>{% endif %}
+          </div>
+          
+          
+          
+          <div class="field">
+            <label>{{ form.insp_thyroid.label }}</label>
+            <div class="checkbox-group">
+              {{ form.insp_thyroid }}
+            </div>
+            {% if form.insp_thyroid.errors %}<div class="errors">{{ form.insp_thyroid.errors }}</div>{% endif %}
+            {% if form.insp_thyroid.help_text %}<div class="help">{{ form.insp_thyroid.help_text }}</div>{% endif %}
+          </div>
+          
+          <div class="field">
+            {{ form.insp_Abdomen.label_tag }}
+            {{ form.insp_Abdomen }}
+            {% if form.insp_Abdomen.errors %}<div class="errors">{{ form.insp_Abdomen.errors }}</div>{% endif %}
+          </div>
+          
+          
+          
+          <div class="field">
+            {{ form.insp_Liver.label_tag }}
+            {{ form.insp_Liver }}
+            {% if form.insp_Liver.errors %}<div class="errors">{{ form.insp_Liver.errors }}</div>{% endif %}
+          </div>
+          
+          
+          <div class="field">
+            {{ form.insp_Liver_protudes.label_tag }}
+            {{ form.insp_Liver_protudes }} см
+            {% if form.insp_Liver_protudes.errors %}<div class="errors">{{ form.insp_Liver_protudes.errors }}</div>{% endif %}
+          </div>
+
+          <div class="field">
+            <label>{{ form.insp_musculoskeletal.label }}</label>
+            <div class="checkbox-group">
+              {{ form.insp_musculoskeletal }}
+            </div>
+            {% if form.insp_musculoskeletal.errors %}<div class="errors">{{ form.insp_musculoskeletal.errors }}</div>{% endif %}
+            {% if form.insp_musculoskeletal.help_text %}<div class="help">{{ form.insp_musculoskeletal.help_text }}</div>{% endif %}
+          </div>
+          
+          
+          <div class="field">
+            {{ form.insp_Other.label_tag }}
+            {{ form.insp_Other }}
+            {% if form.insp_Other.errors %}<div class="errors">{{ form.insp_Liver_protudes.errors }}</div>{% endif %}
+          </div>
+
+        </div>
+      </div>
+
+
+
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn btn-primary">Сохранить</button>
+      <a href="{% url 'patient_detail' patient.pk %}" class="btn btn-secondary">Отмена</a>
+    </div>
+  </form>
+</div>
+</body>
+</html>
+
+

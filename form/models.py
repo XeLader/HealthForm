@@ -168,6 +168,51 @@ class HormonalLevels(models.Model):
     prolactin = models.DecimalField(verbose_name = "Пролактин", max_digits = 10, decimal_places=7)
     PSA = models.DecimalField(verbose_name = "ПСА", max_digits = 10, decimal_places=7)
 
+class LymphInspectOption(models.Model):
+    code = models.CharField(max_length=3, unique=True)
+    label = models.CharField(max_length=100)
+
+    class Meta:
+        verbose_name = "Опция осмотра лимфоузлов"
+        verbose_name_plural = "Опции осмотра лимфоузлов"
+
+    def __str__(self):
+        return self.label
+        
+class SkinInspectOption(models.Model):
+    code = models.CharField(max_length=3, unique=True)
+    label = models.CharField(max_length=100)
+
+    class Meta:
+        verbose_name = "Опция осмотра кожи и слизистых"
+        verbose_name_plural = "Опции осмотра кожи и слизистых"
+
+    def __str__(self):
+        return self.label
+        
+        
+class ThyroidInspectOption(models.Model):
+    code = models.CharField(max_length=3, unique=True)
+    label = models.CharField(max_length=100)
+
+    class Meta:
+        verbose_name = "Опция осмотра щитовидной железы"
+        verbose_name_plural = "Опции осмотра щитовидной железы"
+
+    def __str__(self):
+        return self.label
+        
+        
+class MuscoskeletalInspectOption(models.Model):
+    code = models.CharField(max_length=3, unique=True)
+    label = models.CharField(max_length=100)
+
+    class Meta:
+        verbose_name = "Опция осмотра опорно‑двигательного аппарата"
+        verbose_name_plural = "Опции осмотра опорно‑двигательного аппарата"
+
+    def __str__(self):
+        return self.label
 
 class Medicine(models.Model):
     title = models.CharField(max_length=200)
@@ -323,13 +368,56 @@ class Report(models.Model):
     #Inspection data
     insp_General = models.CharField("Общее состояние пациента", max_length=3, choices=INSP_GEN, default = "NON")
     insp_Body = models.CharField("Телосложение", max_length=3, choices=INSP_BODY, default = "NON")
+    
     insp_Skin = models.CharField("Кожа и слизистые", max_length=3, choices=INSP_SKIN, default = "NON")
+    
+    insp_skin = models.ManyToManyField(
+        SkinInspectOption,
+        verbose_name = "Кожа и слизистые",
+        related_name="reports",
+        blank=True,
+        help_text="Можно выбрать несколько состояний"
+    )
+    
+    
     insp_Lymph = models.CharField("Лимфатические узлы", max_length=3, choices=INSP_LYMP_THYR, default = "NON")
+    
+    insp_lymph = models.ManyToManyField(
+        LymphInspectOption,
+        verbose_name = "Лимфатические узлы",
+        related_name="reports",
+        blank=True,
+        help_text="Можно выбрать несколько состояний"
+    )
+
+    
     insp_Thyroid = models.CharField("Щитовидная железа", max_length=3, choices=INSP_LYMP_THYR, default = "NON")
+    
+    insp_thyroid = models.ManyToManyField(
+        ThyroidInspectOption,
+        verbose_name = "Щитовидная железа",
+        related_name="reports",
+        blank=True,
+        help_text="Можно выбрать несколько состояний"
+    )
+    
     insp_Abdomen = models.CharField("Живот", max_length=3, choices=INSP_ABDOMEN, default = "NON")
+    
+    
+    
     insp_Liver = models.CharField("Печень", max_length=3, choices=INSP_LIVER, default = "NON")
     insp_Liver_protudes = models.FloatField("Печень выступает на", default = 0.0)
+    
     insp_Musculoskeletal = models.CharField("Опорно‑двигательный аппарат", max_length=3, choices=INSP_MUSC, default = "NON")
+    
+    insp_musculoskeletal = models.ManyToManyField(
+        MuscoskeletalInspectOption,
+        verbose_name = "Опорно‑двигательный аппарат",
+        related_name="reports",
+        blank=True,
+        help_text="Можно выбрать несколько состояний"
+    )
+    
     insp_Other = models.CharField("Прочее:", max_length = 150, default = "")
 
     title = models.CharField(verbose_name = "Название", max_length=200)

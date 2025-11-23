@@ -10,8 +10,11 @@ class ReportForm(forms.ModelForm):
         'pref_Fast', 'pref_Cofe', 'pref_Alco', 'intol_Lact', 'intol_Glut' ,'intol_Nuts' ,'intol_Sea' ,'intol_Other',
         'cardiovascular', 'oncological', 'diabetes', 'thyroid', 'autoimmune',
         'allergic', 'foodAllergy', 'medicineAllergy', 'seasonalAllergy', 'contactAllergy', 'noAllergy', 'insp_General', 'insp_Body', 'insp_Skin',
-        'insp_Lymph', 'insp_Thyroid', 'insp_Abdomen', 'insp_Liver', 'insp_Liver_protudes', 'insp_Musculoskeletal', 'insp_Other',
+        "insp_lymph", 'insp_Thyroid', 'insp_Abdomen', 'insp_Liver', 'insp_Liver_protudes', 'insp_Musculoskeletal', 'insp_Other',
         'next_date')
+        widgets = {
+            "insp_lymph": forms.CheckboxSelectMultiple,
+        }
         
 class ReportFormForPatient(forms.ModelForm):
     class Meta:
@@ -20,9 +23,16 @@ class ReportFormForPatient(forms.ModelForm):
         'pref_Dair', 'pref_Eggs', 'pref_Vegs', 'pref_Frut', 'pref_Groa', 'pref_Swet',
         'pref_Fast', 'pref_Cofe', 'pref_Alco', 'intol_Lact', 'intol_Glut' ,'intol_Nuts' ,'intol_Sea' ,'intol_Other',
         'cardiovascular', 'oncological', 'diabetes', 'thyroid', 'autoimmune',
-        'allergic', 'foodAllergy', 'medicineAllergy', 'seasonalAllergy', 'contactAllergy', 'noAllergy', 'insp_General', 'insp_Body', 'insp_Skin',
-        'insp_Lymph', 'insp_Thyroid', 'insp_Abdomen', 'insp_Liver', 'insp_Liver_protudes', 'insp_Musculoskeletal', 'insp_Other',
+        'allergic', 'foodAllergy', 'medicineAllergy', 'seasonalAllergy', 'contactAllergy', 'noAllergy', 'insp_General', 'insp_Body', 'insp_skin',
+        'insp_lymph', 'insp_thyroid', 'insp_Abdomen', 'insp_Liver', 'insp_Liver_protudes', 'insp_musculoskeletal', 'insp_Other',
         'next_date')
+        
+        widgets = {
+            "insp_lymph": forms.CheckboxSelectMultiple,
+            "insp_thyroid": forms.CheckboxSelectMultiple,
+            "insp_skin": forms.CheckboxSelectMultiple,
+            "insp_musculoskeletal": forms.CheckboxSelectMultiple,
+        }
         
         
 class PatientForm(forms.ModelForm):
