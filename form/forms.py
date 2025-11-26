@@ -1,6 +1,37 @@
 from django import forms
-
+from django.contrib.auth.models import User
 from .models import *
+
+
+class UserInviteCreateForm(forms.ModelForm):
+    class Meta:
+        model = UserInvite
+        fields = ["email", "make_staff"]
+        labels = {
+            "email": "E-mail ассистента",
+            "make_staff": "Дать права сотрудника (staff)",
+        }
+
+
+class InviteRegisterForm(forms.Form):
+    username = forms.CharField(label="Логин", max_length=150)
+    password1 = forms.CharField(label="Пароль", widget=forms.PasswordInput)
+    password2 = forms.CharField(label="Повторите пароль", widget=forms.PasswordInput)
+
+    def clean_username(self):
+        username = self.cleaned_data["username"]
+        if User.objects.filter(username=username).exists():
+            raise forms.ValidationError("Пользователь с таким логином уже существует.")
+        return username
+
+    def clean(self):
+        cleaned = super().clean()
+        p1 = cleaned.get("password1")
+        p2 = cleaned.get("password2")
+        if p1 and p2 and p1 != p2:
+            self.add_error("password2", "Пароли не совпадают")
+        return cleaned
+
 
 class ReportForm(forms.ModelForm):
     class Meta:

@@ -1,0 +1,13 @@
+{% extends "form/base.html" %}
+
+{% block title %}Приглашение уже использовано{% endblock %}
+
+{% block content %}
+  <h1>Приглашение недействительно</h1>
+
+  <section class="card">
+    <p>Это приглашение уже было использовано {{ invite.used_at|date:"d.m.Y H:i" }}.</p>
+    <p>Если вы считаете, что это ошибка, обратитесь к администратору.</p>
+  </section>
+{% endblock %}
+

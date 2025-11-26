@@ -38,5 +38,7 @@ urlpatterns = [
     path("q/<uuid:token>/finish/", PublicSurveyFinishView.as_view(), name="survey_finish_public"),
     
     path("patient/<int:pk>/questionnaires/<uuid:token>/results/", SurveyResultsView.as_view(), name="survey_results"),
+    path("invites/new/", views.invite_new, name="invite_new"),
+    path("invite/<uuid:token>/", views.accept_invite, name="accept_invite"),
 ]
 

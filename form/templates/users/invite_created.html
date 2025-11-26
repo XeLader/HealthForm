@@ -1,0 +1,53 @@
+{% extends "form/base.html" %}
+
+{% block title %}Приглашение создано{% endblock %}
+
+{% block content %}
+  <h1>Приглашение создано</h1>
+
+  <section class="card">
+    <div class="card-title">Ссылка</div>
+    <div class="field">
+      <label>Отправь эту ссылку</label>
+      <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
+        <input type="text" value="{{ invite_url }}" readonly
+               style="flex:1; padding:6px 8px; font-size:14px;">
+        <button type="button" class="btn btn-secondary" onclick="copyInviteLink('{{ invite_url }}')">
+          Скопировать
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <script>
+  function copyInviteLink(url) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url).then(function () {
+              alert("Ссылка скопирована:\n" + url);
+          }).catch(function () {
+              fallbackCopy(url);
+          });
+      } else {
+          fallbackCopy(url);
+      }
+  }
+
+  function fallbackCopy(text) {
+      var textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      try {
+          document.execCommand("copy");
+          alert("Ссылка скопирована:\n" + text);
+      } catch (e) {
+          prompt("Скопируйте ссылку вручную:", text);
+      }
+      document.body.removeChild(textarea);
+  }
+  </script>
+{% endblock %}
+

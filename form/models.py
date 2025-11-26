@@ -2,8 +2,36 @@ import uuid
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
-
+from django.contrib.auth.models import User
 # Create your models here.
+
+class UserInvite(models.Model):
+    email = models.EmailField("E-mail ассистента")
+    token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    used = models.BooleanField(default=False)
+    used_at = models.DateTimeField(null=True, blank=True)
+
+    make_staff = models.BooleanField(
+        "Сделать сотрудником (доступ в админку/панель)",
+        default=True,
+    )
+
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Кем создано",
+    )
+
+    def mark_used(self):
+        self.used = True
+        self.used_at = timezone.now()
+        self.save()
+
+    def __str__(self):
+        return f"Приглашение для {self.email}"
 
 class Patient(models.Model):
     class Sex(models.TextChoices):
