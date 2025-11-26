@@ -1,0 +1,48 @@
+{% extends "form/base.html" %}
+
+{% block title %}{{ page_title|default:"Новый анализ" }}{% endblock %}
+
+{% block content %}
+  <h1>{{ page_title|default:"Новый анализ" }}</h1>
+
+  {% if form.non_field_errors %}
+    <div class="errors">{{ form.non_field_errors }}</div>
+  {% endif %}
+
+  <form method="post" class="report-form">
+    {% csrf_token %}
+
+    <div class="cards">
+      <div class="card">
+        {% if card_title %}
+          <div class="card-title">{{ card_title }}</div>
+        {% else %}
+          <div class="card-title">Параметры анализа</div>
+        {% endif %}
+
+        <div class="grid-2">
+          {% for field in form %}
+            <div class="field">
+              {{ field.label_tag }}
+              {{ field }}
+              {% if field.help_text %}
+                <div class="help">{{ field.help_text }}</div>
+              {% endif %}
+              {% if field.errors %}
+                <div class="errors">{{ field.errors }}</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn btn-primary">Сохранить</button>
+
+      {% if cancel_url %}
+        <a href="{{ cancel_url }}" class="btn btn-secondary">Отмена</a>
+      {% endif %}
+    </div>
+  </form>
+{% endblock %}

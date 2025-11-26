@@ -1,78 +1,232 @@
-{% extends 'form/base.html' %}
+{% extends "form/base.html" %}
+{% load age_extras %} {# если фильтр возраста уже создан; иначе убери эту строку #}
+
+{% block title %}Пациент {{ patient.full_name }}{% endblock %}
 
 {% block content %}
-    <article class="post">
+  <h1>Пациент: {{ patient.full_name }}</h1>
 
-	
-<div class = "listblock">
-	<aside class="actions">
-	{% if user.is_authenticated %}
-            <a class="btn btn-secondary" href="{% url 'patient_edit' pk=patient.pk %}" style="float: right;">
-                {% include './icons/pencil-fill.svg' %}
-            </a>
-	{% endif %}        
-	</aside>
-	<h2>1. Данные пациента</h2>
-	        
-	<p>Ф.И.О. <u>{{patient.full_name}}<u> </p>
-	<p>Рост: <u>{{patient.growth}}<u> </p>
-	<p>Вес: <u>{{patient.weight}}<u> </p>
-	
-</div>
+  <div class="cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;">
 
-<div class = "listblock">
-  <aside class="actions">
-		  <a class="btn btn-secondary" href="{% url 'survey_invite_create' pk=patient.pk %}" style="float: right;">
-                {% include './icons/file-earmark-plus.svg' %}
-      </a>      
-	</aside>
-<h2>Предприёмные анкеты</h2>
-	<table style="width:100%;">
-{% for survey in surveys %}
-    <tr>
-      <td> {{ survey.created_at}} </td>
-      <td>{{ survey.submitted_at }}</td>
-      {% if survey.submitted_at %}
-      <td><a href="{% url 'survey_results' pk=patient.pk token=survey.token %}">Результат</a></td>
-      {% endif %}
-    </tr>
-{% endfor %} 
-  </table>
-</div>
+    {# Левая карточка — основные данные #}
+    <section class="card">
+      <div class="card-title">Основные данные</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Ф.И.О.</label>
+          <div>{{ patient.full_name }}</div>
+        </div>
+
+        <div class="field">
+          <label>Пол</label>
+          <div>
+            {% if patient.sex %}
+              {{ patient.get_sex_display }}
+            {% else %}
+              <span class="muted">Не указан</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Дата рождения</label>
+          <div>
+            {% if patient.date_of_birth %}
+              {{ patient.date_of_birth|date:"d.m.Y" }}
+            {% else %}
+              <span class="muted">Не указана</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Возраст</label>
+          <div>
+            {% if patient.date_of_birth %}
+              {{ patient.date_of_birth|age }} лет
+            {% else %}
+              <span class="muted">—</span>
+            {% endif %}
+          </div>
+        </div>
+        
+        <div class="field">
+          <label>Рост</label>
+          <div>
+            {% if patient.growth %}
+              {{ patient.growth }} см
+            {% else %}
+              <span class="muted">—</span>
+            {% endif %}
+          </div>
+        </div>
+        
+        
+        <div class="field">
+          <label>Вес</label>
+          <div>
+            {% if patient.weight %}
+              {{ patient.weight}} кг
+            {% else %}
+              <span class="muted">—</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-title">Действия</div>
+
+      <div class="field" style="margin-bottom:10px;">
+        <a href="{% url 'patient_edit' patient.pk %}" class="btn btn-secondary">
+          Редактировать
+        </a>
+      </div>
+
+      <div class="field" style="margin-bottom:10px;">
+        <a href="{% url 'survey_invite_create' pk=patient.pk %}" class="btn btn-primary">
+           Новая предприёмная анкета
+        </a>
+      </div>
+
+      <div class="field" >
+        <a href="{% url 'report_new_for_patient' pk=patient.pk %}" class="btn btn-primary">
+          Новый приём
+        </a>
+      </div>
+
+     
 
 
-<div class = "listblock">
-  <aside class="actions">
-		  <a class="btn btn-secondary" href="{% url 'report_new_for_patient' pk=patient.pk %}" style="float: right;">
-                {% include './icons/file-earmark-plus.svg' %}
-      </a>      
-	</aside>
-	<h2>2. Приёмы</h2>
-	        
-	{% if reports %}
-	<table style="width:100%;">
+      <hr style="margin:12px 0;border:none;border-top:1px solid #e5e7eb;">
+
+      <div class="field">
+        <label>Всего приёмов</label>
+        <div>
+          {% if reports %}
+            {{ reports|length }}
+          {% else %}
+            0
+          {% endif %}
+        </div>
+      </div>
+    </section>
+  </div>
   
-    {% for report in reports %}
-    <tr>
-      <td> <a href="{% url 'report_detail' pk=report.pk %}">{{ report.created_date }} </a></td>
-      <td>{{ report.title }}</td>
-    </tr>
-    {% endfor %} 
-  </table>
-  {% endif %}
-
-</div>
-
-<div class = "listblock">
-
-	<h2>2. Лабораторные и инструментальные показатели</h2>
-	
-	<div class = "resultsTable">
-	<p><b>2.1 Биохимия</b>
-		<a class="btn btn-secondary" href="{% url 'biochemistry_new' pk=patient.pk %}" style="float: right;">
-                {% include './icons/file-earmark-plus.svg' %}
+  
+  {# Блок со списком предприёмных анкет #}
+<section class="card" style="margin-top:20px;">
+  <header class="card-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+    <h2 class="card-title">Предприёмные анкеты</h2>
+    <a href="{% url 'survey_invite_create' pk=patient.pk %}" class="icon-button" title="Создать ссылку на анкету">
+      {% include "./icons/file-earmark-plus.svg" %}
     </a>
-	</p>
+  </header>
+
+  {% if surveys %}
+    <ol class="item-list" style="list-style:none;margin:0;padding:0;">
+      {% for invite in surveys %}
+        <li class="item-card">
+
+  <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+
+    <div>
+      <div class="item-card-title" style="display:flex; align-items:center; gap:8px;">
+
+        <span>
+          Анкета от {{ invite.created_at|date:"d.m.Y H:i" }}
+        </span>
+
+        {% if invite.submitted_at %}
+          <span class="status-dot status-success"></span>
+          <span class="muted">Заполнена</span>
+        {% else %}
+          <span class="status-dot status-pending"></span>
+          <span class="muted">Ожидает</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <div style="display:flex; align-items:center; gap:10px;">
+
+      {% if invite.submitted_at %}
+        <a href="{% url 'survey_results' pk=patient.pk token=invite.token %}"
+           class="btn btn-secondary" style="white-space:nowrap;">
+          Результат
+        </a>
+      {% else %}
+        <button type="button" class="btn btn-secondary" disabled>Ожидает</button>
+      {% endif %}
+
+      <button class="icon-button-small" onclick="copySurveyLink('{{ invite.token }}')" title="Скопировать ссылку">
+        {% include './icons/clipboard.svg' %}
+      </button>
+
+    </div>
+
+  </div>
+
+</li>
+      {% endfor %}
+    </ol>
+  {% else %}
+    <p class="muted">Для этого пациента пока нет предпринимемых анкет.</p>
+  {% endif %}
+</section>
+  
+  {# Блок со списком приёмов пациента #}
+  <section class="card" style="margin-top:20px;">
+    <header class="card-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <h2 class="card-title">Приёмы пациента</h2>
+      <a href="{% url 'report_new_for_patient' pk=patient.pk %}" class="icon-button" title="Создать приём">
+        {% include "./icons/file-earmark-plus.svg" %}
+      </a>
+    </header>
+
+    {% if reports %}
+      <ol class="item-list" style="list-style:none;margin:0;padding:0;">
+        {% for form in reports %}
+          <li class="item-card">
+            <a href="{% url 'report_detail' pk=form.pk %}" class="item-card-title">
+              {{ form.title }}
+            </a>
+
+            <div class="item-card-meta">
+              <span class="muted">
+                {{ form.create_date|date:"d.m.Y H:i" }}
+              </span>
+            </div>
+
+            {% if form.text %}
+              <div class="item-card-text">
+                {{ form.text|truncatechars:160 }}
+              </div>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ol>
+    {% else %}
+      <p class="muted">Для этого пациента приёмов пока нет.</p>
+    {% endif %}
+  </section>
+
+
+
+  <section class="card" style="margin-top:20px;">
+<header class="card-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <h2 class="card-title">Лабораторные и инструментальные показатели</h2>
+    </header>
+
+<ol class="item-list" style="list-style:none;margin:0;padding:0;">
+	<li class="item-card">
+	<div class = "resultsTable">
+	<div class="item-card-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+	<span>Биохимия</span>
+      <a href="{% url 'biochemistry_new' pk=patient.pk %}" class="icon-button" title="Добавить">
+        {% include "./icons/file-earmark-plus.svg" %}
+      </a>
+  </div>
 
 		{% if biochems %}
 	<table style="width:100%;" onload="readyMark()">
@@ -143,14 +297,19 @@
     {% endfor %}
   </tr>
 </table>
-{% endif %}
+    {% else %}
+      <p class="muted">Нет результатов.</p>
+    {% endif %}
+</li>
+<li class="item-card">
 
-<p class="resultP">
-  <b>2.2 Белковый обмен</b>
-	<a class="btn btn-secondary" href="{% url 'proteinmetabolism_new' pk=patient.pk %}" style="float: right;">
-                {% include './icons/file-earmark-plus.svg' %}
-  </a>
-</p>
+<div class="item-card-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+	<span>Белковый обмен</span>
+      <a href="{% url 'proteinmetabolism_new' pk=patient.pk %}" class="icon-button" title="Добавить">
+        {% include "./icons/file-earmark-plus.svg" %}
+      </a>
+  </div>
+
 
  {% if proteins %}
 <table style="width:100%">
@@ -267,15 +426,17 @@
     {% for rec in proteins %}<th class="val" data="{{ rec.gammaGlobulins }}">{{ rec.gammaGlobulins }}</th>{% endfor %}
   </tr>
 </table>
-{% endif %}
-
-
-
-  <p  class="resultP"><b>2.3 Липидный обмен</b>
-		<a class="btn btn-secondary" href="{% url 'lipidmetabolism_new' pk=patient.pk %}" style="float: right;">
-                {% include './icons/file-earmark-plus.svg' %}
-    </a>
-	</p>
+    {% else %}
+      <p class="muted">Нет результатов.</p>
+    {% endif %}
+</li>
+<li class="item-card">
+<div class="item-card-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+	<span>Липидный обмен</span>
+      <a href="{% url 'lipidmetabolism_new' pk=patient.pk %}" class="icon-button" title="Добавить">
+        {% include "./icons/file-earmark-plus.svg" %}
+      </a>
+  </div>
 	
 	{% if lipids %}
 <table style="width:100%">
@@ -368,15 +529,19 @@
     {% for rec in lipids %}<th class="val" data="{{ rec.Triglycerides }}">{{ rec.Triglycerides }}</th>{% endfor %}
   </tr>
 </table>
-{% endif %}
+    {% else %}
+      <p class="muted">Нет результатов.</p>
+    {% endif %}
 
+	</li>
+<li class="item-card">
 	
-	
-	<p  class="resultP"><b>2.4 Углеводный обмен</b>
-		<a class="btn btn-secondary" href="{% url 'ironmetabolism_new' pk=patient.pk %}" style="float: right;">
-                {% include './icons/file-earmark-plus.svg' %}
-    </a>
-	</p>
+	<div class="item-card-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+	<span>Углеводный обмен</span>
+      <a href="{% url 'carbohydratemetabolism_new' pk=patient.pk %}" class="icon-button" title="Добавить">
+        {% include "./icons/file-earmark-plus.svg" %}
+      </a>
+  </div>
 	
 	{% if carbohydrates %}
 <table style="width:100%">
@@ -398,16 +563,20 @@
     {% for rec in carbohydrates %}<th class="val" data="{{ rec.glycatedHemoglobin }}">{{ rec.glycatedHemoglobin }}</th>{% endfor %}
   </tr>
 </table>
-{% endif %}
+    {% else %}
+      <p class="muted">Нет результатов.</p>
+    {% endif %}
 
+	</li>
+<li class="item-card">
 	
-	
-	<p  class="resultP"><b>2.5 Обмен железа</b>
-		<a class="btn btn-secondary" href="{% url 'ironmetabolism_new' pk=patient.pk %}" style="float: right;">
-                {% include './icons/file-earmark-plus.svg' %}
-    </a>
-	</p>
-	
+	<div class="item-card-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+	<span>Обмен железа</span>
+      <a href="{% url 'ironmetabolism_new' pk=patient.pk %}" class="icon-button" title="Добавить">
+        {% include "./icons/file-earmark-plus.svg" %}
+      </a>
+  </div>
+
 	{% if irons %}
 <table style="width:100%">
   <tr>
@@ -450,14 +619,19 @@
     {% for rec in irons %}<th class="val" data="{{ rec.transferrinSat }}">{{ rec.transferrinSat }}</th>{% endfor %}
   </tr>
 </table>
-{% endif %}
-
+    {% else %}
+      <p class="muted">Нет результатов.</p>
+    {% endif %}
+	</li>
+<li class="item-card">
 	
-	<p  class="resultP"><b>2.6 Микроэлементы</b>
-		<a class="btn btn-secondary" href="{% url 'micronutrients_new' pk=patient.pk %}" style="float: right;">
-                {% include './icons/file-earmark-plus.svg' %}
-    </a>
-	</p>
+	<div class="item-card-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+	<span>Микроэлементы</span>
+      <a href="{% url 'micronutrients_new' pk=patient.pk %}" class="icon-button" title="Добавить">
+        {% include "./icons/file-earmark-plus.svg" %}
+      </a>
+  </div>
+
 	
 	{% if micros %}
 <table style="width:100%">
@@ -515,15 +689,20 @@
     {% for rec in micros %}<th class="val" data="{{ rec.chloride }}">{{ rec.chloride }}</th>{% endfor %}
   </tr>
 </table>
-{% endif %}
+    {% else %}
+      <p class="muted">Нет результатов.</p>
+    {% endif %}
 
+</li>
+<li class="item-card">
 	
-	<p  class="resultP"><b>2.7 Маркеры воспаления</b>
-		<a class="btn btn-secondary" href="{% url 'inflammatorymarkers_new' pk=patient.pk %}" style="float: right;">
-                {% include './icons/file-earmark-plus.svg' %}
-    </a>
-	</p>
-	
+	<div class="item-card-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+	<span>Маркеры воспаления</span>
+      <a href="{% url 'inflammatorymarkers_new' pk=patient.pk %}" class="icon-button" title="Добавить">
+        {% include "./icons/file-earmark-plus.svg" %}
+      </a>
+  </div>
+
 	{% if inflamms %}
 <table style="width:100%">
   <tr>
@@ -543,14 +722,20 @@
     {% for rec in inflamms %}<th class="val" data="{{ rec.homocysteine }}">{{ rec.homocysteine }}</th>{% endfor %}
   </tr>
 </table>
-{% endif %}
-
+    {% else %}
+      <p class="muted">Нет результатов.</p>
+    {% endif %}
+</li>
+<li class="item-card">
 	
-	<p  class="resultP"><b>2.8 Аллергия и инфекция</b>
-		<a class="btn btn-secondary" href="{% url 'allergiesinfections_new' pk=patient.pk %}" style="float: right;">
-                {% include './icons/file-earmark-plus.svg' %}
-    </a>
-	</p>
+	<div class="item-card-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+	<span>Аллергия и инфекция</span>
+      <a href="{% url 'allergiesinfections_new' pk=patient.pk %}" class="icon-button" title="Добавить">
+        {% include "./icons/file-earmark-plus.svg" %}
+      </a>
+  </div>
+
+
 	
 	{% if allergies %}
 <table style="width:100%">
@@ -580,14 +765,19 @@
     {% for rec in allergies %}<th class="val" data="{{ rec.antiParasitic }}">{{ rec.antiParasitic }}</th>{% endfor %}
   </tr>
 </table>
-{% endif %}
+    {% else %}
+      <p class="muted">Нет результатов.</p>
+    {% endif %}
 
+</li>
+<li class="item-card">
 	
-	<p  class="resultP"><b>2.9 Функция щитовидной железы</b>
-		<a class="btn btn-secondary" href="{% url 'thyroidfunction_new' pk=patient.pk %}" style="float: right;">
-                {% include './icons/file-earmark-plus.svg' %}
-    </a>
-	</p>
+	<div class="item-card-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+	<span>Функция щитовидной железы</span>
+      <a href="{% url 'thyroidfunction_new' pk=patient.pk %}" class="icon-button" title="Добавить">
+        {% include "./icons/file-earmark-plus.svg" %}
+      </a>
+  </div>
 	
 	{% if thyroids %}
 <table style="width:100%">
@@ -648,15 +838,20 @@
     {% for rec in thyroids %}<th class="val" data="{{ rec.TgAb }}">{{ rec.TgAb }}</th>{% endfor %}
   </tr>
 </table>
-{% endif %}
+    {% else %}
+      <p class="muted">Нет результатов.</p>
+    {% endif %}
 	
+	</li>
+<li class="item-card">
 	
-	<p  class="resultP"><b>2.10 Гематология (эритроцитарное звено)</b>
-		<a class="btn btn-secondary" href="{% url 'hematology_new' pk=patient.pk %}" style="float: right;">
-                {% include './icons/file-earmark-plus.svg' %}
-    </a>
-	</p>
-	
+	<div class="item-card-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+	<span>Гематология (эритроцитарное звено)</span>
+      <a href="{% url 'hematology_new' pk=patient.pk %}" class="icon-button" title="Добавить">
+        {% include "./icons/file-earmark-plus.svg" %}
+      </a>
+  </div>
+
 	{% if hematologies %}
 <table style="width:100%">
   <tr>
@@ -685,15 +880,20 @@
     {% for rec in hematologies %}<th class="val" data="{{ rec.MCHC }}">{{ rec.MCHC }}</th>{% endfor %}
   </tr>
 </table>
-{% endif %}
+    {% else %}
+      <p class="muted">Нет результатов.</p>
+    {% endif %}
 
+	</li>
+<li class="item-card">
 	
-	
-	<p  class="resultP"><b>2.11 Тромбоцитарное звено</b>
-		<a class="btn btn-secondary" href="{% url 'platelets_new' pk=patient.pk %}" style="float: right;">
-                {% include './icons/file-earmark-plus.svg' %}
-    </a>
-	</p>
+	<div class="item-card-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+	<span>Тромбоцитарное звено</span>
+      <a href="{% url 'platelets_new' pk=patient.pk %}" class="icon-button" title="Добавить">
+        {% include "./icons/file-earmark-plus.svg" %}
+      </a>
+  </div>
+
 	
 	{% if platelets %}
 <table style="width:100%">
@@ -714,14 +914,19 @@
     {% for rec in platelets %}<th class="val" data="{{ rec.PDW }}">{{ rec.PDW }}</th>{% endfor %}
   </tr>
 </table>
-{% endif %}
+    {% else %}
+      <p class="muted">Нет результатов.</p>
+    {% endif %}
 
+	</li>
+<li class="item-card">
 	
-	<p  class="resultP"><b>2.12 Лейкоцитарное звено</b>
-		<a class="btn btn-secondary" href="{% url 'leukocytes_new' pk=patient.pk %}" style="float: right;">
-                {% include './icons/file-earmark-plus.svg' %}
-    </a>
-	</p>
+	<div class="item-card-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+	<span>Лейкоцитарное звено</span>
+      <a href="{% url 'leukocytes_new' pk=patient.pk %}" class="icon-button" title="Добавить">
+        {% include "./icons/file-earmark-plus.svg" %}
+      </a>
+  </div>
 	
 	{% if leukocytes %}
 <table style="width:100%">
@@ -766,14 +971,19 @@
     {% for rec in leukocytes %}<th class="val" data="{{ rec.ESR }}">{{ rec.ESR }}</th>{% endfor %}
   </tr>
 </table>
-{% endif %}
+    {% else %}
+      <p class="muted">Нет результатов.</p>
+    {% endif %}
 
+</li>
+<li class="item-card">
 	
-		<p  class="resultP"><b>2.13 Гормональный фон<b>
-		<a class="btn btn-secondary" href="{% url 'hormonallevels_new' pk=patient.pk %}" style="float: right;">
-                {% include './icons/file-earmark-plus.svg' %}
-    </a>
-	</p>
+	<div class="item-card-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+	<span>Гормональный фон</span>
+      <a href="{% url 'hormonallevels_new' pk=patient.pk %}" class="icon-button" title="Добавить">
+        {% include "./icons/file-earmark-plus.svg" %}
+      </a>
+  </div>
 
 {% if hormons %}
 <table style="width:100%">
@@ -836,15 +1046,23 @@
     {% for rec in hormons %}<th class="val" data="{{ rec.PSA }}">{{ rec.PSA }}</th>{% endfor %}
   </tr>
 </table>
-{% endif %}
-</div>
+    {% else %}
+      <p class="muted">Нет результатов.</p>
+    {% endif %}
+</li>
+</ol>
+</section>
 
-	<a class="btn btn-secondary" href="{% url 'prescription_new' pk=patient.pk %}" style="float: right;">
-                {% include './icons/file-earmark-plus.svg' %}
-            </a>
-	<h3>3. Назначения</h3>
-	
-	<div class = "resultsTable" style="width:100%" >
+ <section class="card" style="margin-top:20px;">
+    <header class="card-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <h2 class="card-title">Назначения</h2>
+      <a href="{% url 'prescription_new' pk=patient.pk %}" class="icon-button" title="Создать назначение">
+        {% include "./icons/file-earmark-plus.svg" %}
+      </a>
+    </header>
+
+    {% if prescriptions %}
+    	<div class = "resultsTable" style="width:100%" >
 	<table style="width:100%">
 	<tr>
     <th>Препарат</th>
@@ -863,9 +1081,15 @@
   </tr>
     {% endfor %}
 
-	</table>
-</div>
-</div>
+	  </table>
+	  </div>
+    {% else %}
+      <p class="muted">Для этого пациента нет назначений.</p>
+    {% endif %}
+  </section>
+
+
+
 </article>
 
 <script>
@@ -914,6 +1138,14 @@
     initUnitControls();
   }
 })();
+
+function copySurveyLink(token) {
+    const url = window.location.origin + "/survey/" + token + "/";
+    navigator.clipboard.writeText(url)
+        .then(() => alert("Ссылка скопирована:\n" + url))
+        .catch(err => alert("Не удалось скопировать ссылку"));
+}
+
 </script>
 
 {% endblock %}

@@ -1,0 +1,76 @@
+{% extends 'form/base.html' %}
+
+{% block title %}
+  {% if patient %}Редактирование пациента{% else %}Новый пациент{% endif %}
+{% endblock %}
+
+{% block content %}
+  <h1>
+    {% if patient %}Редактирование пациента{% else %}Новый пациент{% endif %}
+  </h1>
+
+  {% if form.non_field_errors %}
+    <div class="errors">{{ form.non_field_errors }}</div>
+  {% endif %}
+
+  <form method="post" class="report-form">
+    {% csrf_token %}
+
+    <div class="cards">
+
+      {# Блок 1: основные данные #}
+      <div class="card">
+        <div class="card-title">Основные данные</div>
+        <div class="grid-2">
+          <div class="field">
+            {{ form.full_name.label_tag }}
+            {{ form.full_name }}
+            {% if form.full_name.errors %}<div class="errors">{{ form.full_name.errors }}</div>{% endif %}
+          </div>
+
+          <div class="field">
+            {{ form.date_of_birth.label_tag }}
+            {{ form.date_of_birth }}
+            {% if form.date_of_birth.errors %}<div class="errors">{{ form.date_of_birth.errors }}</div>{% endif %}
+          </div>
+
+          <div class="field">
+            {{ form.sex.label_tag }}
+            {{ form.sex }}
+            {% if form.sex.errors %}<div class="errors">{{ form.sex.errors }}</div>{% endif %}
+          </div>
+        </div>
+      </div>
+
+      {# Блок 2: остальные поля (если есть) #}
+      {% with known="full_name,date_of_birth,sex" %}
+      <div class="card">
+        <div class="card-title">Дополнительная информация</div>
+        <div class="grid-2">
+          {% for field in form %}
+            {% if field.name != "full_name" and field.name != "date_of_birth" and field.name != "sex" %}
+              <div class="field">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.help_text %}<div class="help">{{ field.help_text }}</div>{% endif %}
+                {% if field.errors %}<div class="errors">{{ field.errors }}</div>{% endif %}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+      {% endwith %}
+
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn btn-primary">Сохранить</button>
+      {% if patient %}
+        <a href="{% url 'patient_detail' patient.pk %}" class="btn btn-secondary">Отмена</a>
+      {% else %}
+        <a href="{% url 'patient_list' %}" class="btn btn-secondary">Отмена</a>
+      {% endif %}
+    </div>
+  </form>
+{% endblock %}
+

@@ -1,32 +1,99 @@
 {% extends 'form/base.html' %}
+{% load age_extras %}
+{% block title %}Панель управления{% endblock %}
 
 {% block content %}
+<div class="dashboard">
+  <div class="cards">
 
-    <div class = "listblock">
-    		<a href="{% url 'patient_new' %}" class="top-menu">
-        		{% include './icons/file-earmark-plus.svg' %}
-    			</a>
-    <h2> Пациенты </h2>
-     <ol>
-     {% for patient in patients %}
-    <li><a href="{% url 'patient_detail' pk=patient.pk %}">{{ patient.full_name }}</a></li>
-     {% endfor %}
-    </ol> 
-    <a href="{% url 'patient_list' %}">Показать всех</a>
-    </div>
-    
-    <div class = "listblock">
-        		<a href="{% url 'report_new' %}" class="top-menu">
-        		{% include './icons/file-earmark-plus.svg' %}
-    			</a>
-    <h2> Приёмы </h2>
-     <ol>
-     {% for form in reports %}
-    <li><a href="{% url 'report_detail' pk=form.pk %}">{{ form.title }}</a>
-    <div>{{ form.text }} </div>
-    </li>
-     {% endfor %}
-    </ol> 
-    <a href="{% url 'report_list' %}">Показать всех</a>
-    </div>
+    <section class="card">
+      <header class="card-header">
+        <h2 class="card-title">Пациенты</h2>
+        <a href="{% url 'patient_new' %}" class="icon-button" title="Добавить пациента">
+          {% include './icons/file-earmark-plus.svg' %}
+        </a>
+      </header>
+      {% if patients %}
+        <ol class="item-list" style="list-style:none;margin:0;padding:0;">
+          {% for patient in patients %}
+            <li class="item-card">
+              <a href="{% url 'patient_detail' pk=patient.pk %}" class="item-card-title">
+                {{ patient.full_name }}
+              </a>
+              <div class="item-card-meta">
+                {% if patient.sex %}
+                  {{ patient.get_sex_display }} ·
+                {% else %}
+                  <span class="muted">Пол не указан</span> ·
+                {% endif %}
+                {% if patient.date_of_birth %}
+                  <span class="muted">
+                    {{ patient.date_of_birth|date:"d.m.Y" }} ({{ patient.date_of_birth|age }} лет)
+                  </span>
+                {% else %}
+                  <span class="muted">Дата рождения не указана</span>
+                {% endif %}
+              </div>
+            </li>
+          {% endfor %}
+        </ol>
+      {% else %}
+          <p class="muted">Пока нет пациентов.</p>
+      {% endif %}
+      <footer class="card-footer">
+        <a href="{% url 'patient_list' %}" class="link-more">Показать всех</a>
+      </footer>
+    </section>
+
+    <section class="card">
+  <header class="card-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+    <h2 class="card-title">Приёмы</h2>
+    <a href="{% url 'report_new' %}" class="icon-button" title="Создать приём">
+      {% include "./icons/file-earmark-plus.svg" %}
+    </a>
+  </header>
+
+  {% if reports %}
+    <ol class="item-list" style="list-style:none;margin:0;padding:0;">
+      {% for form in reports %}
+        <li class="item-card">
+          <a href="{% url 'report_detail' pk=form.pk %}" class="item-card-title">
+            {{ form.title }}
+          </a>
+
+          <div class="item-card-meta">
+            Пациент:
+            {% if form.patient %}
+              <a href="{% url 'patient_detail' pk=form.patient.pk %}" class="item-card-meta-link">
+                {{ form.patient.full_name }}
+              </a>
+            {% else %}
+              <span class="muted">не указан</span>
+            {% endif %}
+            ·
+            <span class="muted">
+              {{ form.created_date|date:"d.m.Y" }}
+            </span>
+          </div>
+
+          {% if form.text %}
+            <div class="item-card-text">
+              {{ form.text|truncatechars:120 }}
+            </div>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ol>
+  {% else %}
+    <p class="muted">Пока нет приёмов.</p>
+  {% endif %}
+
+  <footer class="card-footer" style="margin-top:10px;">
+    <a href="{% url 'report_list' %}" class="link-more">Показать всех</a>
+  </footer>
+</section>
+
+  </div>
+</div>
 {% endblock %}
+

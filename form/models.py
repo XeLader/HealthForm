@@ -6,12 +6,26 @@ from django.utils import timezone
 # Create your models here.
 
 class Patient(models.Model):
-	full_name = models.CharField("Ф.И.О.", max_length=150, default = "None")
-	growth = models.IntegerField(default = 0)
-	weight = models.DecimalField(max_digits = 10, decimal_places=3, default = 0)
+    class Sex(models.TextChoices):
+        MALE       = "M", "Мужской"
+        FEMALE     = "F", "Женский"
+        UNKNOWN    = "U", "Не указан"
+
+    full_name = models.CharField("Ф.И.О.", max_length=150, default = "None")
+    growth = models.IntegerField("Рост, см", default = 0)
+    weight = models.DecimalField("Вес, кг", max_digits = 10, decimal_places=3, default = 0)
+    date_of_birth = models.DateField("Дата рождения", blank=True, null=True)
+    sex = models.CharField(
+        "Пол",
+        max_length=2,
+        choices=Sex.choices,
+        blank=True,
+        null=True,
+        default="U",
+    )
     
-	def __str__(self):
-		return self.full_name
+    def __str__(self):
+	    return self.full_name
 
 class Biochemistry(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True, default = 0)

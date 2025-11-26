@@ -1,122 +1,294 @@
-{% extends 'form/base.html' %}
+{% extends "form/base.html" %}
+
+{% block title %}Приём: {{ report.title }}{% endblock %}
 
 {% block content %}
-    <article class="post">
-        <aside class="actions">
-	{% if user.is_authenticated %}
-            <a class="btn btn-secondary" href="{% url 'report_edit' pk=report.pk %}">
-                {% include './icons/pencil-fill.svg' %}
-            </a>
-	{% endif %}        
-	</aside>
-        {% if report.create_date %}
-            <time class="date">
-                {{ report.create_date }}
-            </time>
-        {% endif %}
-        <h2>{{ report.title }}</h2>
-        <p>{{ report.text|linebreaksbr }}</p>
-<div class = "listblock">
-	<h3>1. Данные пациента</h3>
-	<p>Ф.И.О. <a href="{% url 'patient_detail' pk=report.patient.pk %}">{{report.patient.full_name}}</a> </p>
-	<p>Рост: <u>{{report.patient.growth}}<u> </p>
-	<p>Вес: <u>{{report.patient.weight}}<u> </p>
-</div>
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+    <h1>Приём пациента</h1>
+    <div style="display:flex; gap:8px;">
+      <a href="{% url 'report_edit' report.pk %}" class="btn btn-secondary">
+        Редактировать
+      </a>
+      {% if report.patient %}
+        <a href="{% url 'patient_detail' report.patient.pk %}" class="btn btn-secondary">
+          К пациенту
+        </a>
+      {% endif %}
+    </div>
+  </div>
 
-<div class = "listblock">
-	<h3>2. Жалобы</h3>
-	<p>{{report.complaints}}</p>
-</div>
+  <div class="cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:16px;">
 
-<div class = "listblock">
-	<h3>3. Анамнез заболевания</h3>
-	<p>{{report.anamnesis}}</p>
-</div>
+    {# 1. Общие сведения #}
+    <section class="card">
+      <div class="card-title">Общие сведения</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Пациент</label>
+          <div>
+            {% if report.patient %}
+              <a href="{% url 'patient_detail' report.patient.pk %}">
+                {{ report.patient.full_name }}
+              </a>
+            {% else %}
+              <span class="muted">Не указан</span>
+            {% endif %}
+          </div>
+        </div>
 
-<div class = "listblock">
-	<h3>4. Диетологический анамнез</h3>
-	<p> <b>Тип питания:</b> {{report.get_diet_display}}</p>
-	<p> <b>Количество приёмов пищи в день:</b> {{report.get_dmealscount_display}}</p>
-	<p> <b>Перекусы:</b> {{report.get_snacks_display}}</p>
-	<p> <b>Предпочтения:</b> {{report.get_preference_display}}</p>
-</div>
+        <div class="field">
+          <label>Дата приёма</label>
+          <div>{{ report.created_date|date:"d.m.Y H:i" }}</div>
+        </div>
 
-<div class = "listblock">	
-	<h3>5. Наследственность</h3>
-	<p> <b>Сердечно‑сосудистые заболевания:</b> {{report.get_cardiovascular_display}}</p>
-	<p> <b>Онкологические заболевания:</b> {{report.get_oncological_display}}</p>
-	<p> <b>Сахарный диабет: </b> {{report.get_diabetes_display}}</p>
-	<p> <b>Заболевания щитовидной железы:</b> {{report.get_thyroid_display}}</p>
-	<p> <b>Аутоиммунные заболевания: </b> {{report.get_autoimmune_display}}</p>
-	<p> <b>Аллергические заболевания: </b> {{report.get_allergic_display}}</p>
-	</div>
-	
-<div class = "listblock">
-	<h3>8. Лабораторные и инструментальные показатели</h3>
-	<p><b>8.1 Биохимия</b></p>
-	
-	<table style="width:100%">
-  <tr>
-    <th>Показатель</th>
-    <th>Ед. изм.</th>
-    <th>Референсные значения</th>
-    {% for biochem in biochems %}
-    <th>{{ biochem.created_date }}</th>
-    {% endfor %}
-  </tr>
-  <tr>
-    <td>АлАТ </td>
-    <td>Ед/л</td>
-    <td>♂ < 41; ♀ < 33</td>
-    {% for biochem in biochems %}
-    <th>{{ biochem.alat }}</th>
-    {% endfor %}
-  </tr>
-  <tr>
-    <td>АсАТ </td>
-    <td>Ед/л</td>
-    <td>♂ < 41; ♀ < 33</td>
-    {% for biochem in biochems %}
-    <th>{{ biochem.asat }}</th>
-    {% endfor %}
-  </tr>
-  <tr>
-    <td>ЛДГ </td>
-    <td>Ед/л</td>
-    <td>♂ < 41; ♀ < 33</td>
-    {% for biochem in biochems %}
-    <th>{{ biochem.ldh }}</th>
-    {% endfor %}
-  </tr>
-  <tr>
-    <td>КФК </td>
-    <td>Ед/л</td>
-    <td>♂ < 41; ♀ < 33</td>
-    {% for biochem in biochems %}
-    <th>{{ biochem.cpk }}</th>
-    {% endfor %}
-  </tr>
-</table>
-	</div>
-	
-<div class = "listblock">	
-	<h3>11. Назначения</h3>
-	<table style="width:100%">
-	<tr>
-    <th>Препарат</th>
-    <th>Дозировка</th>
-    <th>режим</th>
-    <th>длительность</th>
-    <th>комментарий</th>
-  </tr>
-  <tr>
-    <td>{{report.prescription.medicine.title}} </td>
-    <td>{{report.prescription.dosage}}</td>
-    <td>{{report.prescription.regime}}</td>
-    <td>{{report.prescription.duration}}</td>
-    <td>{{report.prescription.comment}}</td>
-  </tr>
-	</table>
-</div>
-</article>
+        <div class="field">
+          <label>Следующий приём</label>
+          <div>{{ report.next_date|date:"d.m.Y H:i" }}</div>
+        </div>
+      </div>
+    </section>
+
+    {# 2. Жалобы и анамнез #}
+    <section class="card">
+      <div class="card-title">Жалобы и анамнез</div>
+      <div class="field">
+        <label>{{ fields_verbose.complaints }}</label>
+        <div>{{ report.complaints|default:"—" }}</div>
+      </div>
+      <div class="field" style="margin-top:8px;">
+        <label>{{ fields_verbose.anamnesis }}</label>
+        <div>{{ report.anamnesis|default:"—" }}</div>
+      </div>
+    </section>
+
+    {# 3. Питание и предпочтения #}
+    <section class="card">
+      <div class="card-title">Питание</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>{{ fields_verbose.diet }}</label>
+          <div>{{ report.get_diet_display }}</div>
+        </div>
+        <div class="field">
+          <label>{{ fields_verbose.mealscount }}</label>
+          <div>{{ report.mealscount }}</div>
+        </div>
+        <div class="field">
+          <label>{{ fields_verbose.snacks }}</label>
+          <div>{{ report.get_snacks_display }}</div>
+        </div>
+      </div>
+
+      <hr style="margin:12px 0;border:none;border-top:1px solid #e5e7eb;">
+
+      <div class="field">
+        <label>Предпочтительные продукты</label>
+        <div>
+          {% if report.pref_Meat or report.pref_Fish or report.pref_Dair or report.pref_Eggs or report.pref_Vegs or report.pref_Frut or report.pref_Groa or report.pref_Swet or report.pref_Fast or report.pref_Cofe or report.pref_Alco %}
+            {% if report.pref_Meat %}мясо{% endif %}
+            {% if report.pref_Fish %}{% if report.pref_Meat %}, {% endif %}рыба{% endif %}
+            {% if report.pref_Dair %}{% if report.pref_Meat or report.pref_Fish %}, {% endif %}молочные продукты{% endif %}
+            {% if report.pref_Eggs %}{% if report.pref_Meat or report.pref_Fish or report.pref_Dair %}, {% endif %}яйца{% endif %}
+            {% if report.pref_Vegs %}{% if report.pref_Meat or report.pref_Fish or report.pref_Dair or report.pref_Eggs %}, {% endif %}овощи{% endif %}
+            {% if report.pref_Frut %}{% if report.pref_Meat or report.pref_Fish or report.pref_Dair or report.pref_Eggs or report.pref_Vegs %}, {% endif %}фрукты{% endif %}
+            {% if report.pref_Groa %}{% if report.pref_Meat or report.pref_Fish or report.pref_Dair or report.pref_Eggs or report.pref_Vegs or report.pref_Frut %}, {% endif %}крупы{% endif %}
+            {% if report.pref_Swet %}{% if report.pref_Meat or report.pref_Fish or report.pref_Dair or report.pref_Eggs or report.pref_Vegs or report.pref_Frut or report.pref_Groa %}, {% endif %}сладкое{% endif %}
+            {% if report.pref_Fast %}{% if report.pref_Meat or report.pref_Fish or report.pref_Dair or report.pref_Eggs or report.pref_Vegs or report.pref_Frut or report.pref_Groa or report.pref_Swet %}, {% endif %}фаст-фуд{% endif %}
+            {% if report.pref_Cofe %}{% if report.pref_Meat or report.pref_Fish or report.pref_Dair or report.pref_Eggs or report.pref_Vegs or report.pref_Frut or report.pref_Groa or report.pref_Swet or report.pref_Fast %}, {% endif %}напитки с кофе{% endif %}
+            {% if report.pref_Alco %}{% if report.pref_Meat or report.pref_Fish or report.pref_Dair or report.pref_Eggs or report.pref_Vegs or report.pref_Frut or report.pref_Groa or report.pref_Swet or report.pref_Fast or report.pref_Cofe %}, {% endif %}алкоголь{% endif %}
+          {% else %}
+            <span class="muted">Не указано</span>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    {# 4. Непереносимости #}
+    <section class="card">
+      <div class="card-title">Непереносимость продуктов</div>
+      <div class="field">
+        <label>Непереносимости</label>
+        <div>
+          {% if report.intol_Lact or report.intol_Glut or report.intol_Nuts or report.intol_Sea or report.intol_Other %}
+            <ul style="margin:0;padding-left:18px;">
+              {% if report.intol_Lact %}<li>{{ fields_verbose.intol_Lact }}</li>{% endif %}
+              {% if report.intol_Glut %}<li>{{ fields_verbose.intol_Glut }}</li>{% endif %}
+              {% if report.intol_Nuts %}<li>{{ fields_verbose.intol_Nuts }}</li>{% endif %}
+              {% if report.intol_Sea %}<li>{{ fields_verbose.intol_Sea }}</li>{% endif %}
+              {% if report.intol_Other %}<li>{{ fields_verbose.intol_Other }}: {{ report.intol_Other }}</li>{% endif %}
+            </ul>
+          {% else %}
+            <span class="muted">Не указано</span>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    {# 5. Наследственность #}
+    <section class="card">
+      <div class="card-title">Наследственность</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>{{ fields_verbose.cardiovascular }}</label>
+          <div>{{ report.get_cardiovascular_display }}</div>
+        </div>
+        <div class="field">
+          <label>{{ fields_verbose.oncological }}</label>
+          <div>{{ report.get_oncological_display }}</div>
+        </div>
+        <div class="field">
+          <label>{{ fields_verbose.diabetes }}</label>
+          <div>{{ report.get_diabetes_display }}</div>
+        </div>
+        <div class="field">
+          <label>{{ fields_verbose.thyroid }}</label>
+          <div>{{ report.get_thyroid_display }}</div>
+        </div>
+        <div class="field">
+          <label>{{ fields_verbose.autoimmune }}</label>
+          <div>{{ report.get_autoimmune_display }}</div>
+        </div>
+        <div class="field">
+          <label>{{ fields_verbose.allergic }}</label>
+          <div>{{ report.get_allergic_display }}</div>
+        </div>
+      </div>
+    </section>
+
+    {# 6. Аллергический анамнез #}
+    <section class="card">
+      <div class="card-title">Аллергический анамнез</div>
+      <div class="field">
+        <label>{{ fields_verbose.foodAllergy }}</label>
+        <div>{{ report.foodAllergy|default:"—" }}</div>
+      </div>
+      <div class="field" style="margin-top:6px;">
+        <label>{{ fields_verbose.medicineAllergy }}</label>
+        <div>{{ report.medicineAllergy|default:"—" }}</div>
+      </div>
+      <div class="field" style="margin-top:6px;">
+        <label>{{ fields_verbose.seasonalAllergy }}</label>
+        <div>{{ report.seasonalAllergy|default:"—" }}</div>
+      </div>
+      <div class="field" style="margin-top:6px;">
+        <label>{{ fields_verbose.contactAllergy }}</label>
+        <div>{{ report.contactAllergy|default:"—" }}</div>
+      </div>
+      <div class="field" style="margin-top:6px;">
+        <label>{{ fields_verbose.noAllergy }}</label>
+        <div>{{ report.noAllergy|default:"—" }}</div>
+      </div>
+    </section>
+
+    {# 7. Объективный статус #}
+    <section class="card">
+      <div class="card-title">Объективный статус</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>{{ fields_verbose.insp_General }}</label>
+          <div>{{ report.get_insp_General_display }}</div>
+        </div>
+        <div class="field">
+          <label>{{ fields_verbose.insp_Body }}</label>
+          <div>{{ report.get_insp_Body_display }}</div>
+        </div>
+        <div class="field">
+          <label>{{ fields_verbose.insp_Abdomen }}</label>
+          <div>{{ report.get_insp_Abdomen_display }}</div>
+        </div>
+        <div class="field">
+          <label>{{ fields_verbose.insp_Liver }}</label>
+          <div>{{ report.get_insp_Liver_display }}</div>
+        </div>
+        <div class="field">
+          <label>{{ fields_verbose.insp_Liver_protudes }}</label>
+          <div>{{ report.insp_Liver_protudes }} см</div>
+        </div>
+      </div>
+
+      <hr style="margin:12px 0;border:none;border-top:1px solid #e5e7eb;">
+
+      <div class="grid-2">
+        <div class="field">
+          <label>Кожа и слизистые</label>
+          <div>
+            {% if report.insp_skin.all %}
+              <ul style="margin:0;padding-left:18px;">
+                {% for opt in report.insp_skin.all %}
+                  <li>{{ opt }}</li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <span class="muted">Не указано</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Лимфатические узлы</label>
+          <div>
+            {% if report.insp_lymph.all %}
+              <ul style="margin:0;padding-left:18px;">
+                {% for opt in report.insp_lymph.all %}
+                  <li>{{ opt }}</li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <span class="muted">Не указано</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Щитовидная железа</label>
+          <div>
+            {% if report.insp_thyroid.all %}
+              <ul style="margin:0;padding-left:18px;">
+                {% for opt in report.insp_thyroid.all %}
+                  <li>{{ opt }}</li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <span class="muted">Не указано</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Опорно‑двигательный аппарат</label>
+          <div>
+            {% if report.insp_musculoskeletal.all %}
+              <ul style="margin:0;padding-left:18px;">
+                {% for opt in report.insp_musculoskeletal.all %}
+                  <li>{{ opt }}</li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <span class="muted">Не указано</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="field" style="margin-top:8px;">
+        <label>{{ fields_verbose.insp_Other }}</label>
+        <div>{{ report.insp_Other|default:"—" }}</div>
+      </div>
+    </section>
+
+    {# 8. Заключение #}
+    <section class="card">
+      <div class="card-title">Заключение</div>
+      <div class="field">
+        <label>{{ fields_verbose.title }}</label>
+        <div>{{ report.title }}</div>
+      </div>
+      <div class="field" style="margin-top:8px;">
+        <label>{{ fields_verbose.text }}</label>
+        <div style="white-space:pre-wrap;">{{ report.text }}</div>
+      </div>
+    </section>
+
+  </div>
 {% endblock %}
+

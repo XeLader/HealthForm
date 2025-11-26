@@ -1,23 +1,68 @@
-{% extends 'form/base.html' %}
+{% extends "form/base.html" %}
+{% load age_extras %} {# если используешь фильтр возраста #}
+
+{% block title %}Пациенты{% endblock %}
 
 {% block content %}
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+    <h1>Пациенты</h1>
+    <a href="{% url 'patient_new' %}" class="btn btn-primary">
+      Новый пациент
+    </a>
+  </div>
 
+  <section class="card">
+    <header class="card-header" style="margin-bottom:8px;">
+      <h2 class="card-title">Список пациентов</h2>
+    </header>
 
-<div class = "listblock">
-    		<a href="{% url 'patient_new' %}" class="top-menu">
-        		{% include './icons/file-earmark-plus.svg' %}
-    			</a>
-    <h2> Пациенты </h2>
-     <ol>
-     {% for form in patients %}
-    <li>
-      <a href="{% url 'patient_detail' pk=form.pk %}">{{ form.full_name }}</a>
-        <p>Рост: {{ form.growth }} см<br>
-           Вес: {{ form.weight }} кг
-        </p>
-    </li>
-     {% endfor %}
-    </ol> 
-    </div>
-    
+    {% if patients %}
+      <ol class="item-list" style="list-style:none;margin:0;padding:0;">
+        {% for patient in patients %}
+          <li class="item-card">
+
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+
+              <!-- Левая часть: данные пациента -->
+              <div>
+                <a href="{% url 'patient_detail' pk=patient.pk %}" class="item-card-title">
+                  {{ patient.full_name }}
+                </a>
+
+                <div class="item-card-meta">
+                  {# Пол #}
+                  {% if patient.sex %}
+                    {{ patient.get_sex_display }}
+                  {% else %}
+                    <span class="muted">Пол не указан</span>
+                  {% endif %}
+                  ·
+                  {# Дата рождения и возраст #}
+                  {% if patient.date_of_birth %}
+                    <span class="muted">
+                      {{ patient.date_of_birth|date:"d.m.Y" }}
+                      ({{ patient.date_of_birth|age }} лет)
+                    </span>
+                  {% else %}
+                    <span class="muted">Дата рождения не указана</span>
+                  {% endif %}
+                </div>
+              </div>
+
+              <!-- Правая часть: кнопка -->
+              <div>
+                <a href="{% url 'patient_detail' pk=patient.pk %}" class="btn btn-secondary" style="white-space:nowrap;">
+                  Открыть
+                </a>
+              </div>
+
+            </div>
+
+          </li>
+        {% endfor %}
+      </ol>
+    {% else %}
+      <p class="muted">Пациенты ещё не добавлены.</p>
+    {% endif %}
+  </section>
 {% endblock %}

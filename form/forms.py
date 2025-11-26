@@ -38,7 +38,10 @@ class ReportFormForPatient(forms.ModelForm):
 class PatientForm(forms.ModelForm):
     class Meta:
         model = Patient
-        fields = ('full_name', 'growth', 'weight')
+        fields = ('full_name',"date_of_birth", "sex", 'growth', 'weight')
+        widgets = {
+            "date_of_birth": forms.DateInput(attrs={"type": "date"}),
+        }
         
 class PrescriptionForm(forms.ModelForm):
     class Meta:

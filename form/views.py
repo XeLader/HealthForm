@@ -14,19 +14,22 @@ from .forms import *
 def dashboard(request):
     reports = Report.objects.order_by('created_date')
     patients = Patient.objects.order_by('full_name')
-    return render(request, 'form/dash.html',{'reports':reports, "patients":patients})
+    return render(request, 'form/dash.html',{
+        "reports":reports,
+        "patients":patients,
+        "nav_section": "dashboard",})
 
 
 @login_required()
 def report_list(request):
-    forms = Report.objects.order_by('created_date')
-    return render(request, 'form/report_list.html',{'forms':forms})
+    reports = Report.objects.order_by('created_date')
+    return render(request, 'form/report_list.html',{"reports":reports, "nav_section": "reports"})
 
 
 @login_required()
 def patient_list(request):
     patients = Patient.objects.order_by('full_name')
-    return render(request, 'form/patient_list.html',{'patients':patients})
+    return render(request, 'form/patient_list.html',{'patients':patients, "nav_section": "patients"})
     
     
     
@@ -70,13 +73,61 @@ def patient_detail(request, pk):
         'leukocytes':leukocytes,
         'hormons':hormons,
         'prescriptions': prescriptions,
+        "nav_section": "patients"
         })
 
 @login_required()
 def report_detail(request, pk):
-	report = get_object_or_404(Report, pk = pk)
-	biochems = Biochemistry.objects.filter(patient = report.patient)
-	return render(request, 'form/report_detail.html', {'report':report, 'biochems':biochems})
+    report = get_object_or_404(Report, pk = pk)
+    fields_verbose = {
+        "complaints": Report._meta.get_field("complaints").verbose_name,
+        "anamnesis": Report._meta.get_field("anamnesis").verbose_name,
+
+        # Питание
+        "diet": Report._meta.get_field("diet").verbose_name,
+        "mealscount": Report._meta.get_field("mealscount").verbose_name,
+        "snacks": Report._meta.get_field("snacks").verbose_name,
+
+        # Непереносимости
+        "intol_Lact": Report._meta.get_field("intol_Lact").verbose_name,
+        "intol_Glut": Report._meta.get_field("intol_Glut").verbose_name,
+        "intol_Nuts": Report._meta.get_field("intol_Nuts").verbose_name,
+        "intol_Sea": Report._meta.get_field("intol_Sea").verbose_name,
+        "intol_Other": Report._meta.get_field("intol_Other").verbose_name,
+
+        # Наследственность
+        "cardiovascular": Report._meta.get_field("cardiovascular").verbose_name,
+        "oncological": Report._meta.get_field("oncological").verbose_name,
+        "diabetes": Report._meta.get_field("diabetes").verbose_name,
+        "thyroid": Report._meta.get_field("thyroid").verbose_name,
+        "autoimmune": Report._meta.get_field("autoimmune").verbose_name,
+        "allergic": Report._meta.get_field("allergic").verbose_name,
+
+        # Аллергии
+        "foodAllergy": Report._meta.get_field("foodAllergy").verbose_name,
+        "medicineAllergy": Report._meta.get_field("medicineAllergy").verbose_name,
+        "seasonalAllergy": Report._meta.get_field("seasonalAllergy").verbose_name,
+        "contactAllergy": Report._meta.get_field("contactAllergy").verbose_name,
+        "noAllergy": Report._meta.get_field("noAllergy").verbose_name,
+
+        # Объективный статус
+        "insp_General": Report._meta.get_field("insp_General").verbose_name,
+        "insp_Body": Report._meta.get_field("insp_Body").verbose_name,
+        "insp_Abdomen": Report._meta.get_field("insp_Abdomen").verbose_name,
+        "insp_Liver": Report._meta.get_field("insp_Liver").verbose_name,
+        "insp_Liver_protudes": Report._meta.get_field("insp_Liver_protudes").verbose_name,
+        "insp_Other": Report._meta.get_field("insp_Other").verbose_name,
+
+        # Итоги
+        "title": Report._meta.get_field("title").verbose_name,
+        "text": Report._meta.get_field("text").verbose_name,
+    }
+
+    return render(request, "form/report_detail.html", {
+        "report": report,
+        "fields_verbose": fields_verbose,
+        "nav_section": "reports",
+    })
 
 @login_required()
 def report_new(request):
@@ -98,7 +149,8 @@ def report_new(request):
                                             'form': form,
                                             'prefs':Preferable,
                                             'intols':Intolerances, 
-                                            'allergies': Allergies})
+                                            'allergies': Allergies,
+                                             "nav_section": "reports"})
     
     
 def report_new_for_patient(request, pk):
@@ -124,7 +176,8 @@ def report_new_for_patient(request, pk):
                                             'prefs':Preferable,
                                             'intols':Intolerances, 
                                             'herr':Heredity,
-                                            'allergies': Allergies})
+                                            'allergies': Allergies,
+                                             "nav_section": "patients"})
     
 @login_required()
 def patient_new(request):
@@ -136,7 +189,7 @@ def patient_new(request):
             return redirect('patient_list')
     else:
         form = PatientForm()
-    return render(request, 'form/report_edit.html', {'form': form})
+    return render(request, 'form/patient_edit.html', {'form': form,"nav_section": "patients"})
 
 @login_required()
 def report_edit(request, pk):
@@ -151,7 +204,7 @@ def report_edit(request, pk):
             return redirect('report_detail', pk=post.pk)
     else:
         form = ReportForm(instance=report)
-    return render(request, 'form/report_edit.html', {'form': form})
+    return render(request, 'form/report_edit.html', {'form': form,"nav_section": "reports"})
     
     
 @login_required()
@@ -165,10 +218,11 @@ def patient_edit(request, pk):
             return redirect('patient_detail', pk=post.pk)
     else:
         form = PatientForm(instance=patient)
-    return render(request, 'form/report_edit.html', {'form': form})
+    return render(request, 'form/patient_edit.html', {'form': form, "patient": patient, "nav_section": "patients"})
     
 @login_required()
 def prescription_new(request, pk):
+    patient = get_object_or_404(Patient, pk=pk)
     if request.method == "POST":
         form = PrescriptionForm(request.POST)
         if form.is_valid():
@@ -179,10 +233,18 @@ def prescription_new(request, pk):
             return redirect('patient_detail', pk=post.pk)
     else:
         form = PrescriptionForm()
-    return render(request, 'form/report_edit.html', {'form': form})
+    return render(request, 'form/analysis_form.html', {
+        "form": form,
+        "page_title": "Назначение",
+        "card_title": "назначение",
+        "cancel_url": request.META.get("HTTP_REFERER") or redirect("patient_detail", pk=patient.pk).url,
+        "nav_section": "patients",
+    })
 
 @login_required()
 def biochemistry_new(request, pk):
+    patient = get_object_or_404(Patient, pk=pk)
+    patient = get_object_or_404(Patient, pk=pk)
     if request.method == "POST":
         form = BiochemistryForm(request.POST)
         if form.is_valid():
@@ -193,10 +255,17 @@ def biochemistry_new(request, pk):
             return redirect('patient_detail', pk=post.patient.pk)
     else:
         form = BiochemistryForm()
-    return render(request, 'form/report_edit.html', {'form': form})
+    return render(request, 'form/analysis_form.html', {
+        "form": form,
+        "page_title": "Новый анализ — биохимия",
+        "card_title": "Биохимический анализ",
+        "cancel_url": request.META.get("HTTP_REFERER") or redirect("patient_detail", pk=patient.pk).url,
+        "nav_section": "patients",
+    })
     
 @login_required()
 def proteinmetabolism_new(request, pk):
+    patient = get_object_or_404(Patient, pk=pk)
     if request.method == "POST":
         form = ProteinMetabolismForm(request.POST)
         if form.is_valid():
@@ -207,12 +276,19 @@ def proteinmetabolism_new(request, pk):
             return redirect('patient_detail', pk=post.patient.pk)
     else:
         form = ProteinMetabolismForm()
-    return render(request, 'form/report_edit.html', {'form': form})
+    return render(request, 'form/analysis_form.html', {
+        "form": form,
+        "page_title": "Белковый обмен",
+        "card_title": "Белковый обмен",
+        "cancel_url": request.META.get("HTTP_REFERER") or redirect("patient_detail", pk=patient.pk).url,
+        "nav_section": "patients",
+    })
     
     
     
 @login_required()
 def lipidmetabolism_new(request, pk):
+    patient = get_object_or_404(Patient, pk=pk)
     if request.method == "POST":
         form = LipidMetabolismForm(request.POST)
         if form.is_valid():
@@ -223,7 +299,13 @@ def lipidmetabolism_new(request, pk):
             return redirect('patient_detail', pk=post.patient.pk)
     else:
         form = LipidMetabolismForm()
-    return render(request, 'form/report_edit.html', {'form': form})
+    return render(request, 'form/analysis_form.html', {
+        "form": form,
+        "page_title": "Липидный обмен",
+        "card_title": "Липидный обмен",
+        "cancel_url": request.META.get("HTTP_REFERER") or redirect("patient_detail", pk=patient.pk).url,
+        "nav_section": "patients",
+    })
     
     
     
@@ -231,6 +313,7 @@ def lipidmetabolism_new(request, pk):
     
 @login_required()
 def carbohydratemetabolism_new(request, pk):
+    patient = get_object_or_404(Patient, pk=pk)
     if request.method == "POST":
         form = CarbohydrateMetabolismForm(request.POST)
         if form.is_valid():
@@ -241,12 +324,19 @@ def carbohydratemetabolism_new(request, pk):
             return redirect('patient_detail', pk=post.patient.pk)
     else:
         form = CarbohydrateMetabolismForm()
-    return render(request, 'form/report_edit.html', {'form': form})
+    return render(request, 'form/analysis_form.html', {
+        "form": form,
+        "page_title": "Углеводный обмен",
+        "card_title": "Углеводный обмен",
+        "cancel_url": request.META.get("HTTP_REFERER") or redirect("patient_detail", pk=patient.pk).url,
+        "nav_section": "patients",
+    })
     
     
     
 @login_required()
 def ironmetabolism_new(request, pk):
+    patient = get_object_or_404(Patient, pk=pk)
     if request.method == "POST":
         form = IronMetabolismForm(request.POST)
         if form.is_valid():
@@ -257,12 +347,19 @@ def ironmetabolism_new(request, pk):
             return redirect('patient_detail', pk=post.patient.pk)
     else:
         form = IronMetabolismForm()
-    return render(request, 'form/report_edit.html', {'form': form})
+    return render(request, 'form/analysis_form.html', {
+        "form": form,
+        "page_title": "Обмен железа",
+        "card_title": "Обмен железа",
+        "cancel_url": request.META.get("HTTP_REFERER") or redirect("patient_detail", pk=patient.pk).url,
+        "nav_section": "patients",
+    })
     
     
     
 @login_required()
 def micronutrients_new(request, pk):
+    patient = get_object_or_404(Patient, pk=pk)
     if request.method == "POST":
         form = MicronutrientsForm(request.POST)
         if form.is_valid():
@@ -273,12 +370,19 @@ def micronutrients_new(request, pk):
             return redirect('patient_detail', pk=post.patient.pk)
     else:
         form = MicronutrientsForm()
-    return render(request, 'form/report_edit.html', {'form': form})
+    return render(request, 'form/analysis_form.html', {
+        "form": form,
+        "page_title": "Микроэлементы",
+        "card_title": "Микроэлементы",
+        "cancel_url": request.META.get("HTTP_REFERER") or redirect("patient_detail", pk=patient.pk).url,
+        "nav_section": "patients",
+    })
     
     
     
 @login_required()
 def inflammatorymarkers_new(request, pk):
+    patient = get_object_or_404(Patient, pk=pk)
     if request.method == "POST":
         form = InflammatoryMarkersForm(request.POST)
         if form.is_valid():
@@ -289,12 +393,19 @@ def inflammatorymarkers_new(request, pk):
             return redirect('patient_detail', pk=post.patient.pk)
     else:
         form = InflammatoryMarkersForm()
-    return render(request, 'form/report_edit.html', {'form': form})
+    return render(request, 'form/analysis_form.html', {
+        "form": form,
+        "page_title": "Маркеры воспаления",
+        "card_title": "Маркеры воспаления",
+        "cancel_url": request.META.get("HTTP_REFERER") or redirect("patient_detail", pk=patient.pk).url,
+        "nav_section": "patients",
+    })
     
     
     
 @login_required()
 def allergiesinfections_new(request, pk):
+    patient = get_object_or_404(Patient, pk=pk)
     if request.method == "POST":
         form = AllergiesInfectionsForm(request.POST)
         if form.is_valid():
@@ -305,13 +416,20 @@ def allergiesinfections_new(request, pk):
             return redirect('patient_detail', pk=post.patient.pk)
     else:
         form = AllergiesInfectionsForm()
-    return render(request, 'form/report_edit.html', {'form': form})
+    return render(request, 'form/analysis_form.html', {
+        "form": form,
+        "page_title": "Аллергия и инфекция",
+        "card_title": "Аллергия и инфекция",
+        "cancel_url": request.META.get("HTTP_REFERER") or redirect("patient_detail", pk=patient.pk).url,
+        "nav_section": "patients",
+    })
     
     
     
     
 @login_required()
 def thyroidfunction_new(request, pk):
+    patient = get_object_or_404(Patient, pk=pk)
     if request.method == "POST":
         form = ThyroidFunctionForm(request.POST)
         if form.is_valid():
@@ -322,7 +440,13 @@ def thyroidfunction_new(request, pk):
             return redirect('patient_detail', pk=post.patient.pk)
     else:
         form = ThyroidFunctionForm()
-    return render(request, 'form/report_edit.html', {'form': form})
+    return render(request, 'form/analysis_form.html', {
+        "form": form,
+        "page_title": "Функция щитовидной железы",
+        "card_title": "Функция щитовидной железы",
+        "cancel_url": request.META.get("HTTP_REFERER") or redirect("patient_detail", pk=patient.pk).url,
+        "nav_section": "patients",
+    })
     
     
     
@@ -330,6 +454,7 @@ def thyroidfunction_new(request, pk):
     
 @login_required()
 def hematology_new(request, pk):
+    patient = get_object_or_404(Patient, pk=pk)
     if request.method == "POST":
         form = HematologyForm(request.POST)
         if form.is_valid():
@@ -340,7 +465,13 @@ def hematology_new(request, pk):
             return redirect('patient_detail', pk=post.patient.pk)
     else:
         form = HematologyForm()
-    return render(request, 'form/report_edit.html', {'form': form})
+    return render(request, 'form/analysis_form.html', {
+        "form": form,
+        "page_title": "Гематология (эритроцитарное звено)",
+        "card_title": "Гематология (эритроцитарное звено)",
+        "cancel_url": request.META.get("HTTP_REFERER") or redirect("patient_detail", pk=patient.pk).url,
+        "nav_section": "patients",
+    })
     
     
     
@@ -348,6 +479,7 @@ def hematology_new(request, pk):
     
 @login_required()
 def platelets_new(request, pk):
+    patient = get_object_or_404(Patient, pk=pk)
     if request.method == "POST":
         form = PlateletsForm(request.POST)
         if form.is_valid():
@@ -358,13 +490,20 @@ def platelets_new(request, pk):
             return redirect('patient_detail', pk=post.patient.pk)
     else:
         form = PlateletsForm()
-    return render(request, 'form/report_edit.html', {'form': form})
+    return render(request, 'form/analysis_form.html', {
+        "form": form,
+        "page_title": "Тромбоцитарное звено",
+        "card_title": "Тромбоцитарное звено",
+        "cancel_url": request.META.get("HTTP_REFERER") or redirect("patient_detail", pk=patient.pk).url,
+        "nav_section": "patients",
+    })
     
     
     
     
 @login_required()
 def leukocytes_new(request, pk):
+    patient = get_object_or_404(Patient, pk=pk)
     if request.method == "POST":
         form = LeukocytesForm(request.POST)
         if form.is_valid():
@@ -375,12 +514,19 @@ def leukocytes_new(request, pk):
             return redirect('patient_detail', pk=post.patient.pk)
     else:
         form = LeukocytesForm()
-    return render(request, 'form/report_edit.html', {'form': form})
+    return render(request, 'form/analysis_form.html', {
+        "form": form,
+        "page_title": "Лейкоцитарное звено",
+        "card_title": "Лейкоцитарное звено",
+        "cancel_url": request.META.get("HTTP_REFERER") or redirect("patient_detail", pk=patient.pk).url,
+        "nav_section": "patients",
+    })
     
     
     
 @login_required()
 def hormonallevels_new(request, pk):
+    patient = get_object_or_404(Patient, pk=pk)
     if request.method == "POST":
         form = HormonalLevelsForm(request.POST)
         if form.is_valid():
@@ -391,7 +537,13 @@ def hormonallevels_new(request, pk):
             return redirect('patient_detail', pk=post.patient.pk)
     else:
         form = HormonalLevelsForm()
-    return render(request, 'form/report_edit.html', {'form': form})
+    return render(request, 'form/analysis_form.html', {
+        "form": form,
+        "page_title": "Гормональный фон",
+        "card_title": "Гормональный фон",
+        "cancel_url": request.META.get("HTTP_REFERER") or redirect("patient_detail", pk=patient.pk).url,
+        "nav_section": "patients",
+    })
     
 
 
@@ -411,7 +563,7 @@ def build_section_order(qt: QuestionnaireTemplate):
     return order
 
 def get_choices_by_key(key: str):
-    if not key:  # дефолтная бинарная шкала
+    if not key: 
         return [(0, "нет"), (8, "да")]
     k = key.lower()
     if k in ("08"):
