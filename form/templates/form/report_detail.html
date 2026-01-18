@@ -6,6 +6,9 @@
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
     <h1>Приём пациента</h1>
     <div style="display:flex; gap:8px;">
+      <a href="{% url 'report_print_config' report.pk %}" class="btn btn-secondary">
+        Печать
+      </a>
       <a href="{% url 'report_edit' report.pk %}" class="btn btn-secondary">
         Редактировать
       </a>

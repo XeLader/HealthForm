@@ -3,6 +3,8 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
 # Create your models here.
 
 class UserInvite(models.Model):
@@ -54,6 +56,21 @@ class Patient(models.Model):
     
     def __str__(self):
 	    return self.full_name
+
+class LabKind(models.TextChoices):
+    BIOCHEM = "biochem", "Биохимия"
+    PROTEIN = "protein", "Белковый обмен"
+    LIPID = "lipid", "Липидный профиль"
+    CARB = "carb", "Углеводный обмен"
+    IRON = "iron", "Железо/ферритин"
+    MICRO = "micro", "Микроэлементы"
+    INFLAMM = "inflamm", "Воспаление"
+    ALLERGY = "allergy", "Аллергология"
+    THYROID = "thyroid", "Щитовидная железа"
+    HEMAT = "hemat", "Гематология"
+    PLATELET = "platelet", "Тромбоциты"
+    LEUKO = "leuko", "Лейкоформула"
+    HORMON = "hormon", "Гормоны"
 
 class Biochemistry(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True, default = 0)
@@ -268,6 +285,7 @@ class Prescription(models.Model):
     regime = models.CharField(verbose_name = "Режим", max_length=200)
     duration = models.CharField(verbose_name = "Длительность", max_length = 200)
     comment = models.TextField(verbose_name = "Комментариий")
+    created_at = models.DateField(verbose_name = "Дата",default=timezone.now)
 
     def __str__(self):
         return  self.medicine.title
@@ -521,4 +539,27 @@ class Answer(models.Model):
             models.Index(fields=["questionnaire"]),
             models.Index(fields=["question"]),
         ]
+
+class LabEntry(models.Model):
+    patient = models.ForeignKey("Patient", on_delete=models.CASCADE, related_name="lab_entries")
+    kind = models.CharField("Тип анализа", max_length=20, choices=LabKind.choices)
+
+    taken_at = models.DateTimeField("Дата анализа", default=timezone.now)
+
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey("content_type", "object_id")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("content_type", "object_id")
+        indexes = [
+            models.Index(fields=["patient", "-taken_at"]),
+            models.Index(fields=["kind", "-taken_at"]),
+        ]
+
+    def __str__(self):
+        return f"{self.get_kind_display()} — {self.taken_at:%d.%m.%Y}"
+
 

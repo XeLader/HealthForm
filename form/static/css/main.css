@@ -319,3 +319,35 @@ body {
 .icon-button-small:hover {
     opacity: 1;
 }
+
+.lab-picker {
+  display: grid;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.lab-row {
+  display: grid;
+  grid-template-columns: 18px 1fr auto;
+  gap: 10px;
+  align-items: start;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+}
+
+.lab-main { display: grid; gap: 2px; }
+.lab-title { font-weight: 700; }
+.lab-preview { margin: -6px 0 6px 40px; }
+.lab-preview summary { cursor: pointer; user-select: none; }
+.lab-preview-body {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border: 1px dashed #e5e7eb;
+  border-radius: 12px;
+}
+
+.kv { display:flex; justify-content:space-between; gap: 12px; padding: 4px 0; }
+.kv .k { color:#6b7280; font-size: 12px; }
+.kv .v { text-align:right; }
+

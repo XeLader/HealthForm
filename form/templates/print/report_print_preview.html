@@ -1,0 +1,260 @@
+{% extends "print/base_print.html" %}
+{% load lab_extras %}
+{% block title %}Печать — {{ report.title }}{% endblock %}
+
+{% block content %}
+  <div class="print-toolbar no-print">
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <a class="btn" href="{% url 'report_print_config' report.pk %}">Назад к настройке</a>
+      <a class="btn" href="{% url 'report_detail' report.pk %}">К приёму</a>
+    </div>
+    <button class="btn btn-primary" onclick="window.print()">Печать</button>
+  </div>
+
+  <header class="doc-header">
+    <div>
+      <h1 class="doc-title">
+        {% if doc_type == "clinic" %}
+          Заключение для клиники
+        {% else %}
+          Заключение для пациента
+        {% endif %}
+      </h1>
+      <div class="doc-subtitle">
+        {% if report.patient %}Пациент: {{ report.patient.full_name }} · {% endif %}
+        Дата: {{ report.created_date|date:"d.m.Y H:i" }}
+      </div>
+    </div>
+
+    <div class="muted" style="text-align:right; font-size:12px;">
+      {{ report.title }}
+    </div>
+  </header>
+
+  {# 1) Жалобы и анамнез #}
+  {% if "complaints_anamnesis" in sections %}
+    <section class="block">
+      <h2>Жалобы и анамнез</h2>
+      <div class="grid-2">
+        <div class="kv">
+          <div class="k">Жалобы</div>
+          <div class="v text">{{ report.complaints|default:"—" }}</div>
+        </div>
+        <div class="kv">
+          <div class="k">Анамнез</div>
+          <div class="v text">{{ report.anamnesis|default:"—" }}</div>
+        </div>
+      </div>
+    </section>
+  {% endif %}
+
+  {# 2) Питание и предпочтения #}
+  {% if "diet_preferences" in sections %}
+    <section class="block">
+      <h2>Питание</h2>
+      <div class="grid-2">
+        <div class="kv">
+          <div class="k">Тип питания</div>
+          <div class="v">{{ report.get_diet_display }}</div>
+        </div>
+        <div class="kv">
+          <div class="k">Приёмов пищи в день</div>
+          <div class="v">{{ report.mealscount }}</div>
+        </div>
+        <div class="kv">
+          <div class="k">Перекусы</div>
+          <div class="v">{{ report.get_snacks_display }}</div>
+        </div>
+      </div>
+
+      <div style="margin-top:10px;" class="kv">
+        <div class="k">Предпочтения</div>
+        <div class="v">
+          {% if report.pref_Meat or report.pref_Fish or report.pref_Dair or report.pref_Eggs or report.pref_Vegs or report.pref_Frut or report.pref_Groa or report.pref_Swet or report.pref_Fast or report.pref_Cofe or report.pref_Alco %}
+            {% if report.pref_Meat %}мясо{% endif %}
+            {% if report.pref_Fish %}{% if report.pref_Meat %}, {% endif %}рыба{% endif %}
+            {% if report.pref_Dair %}{% if report.pref_Meat or report.pref_Fish %}, {% endif %}молочные продукты{% endif %}
+            {% if report.pref_Eggs %}{% if report.pref_Meat or report.pref_Fish or report.pref_Dair %}, {% endif %}яйца{% endif %}
+            {% if report.pref_Vegs %}{% if report.pref_Meat or report.pref_Fish or report.pref_Dair or report.pref_Eggs %}, {% endif %}овощи{% endif %}
+            {% if report.pref_Frut %}{% if report.pref_Meat or report.pref_Fish or report.pref_Dair or report.pref_Eggs or report.pref_Vegs %}, {% endif %}фрукты{% endif %}
+            {% if report.pref_Groa %}{% if report.pref_Meat or report.pref_Fish or report.pref_Dair or report.pref_Eggs or report.pref_Vegs or report.pref_Frut %}, {% endif %}крупы{% endif %}
+            {% if report.pref_Swet %}{% if report.pref_Meat or report.pref_Fish or report.pref_Dair or report.pref_Eggs or report.pref_Vegs or report.pref_Frut or report.pref_Groa %}, {% endif %}сладкое{% endif %}
+            {% if report.pref_Fast %}{% if report.pref_Meat or report.pref_Fish or report.pref_Dair or report.pref_Eggs or report.pref_Vegs or report.pref_Frut or report.pref_Groa or report.pref_Swet %}, {% endif %}фаст-фуд{% endif %}
+            {% if report.pref_Cofe %}{% if report.pref_Meat or report.pref_Fish or report.pref_Dair or report.pref_Eggs or report.pref_Vegs or report.pref_Frut or report.pref_Groa or report.pref_Swet or report.pref_Fast %}, {% endif %}кофе-напитки{% endif %}
+            {% if report.pref_Alco %}{% if report.pref_Meat or report.pref_Fish or report.pref_Dair or report.pref_Eggs or report.pref_Vegs or report.pref_Frut or report.pref_Groa or report.pref_Swet or report.pref_Fast or report.pref_Cofe %}, {% endif %}алкоголь{% endif %}
+          {% else %}
+            <span class="muted">Не указано</span>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+  {% endif %}
+
+  {# 3) Непереносимости #}
+  {% if "intolerances" in sections %}
+    <section class="block">
+      <h2>Непереносимости</h2>
+      <div>
+        {% if report.intol_Lact or report.intol_Glut or report.intol_Nuts or report.intol_Sea or report.intol_Other %}
+          <ul style="margin:0; padding-left:18px;">
+          {% if report.intol_Lact %}<li>лактоза</li>{% endif %}
+          {% if report.intol_Glut %}<li>глютен</li>{% endif %}
+          {% if report.intol_Nuts %}<li>орехи</li>{% endif %}
+          {% if report.intol_Sea %}<li>морепродукты</li>{% endif %}
+	  {% if report.intol_Other %}<li>другое: {{ report.intol_Other }}</li>{% endif %}
+          </ul>
+        {% else %}
+          <span class="muted">Не указано</span>
+        {% endif %}
+      </div>
+    </section>
+  {% endif %}
+
+  {# 4) Наследственность #}
+  {% if "heredity" in sections %}
+    <section class="block">
+      <h2>Наследственность</h2>
+      <div class="grid-2">
+        <div class="kv"><div class="k">Сердечно-сосудистые</div><div class="v">{{ report.get_cardiovascular_display }}</div></div>
+        <div class="kv"><div class="k">Онкологические</div><div class="v">{{ report.get_oncological_display }}</div></div>
+        <div class="kv"><div class="k">Сахарный диабет</div><div class="v">{{ report.get_diabetes_display }}</div></div>
+        <div class="kv"><div class="k">Щитовидная железа</div><div class="v">{{ report.get_thyroid_display }}</div></div>
+        <div class="kv"><div class="k">Аутоиммунные</div><div class="v">{{ report.get_autoimmune_display }}</div></div>
+        <div class="kv"><div class="k">Аллергические</div><div class="v">{{ report.get_allergic_display }}</div></div>
+      </div>
+    </section>
+  {% endif %}
+
+  {# 5) Аллергии #}
+  {% if "allergies" in sections %}
+    <section class="block">
+      <h2>Аллергический анамнез</h2>
+      <div class="grid-2">
+        <div class="kv"><div class="k">Пищевая</div><div class="v text">{{ report.foodAllergy|default:"—" }}</div></div>
+        <div class="kv"><div class="k">Медикаментозная</div><div class="v text">{{ report.medicineAllergy|default:"—" }}</div></div>
+        <div class="kv"><div class="k">Сезонная</div><div class="v text">{{ report.seasonalAllergy|default:"—" }}</div></div>
+        <div class="kv"><div class="k">Контактная</div><div class="v text">{{ report.contactAllergy|default:"—" }}</div></div>
+      </div>
+      {% if report.noAllergy %}
+        <div class="kv" style="margin-top:10px;">
+          <div class="k">Отсутствие аллергии</div>
+          <div class="v text">{{ report.noAllergy }}</div>
+        </div>
+      {% endif %}
+    </section>
+  {% endif %}
+
+  {# 6) Объективный статус (укороченно; можно расширить потом) #}
+  {% if "inspection" in sections %}
+    <section class="block">
+      <h2>Объективный статус</h2>
+      <div class="grid-2">
+        <div class="kv"><div class="k">Общее состояние</div><div class="v">{{ report.get_insp_General_display }}</div></div>
+        <div class="kv"><div class="k">Телосложение</div><div class="v">{{ report.get_insp_Body_display }}</div></div>
+        <div class="kv"><div class="k">Живот</div><div class="v">{{ report.get_insp_Abdomen_display }}</div></div>
+        <div class="kv"><div class="k">Печень</div><div class="v">{{ report.get_insp_Liver_display }}</div></div>
+      </div>
+      {% if report.insp_Other %}
+        <div class="kv" style="margin-top:10px;">
+          <div class="k">Прочее</div>
+          <div class="v text">{{ report.insp_Other }}</div>
+        </div>
+      {% endif %}
+    </section>
+  {% endif %}
+
+  {# 7) Заключение #}
+  {% if "conclusion" in sections %}
+    <section class="block">
+      <h2>Заключение</h2>
+      <div class="kv">
+        <div class="k">Название</div>
+        <div class="v">{{ report.title }}</div>
+      </div>
+      <div class="kv" style="margin-top:10px;">
+        <div class="k">Комментарий</div>
+        <div class="v text">{{ report.text|default:"—" }}</div>
+      </div>
+    </section>
+  {% endif %}
+
+  {# 8) Следующий приём #}
+  {% if "followup" in sections %}
+    <section class="block">
+      <h2>Следующий приём</h2>
+      <div class="kv">
+        <div class="k">Дата</div>
+        <div class="v">{{ report.next_date|date:"d.m.Y H:i" }}</div>
+      </div>
+    </section>
+  {% endif %}
+
+  {# Анализы #}
+  {% if labs_grouped %}
+      <section class="block">
+        <h2>Анализы</h2>
+      {% for group in labs_grouped %}
+        <div class="lab-group">
+          <div class="lab-group-title">{{ group.title }}</div>
+
+          {% for entry in group.items %}
+            <div class="lab-card">
+              <div class="lab-card-head">
+                <div class="lab-card-date">{{ entry.taken_at|date:"d.m.Y" }}</div>
+              </div>
+
+              {% with kv=entry.content_object|lab_kv %}
+                {% if kv %}
+                  <table class="lab-table">
+                    <tbody>
+                      {% for k, v in kv %}
+                        <tr>
+                          <td class="lab-k">{{ k }}</td>
+                          <td class="lab-v">{{ v }}</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                {% else %}
+                  <div class="muted">Нет заполненных показателей.</div>
+                {% endif %}
+              {% endwith %}
+            </div>
+          {% endfor %}
+        </div>
+      {% endfor %}
+      </section>
+  {% endif %}
+
+  {# Рецепты #}
+  {% if rx_rows %}
+      <section class="block">
+        <h2>Рецепты</h2>
+        <table class="rx-table">
+        <thead>
+          <tr>
+            <th>Препарат</th>
+            <th>Дозировка</th>
+            <th>Режим</th>
+            <th>Длительность</th>
+            <th>Комментарий</th>
+            <th style="text-align:right;">Дата</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for rx in rx_rows %}
+            <tr>
+              <td><strong>{{ rx.medicine }}</strong></td>
+              <td>{{ rx.dosage|default:"—" }}</td>
+              <td>{{ rx.regime|default:"—" }}</td>
+              <td>{{ rx.duration|default:"—" }}</td>
+              <td class="rx-comment">{{ rx.comment|default:"" }}</td>
+              <td style="text-align:right;">{{ rx.created_at|date:"d.m.Y" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+
+{% endblock %}
+

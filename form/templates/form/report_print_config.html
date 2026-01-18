@@ -1,0 +1,134 @@
+{% extends "form/base.html" %}
+
+{% load utils_extras %}
+
+{% block title %}Настройка печати{% endblock %}
+
+{% block content %}
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+    <h1>Настройка печати</h1>
+    <a href="{% url 'report_detail' report.pk %}" class="btn btn-secondary">Назад</a>
+  </div>
+
+  <form method="post" class="report-form">
+    {% csrf_token %}
+
+    <div class="cards">
+      <section class="card">
+        <div class="card-title">Тип документа</div>
+        <div class="label">
+          {{ form.doc_type }}
+          {% if form.doc_type.errors %}<div class="errors">{{ form.doc_type.errors }}</div>{% endif %}
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-title">Разделы</div>
+        <div class="label">
+          {{ form.sections }}
+          {% if form.sections.errors %}<div class="errors">{{ form.sections.errors }}</div>{% endif %}
+        </div>
+      </section>
+	
+
+{% if form.labs %}
+<section class="card">
+    <div class="card-title">{{ form.labs.label }}</div>
+    <div class="lab-picker">
+      {% for lab in form.labs.field.queryset %}
+        {% with lab_id=lab.pk %}
+          <label class="lab-row">
+          <input
+            type="checkbox"
+            name="labs"
+            value="{{ lab_id }}"
+            {% if lab_id|stringformat:"s" in selected_labs %}checked{% endif %}
+          >
+            <div class="lab-main">
+              <div class="lab-title">
+                {{ lab.get_kind_display }} — {{ lab.taken_at|date:"d.m.Y" }}
+              </div>
+              <div class="lab-sub muted">
+                {% if lab.content_object %}{{ lab.content_object }}{% endif %}
+              </div>
+
+            </div>
+
+            {% if lab_links and lab_links.lab_id %}
+              <a class="btn btn-secondary" href="{{ lab_links.lab_id }}" target="_blank">Открыть</a>
+            {% endif %}
+          </label>
+
+          <details class="lab-preview">
+            <summary class="muted">Быстрый просмотр</summary>
+            <div class="lab-preview-body">
+              {% for k, v in lab_previews|get_item:lab_id %}
+                <div class="kv">
+                  <div class="k">{{ k }}</div>
+                  <div class="v">{{ v }}</div>
+                </div>
+              {% empty %}
+                <div class="muted">Нет данных для предпросмотра.</div>
+              {% endfor %}
+            </div>
+          </details>
+
+        {% endwith %}
+      {% endfor %}
+    </div>
+
+    {% if form.errors.labs %}
+      <div class="errors">{{ form.errors.labs }}</div>
+    {% endif %}
+    </section>
+{% endif %}
+
+{% if rx_qs %}
+      <section class="card">
+          <div class="card-title">{{ form.prescriptions.label }}</div>
+          <div class="lab-picker">
+        {% for rx in rx_qs %}
+          <label class="lab-row">
+            <input
+              type="checkbox"
+              name="rx"
+              value="{{ rx.pk }}"
+              {% if rx.pk|stringformat:"s" in selected_rx %}checked{% endif %}
+            >
+
+            <div class="lab-main">
+              <div class="lab-title">
+                {{ rx.medicine }}{% if rx.dosage %} · {{ rx.dosage }}{% endif %}
+              </div>
+              <div class="lab-sub muted">
+                {{ rx.created_at|date:"d.m.Y" }}
+                {% if rx.regime %} · {{ rx.regime }}{% endif %}
+              </div>
+            </div>
+          </label>
+
+          <details class="lab-preview">
+            <summary class="muted">Детали</summary>
+            <div class="alb-preview-body">
+              {% with p=rx_previews|get_item:rx.pk %}
+                {% if p.regime %}<div class="kv"><div class="k">Режим</div><div class="v">{{ p.regime }}</div></div>{% endif %}
+                {% if p.duration %}<div class="kv"><div class="k">Длительность</div><div class="v">{{ p.duration }}</div></div>{% endif %}
+                {% if p.comment %}<div class="kv"><div class="k">Комментарий</div><div class="v">{{ p.comment }}</div></div>{% endif %}
+                {% if not p.regime and not p.duration and not p.comment %}
+                  <div class="muted">Дополнительных деталей нет.</div>
+                {% endif %}
+              {% endwith %}
+            </div>
+          </details>
+        {% endfor %}
+      </div>
+      </section>
+      {% endif %}
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn btn-primary">Предпросмотр</button>
+    </div>
+  </form>
+{% endblock %}
+

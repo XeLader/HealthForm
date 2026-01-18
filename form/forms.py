@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from .models import *
+from django.db import models
 
 
 class UserInviteCreateForm(forms.ModelForm):
@@ -155,4 +156,103 @@ class HormonalLevelsForm(forms.ModelForm):
         model = HormonalLevels
         fields = ('patient', 'FSH', 'LH' ,'estradiol', 'progesterone', 'ttlTestosterone', 'freeTestosterone', 'DHT', 'DHEASulfate', 'SHBG', 'prolactin', 'PSA')
         
+class ReportPrintConfigForm(forms.Form):
+    class DocType(models.TextChoices):
+        PATIENT = "patient", "Для пациента"
+        CLINIC = "clinic", "Для клиники"
 
+    SECTION_CHOICES = [
+        ("complaints_anamnesis", "Жалобы и анамнез"),
+        ("diet_preferences", "Питание и предпочтения"),
+        ("intolerances", "Непереносимости"),
+        ("heredity", "Наследственность"),
+        ("allergies", "Аллергический анамнез"),
+        ("inspection", "Объективный статус"),
+        ("conclusion", "Заключение (текст/рекомендации)"),
+        ("followup", "Следующий приём (дата)"),
+    ]
+
+    PRESETS = {
+        DocType.PATIENT: {
+            "sections": [
+                "complaints_anamnesis",
+                "diet_preferences",
+                "intolerances",
+                "allergies",
+                "conclusion",
+                "followup",
+            ],
+            "include_labs": True,
+            "include_rx": True,
+        },
+        DocType.CLINIC: {
+            "sections": [
+                "complaints_anamnesis",
+                "diet_preferences",
+                "intolerances",
+                "heredity",
+                "allergies",
+                "inspection",
+                "conclusion",
+                "followup",
+            ],
+        },
+    }
+
+    doc_type = forms.ChoiceField(
+        label="Вариант документа",
+        choices=DocType.choices,
+        initial=DocType.PATIENT,
+        widget=forms.RadioSelect,
+    )
+
+    sections = forms.MultipleChoiceField(
+        label="Какие разделы включить",
+        choices=SECTION_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+    )
+
+
+
+    def __init__(self, *args, labs_queryset=None, rx_queryset=None, initial_doc_type=None, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if initial_doc_type in self.PRESETS and not self.is_bound:
+            preset = self.PRESETS[initial_doc_type]
+            self.initial.setdefault("doc_type", initial_doc_type)
+            self.initial.setdefault("sections", preset["sections"])
+
+        if labs_queryset is not None:
+            self.fields["labs"] = forms.ModelMultipleChoiceField(
+                label="Анализы",
+                queryset=labs_queryset,
+                required=False,
+                widget=forms.CheckboxSelectMultiple,
+            )
+
+        if rx_queryset is not None:
+            self.fields["prescriptions"] = forms.ModelMultipleChoiceField(
+                label="Рецепты",
+                queryset=rx_queryset,
+                required=False,
+                widget=forms.CheckboxSelectMultiple,
+            )
+
+    @classmethod
+    def preset_for(cls, doc_type: str) -> dict:
+        return cls.PRESETS.get(doc_type, cls.PRESETS[cls.DocType.PATIENT])
+
+    def cleaned_payload(self) -> dict:
+        data = {
+            "doc_type": self.cleaned_data.get("doc_type"),
+            "sections": self.cleaned_data.get("sections", []),
+        }
+
+        if "labs" in self.fields:
+            data["labs_ids"] = [obj.pk for obj in self.cleaned_data.get("labs", [])]
+
+        if "prescriptions" in self.fields:
+            data["rx_ids"] = [obj.pk for obj in self.cleaned_data.get("prescriptions", [])]
+
+        return data
