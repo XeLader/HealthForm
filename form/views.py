@@ -1002,7 +1002,7 @@ def report_print_config(request, pk):
             return redirect("report_print_preview", pk=report.pk)
     else:
         sess_key = f"print_cfg_report_{report.pk}"
-        saved = request.session.get(sess_key)
+        saved = request.session.get(sess_key, {})
         selected_labs = set(str(x) for x in saved.get("labs_ids", []))
         selected_rx = set(str(x) for x in saved.get("rx_ids", []))
         if saved:
