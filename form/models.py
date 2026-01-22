@@ -563,3 +563,25 @@ class LabEntry(models.Model):
         return f"{self.get_kind_display()} — {self.taken_at:%d.%m.%Y}"
 
 
+class LabDocument(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    patient = models.ForeignKey("Patient", on_delete=models.CASCADE, related_name="lab_documents")
+    uploaded_by = models.ForeignKey("auth.User", on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    file = models.FileField(upload_to="lab_docs/%Y/%m/%d/")
+    original_name = models.CharField(max_length=255, blank=True, default="")
+    note = models.CharField(max_length=255, blank=True, default="")
+
+    entries = models.ManyToManyField("LabEntry", related_name="source_documents", blank=True)
+
+    class Status(models.TextChoices):
+        NEW = "new", "Новый"
+        IN_PROGRESS = "in_progress", "В работе"
+        DONE = "done", "Заполнен"
+
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.NEW)
+
+    def __str__(self):
+        return f"PDF анализов {self.patient} ({self.created_at:%d.%m.%Y})"
