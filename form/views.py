@@ -277,7 +277,7 @@ def report_edit(request, pk):
             return redirect('report_detail', pk=post.pk)
     else:
         form = ReportForm(instance=report)
-    return render(request, 'form/report_edit.html', {'form': form,"nav_section": "reports"})
+    return render(request, 'form/report_edit.html', {'form': form,"nav_section": "reports", 'patient': report.patient})
     
     
 @login_required()
