@@ -570,9 +570,9 @@ class LabDocument(models.Model):
     uploaded_by = models.ForeignKey("auth.User", on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
 
-    file = models.FileField(upload_to="lab_docs/%Y/%m/%d/")
+    file = models.FileField(upload_to="lab_docs/%Y/%m/%d/", verbose_name = "Файл")
     original_name = models.CharField(max_length=255, blank=True, default="")
-    note = models.CharField(max_length=255, blank=True, default="")
+    note = models.CharField(max_length=255, blank=True, verbose_name = "Замечания", default="")
 
     entries = models.ManyToManyField("LabEntry", related_name="source_documents", blank=True)
 

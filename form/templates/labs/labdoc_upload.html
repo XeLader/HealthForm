@@ -1,0 +1,47 @@
+{% extends "../form/base.html" %}
+
+{% block title %}Загрузка анализов{% endblock %}
+
+{% block content %}
+<div class="page">
+  <section class="card">
+    <header class="card-header">
+      <div>
+        <h2 class="card-title">Загрузка PDF с анализами</h2>
+        <div class="muted">
+          Пациент: <a href="{% url 'patient_detail' pk=patient.pk %}">{{ patient.full_name }}</a>
+        </div>
+      </div>
+      <a class="btn btn-secondary" href="{% url 'patient_detail' pk=patient.pk %}">Назад</a>
+    </header>
+
+    <div class="cards">
+      <form method="post" enctype="multipart/form-data" class="form">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="errors">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <div class="card" style="margin-top:10px;">
+          <label class="form-label">{{ form.file.label }}</label>
+          {{ form.file }}
+          {% if form.errors.file %}<div class="errors">{{ form.errors.file }}</div>{% endif %}
+          <div class="muted">Поддерживается PDF</div>
+        </div>
+
+        <div class="card" style="margin-top:10px;">
+          <label class="form-label">{{ form.note.label }}</label>
+          {{ form.note }}
+          {% if form.errors.note %}<div class="errors">{{ form.errors.note }}</div>{% endif %}
+          <div class="muted">Например: “Анализы от 12.01.2026”, “из почты”, “сдано натощак”.</div>
+        </div>
+
+        <div class="form-actions" style="float: right;">
+          <button type="submit" class="btn" >Загрузить</button>
+        </div>
+      </form>
+    </div>
+  </section>
+</div>
+{% endblock %}

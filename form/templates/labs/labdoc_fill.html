@@ -1,0 +1,94 @@
+{% extends "../form/base.html" %}
+
+{% block title %}Внесение анализов из PDF{% endblock %}
+
+{% block content %}
+<div class="page two-col">
+
+  <!-- LEFT: PDF -->
+  <section class="card">
+    <header class="card-header">
+      <div>
+        <h2 class="card-title">Исходный файл</h2>
+        <div class="muted">
+          Пациент: <a href="{% url 'patient_detail' pk=patient.pk %}">{{ patient.full_name }}</a>
+          · Статус: <strong>{{ doc.get_status_display }}</strong>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <a class="btn btn-secondary" href="{% url 'patient_detail' pk=patient.pk %}">К пациенту</a>
+        <a class="btn btn-secondary" href="{% url 'labdoc_file' doc_id=doc.id %}" target="_blank">Открыть PDF</a>
+      </div>
+    </header>
+
+    <div class="card-body">
+      <div class="pdf-frame-wrap">
+        <iframe class="pdf-frame" src="{% url 'labdoc_file' doc_id=doc.id %}"></iframe>
+      </div>
+      {% if doc.note %}
+        <div class="muted" style="margin-top:10px;">Комментарий: {{ doc.note }}</div>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- RIGHT: actions + linked entries -->
+  <section class="card">
+    <header class="card-header">
+      <div>
+        <h2 class="card-title">Добавить анализ</h2>
+        <div class="muted">Выберите тип → откроется форма справа с сохранением привязки к этому PDF.</div>
+      </div>
+    </header>
+
+    <div class="card-body">
+      <div class="labtype-grid">
+        {% for t in lab_types %}
+          <a class="labtype-row" href="{% url 'labdoc_add_lab' doc_id=doc.id kind=t.slug %}">
+            <div class="labtype-title">{{ t.title }}</div>
+            <div class="labtype-action">+</div>
+          </a>
+        {% endfor %}
+      </div>
+
+      <div class="divider"></div>
+
+      <h3 style="margin:0 0 8px;">Уже внесено из этого файла</h3>
+
+      {% if entries %}
+        <div class="entry-list">
+          {% for e in entries %}
+            <div class="entry-row">
+              <div class="entry-main">
+                <div class="entry-title">
+                  {{ e.get_kind_display }} — {{ e.taken_at|date:"d.m.Y" }}
+                </div>
+                <div class="muted">
+                  {% if e.content_object %}{{ e.content_object }}{% endif %}
+                </div>
+              </div>
+
+              <form method="post" action="{% url 'labdoc_unlink_entry' doc_id=doc.id entry_id=e.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm" title="Отвязать от PDF">✕</button>
+              </form>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="muted">Пока ничего не внесено.</div>
+      {% endif %}
+    </div>
+
+    <footer class="card-footer">
+      <div class="muted">Вносите по одному анализу, нажимая “Сохранить”</div>
+    </footer>
+    <form method="post" action="{% url 'labdoc_mark_done' doc_id=doc.id %}" style="float:right;">
+      {% csrf_token %}
+      <button type="submit" class="btn">Готово</button>
+    </form>
+  </section>
+
+</div>
+{% endblock %}
+

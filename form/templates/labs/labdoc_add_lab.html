@@ -1,0 +1,68 @@
+{% extends "../form/base.html" %}
+
+{% block title %}Добавить анализ{% endblock %}
+
+{% block content %}
+<div class="page two-col">
+
+  <!-- LEFT: PDF -->
+  <section class="card">
+    <header class="card-header">
+      <div>
+        <h2 class="card-title">Исходный файл</h2>
+        <div class="muted">
+          Пациент: <a href="{% url 'patient_detail' pk=patient.pk %}">{{ patient.full_name }}</a>
+          · Статус: <strong>{{ doc.get_status_display }}</strong>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <a class="btn btn-secondary" href="{% url 'labdoc_fill' doc_id=doc.id %}">Назад к списку</a>
+        <a class="btn btn-secondary" href="{% url 'labdoc_file' doc_id=doc.id %}" target="_blank">Открыть PDF</a>
+      </div>
+    </header>
+
+    <div class="card-body">
+      <div class="pdf-frame-wrap">
+        <iframe class="pdf-frame" src="{% url 'labdoc_file' doc_id=doc.id %}"></iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- RIGHT: form -->
+  <section class="card">
+    <header class="card-header">
+      <div>
+        <h2 class="card-title">{{ title }}</h2>
+        <div class="muted">Заполните значения по PDF и нажмите “Сохранить”. Анализ будет привязан к этому файлу.</div>
+      </div>
+    </header>
+
+    <div class="card-body">
+      <form method="post" class="form">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="errors">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        {% for field in form %}
+          <div class="form-row">
+            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}<div class="muted">{{ field.help_text }}</div>{% endif %}
+            {% if field.errors %}<div class="errors">{{ field.errors }}</div>{% endif %}
+          </div>
+        {% endfor %}
+
+        <div class="form-actions">
+          <button type="submit" class="btn">Сохранить анализ</button>
+          <a class="btn btn-secondary" href="{% url 'labdoc_fill' doc_id=doc.id %}">Отмена</a>
+        </div>
+      </form>
+    </div>
+  </section>
+
+</div>
+{% endblock %}
+

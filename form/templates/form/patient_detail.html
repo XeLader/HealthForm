@@ -216,8 +216,11 @@
   <section class="card" style="margin-top:20px;">
 <header class="card-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
       <h2 class="card-title">Лабораторные и инструментальные показатели</h2>
+      <a href="{% url 'labdoc_upload' pk=patient.pk %}" class="icon-button" title="Загрузить файл">
+              {% include "./icons/file-arrow-up.svg" %}
+      </a>
     </header>
-
+    <a href="{% url 'patient_labdocs' pk=patient.pk %}" class="muted" style="margin-bottom:10px;">Файлы анализов</a>
 <ol class="item-list" style="list-style:none;margin:0;padding:0;">
 	<li class="item-card">
 	<div class = "resultsTable">

@@ -1,0 +1,65 @@
+{% extends "../form/base.html" %}
+
+{% block title %}Файлы анализов{% endblock %}
+
+{% block content %}
+<div class="page">
+  <section class="card">
+    <header class="card-header">
+      <div>
+        <h2 class="card-title">Файлы анализов</h2>
+        <div class="muted">
+          Пациент: <a href="{% url 'patient_detail' pk=patient.pk %}">{{ patient.full_name }}</a>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <a class="btn btn-secondary" href="{% url 'patient_detail' pk=patient.pk %}">Назад</a>
+        <a class="btn" href="{% url 'labdoc_upload' pk=patient.pk %}">Загрузить PDF</a>
+      </div>
+    </header>
+
+    <div class="card-body">
+      {% if docs %}
+        <div class="doc-list">
+          {% for doc in docs %}
+            <div class="doc-row">
+              <div class="doc-main">
+                <div class="doc-title">
+                  {{ doc.created_at|date:"d.m.Y H:i" }}
+                  {% if doc.original_name %}
+                    <span class="muted">· {{ doc.original_name }}</span>
+                  {% endif %}
+                </div>
+
+                <div class="doc-meta muted">
+                  Статус:
+                  <span class="badge badge-{{ doc.status }}">{{ doc.get_status_display }}</span>
+                  {% if doc.uploaded_by %} · Загрузил(а): {{ doc.uploaded_by }}{% endif %}
+                  · Анализов внесено: {{ doc.entries.count }}
+                </div>
+
+                {% if doc.note %}
+                  <div class="doc-note">{{ doc.note }}</div>
+                {% endif %}
+              </div>
+
+              <div class="doc-actions">
+                <a class="btn btn-secondary" href="{% url 'labdoc_fill' doc_id=doc.id %}">
+                  Открыть
+                </a>
+                <a class="btn btn-secondary" href="{% url 'labdoc_file' doc_id=doc.id %}" target="_blank" rel="noopener">
+                  PDF
+                </a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="muted">Файлы ещё не загружены.</div>
+      {% endif %}
+    </div>
+  </section>
+</div>
+{% endblock %}
+

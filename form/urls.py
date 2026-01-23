@@ -14,7 +14,7 @@ urlpatterns = [
     path('report/new/', views.report_new, name='report_new'),
     path('report/<int:pk>/edit/', views.report_edit, name='report_edit'),
     path('report/<int:pk>/print/', views.report_print_config, name='report_print_config'),
-    path("report/<int:pk>/print/preview/", views.report_print_preview, name="report_print_preview"),
+    path('report/<int:pk>/print/preview/', views.report_print_preview, name='report_print_preview'),
     path('patient/<int:pk>/', views.patient_detail, name='patient_detail'),
     path('patient/<int:pk>/report/new', views.report_new_for_patient, name='report_new_for_patient'),
     path('patient/<int:pk>/edit', views.patient_edit, name='patient_edit'),
@@ -34,13 +34,23 @@ urlpatterns = [
     path('patient/<int:pk>/platelets/new', views.platelets_new, name='platelets_new'),
     path('patient/<int:pk>/leukocytes/new', views.leukocytes_new, name='leukocytes_new'),
     path('patient/<int:pk>/hormonallevels/new', views.hormonallevels_new, name='hormonallevels_new'),
+    path('patient/<int:pk>/labs/upload/', views.labdoc_upload, name='labdoc_upload'),
+    path('patient/<int:pk>/labs/files/', views.patient_labdocs, name='patient_labdocs'),
+    path('labdoc/<uuid:doc_id>/', views.labdoc_fill, name='labdoc_fill'),
+    path('labdoc/<uuid:doc_id>/done/', views.labdoc_mark_done, name='labdoc_mark_done'),
+    path('labdoc/<uuid:doc_id>/add/<slug:kind>/', views.labdoc_add_lab, name='labdoc_add_lab'),
+    path('labdoc/<uuid:doc_id>/unlink/<int:entry_id>/', views.labdoc_unlink_entry, name='labdoc_unlink_entry'),
+    path('labdoc/<uuid:doc_id>/file/', views.labdoc_file, name='labdoc_file'),
     
-    path("patient/<int:pk>/questionnaires/new/", CreateSurveyInviteView.as_view(), name="survey_invite_create"),
-    path("q/<uuid:token>/", PublicSurveySectionView.as_view(), name="survey_run_public"),
-    path("q/<uuid:token>/finish/", PublicSurveyFinishView.as_view(), name="survey_finish_public"),
+    path('patient/<int:pk>/questionnaires/new/', CreateSurveyInviteView.as_view(), name='survey_invite_create'),
+    path('q/<uuid:token>/', PublicSurveySectionView.as_view(), name='survey_run_public'),
+    path('q/<uuid:token>/finish/', PublicSurveyFinishView.as_view(), name='survey_finish_public'),
     
-    path("patient/<int:pk>/questionnaires/<uuid:token>/results/", SurveyResultsView.as_view(), name="survey_results"),
-    path("invites/new/", views.invite_new, name="invite_new"),
-    path("invite/<uuid:token>/", views.accept_invite, name="accept_invite"),
+    path('patient/<int:pk>/questionnaires/<uuid:token>/results/', SurveyResultsView.as_view(), name='survey_results'),
+    path('invites/new/', views.invite_new, name='invite_new'),
+    path('invite/<uuid:token>/', views.accept_invite, name='accept_invite'),
+    
+    path('labdoc/<uuid:doc_id>/file/', views.labdoc_file, name='labdoc_file'),
+    
 ]
 

@@ -256,3 +256,9 @@ class ReportPrintConfigForm(forms.Form):
             data["rx_ids"] = [obj.pk for obj in self.cleaned_data.get("prescriptions", [])]
 
         return data
+        
+class LabDocumentUploadForm(forms.ModelForm):
+    class Meta:
+        model = LabDocument
+        fields = ["file", "note"]
+
