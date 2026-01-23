@@ -237,8 +237,8 @@
     <th>Показатель</th>
     <th>Ед. изм.</th>
     <th>Референсные значения</th>
-    {% for biochem in biochems %}
-      <th>{{ biochem.created_date }}</th>
+    {% for labs in biochems %}
+      <th><a href="{% url 'labentry_detail' pk=labs.entry.pk %}">{{ labs.created_date }}</a></th>
     {% endfor %}
   </tr>
   <tr id='row'>
@@ -321,7 +321,7 @@
     <th>Ед. изм.</th>
     <th>Референсные значения</th>
     {% for rec in proteins %}
-      <th>{{ rec.created_date }}</th>
+      <th><a href="{% url 'labentry_detail' pk=rec.entry.pk %}">{{ rec.created_date }}</a></th>
     {% endfor %}
   </tr>
 
@@ -445,7 +445,7 @@
 <table style="width:100%">
   <tr>
     <th>Показатель</th><th>Ед. изм.</th><th>Референсные значения</th>
-    {% for rec in lipids %}<th>{{ rec.created_date }}</th>{% endfor %}
+    {% for rec in lipids %}<th><a href="{% url 'labentry_detail' pk=rec.entry.pk %}">{{ rec.created_date }}</a></th>{% endfor %}
   </tr>
   <tr id="row"><td>Общий билирубин</td>
   <td>
@@ -550,7 +550,7 @@
 <table style="width:100%">
   <tr>
     <th>Показатель</th><th>Ед. изм.</th><th>Референсные значения</th>
-    {% for rec in carbohydrates %}<th>{{ rec.created_date }}</th>{% endfor %}
+    {% for rec in carbohydrates %}<th><a href="{% url 'labentry_detail' pk=rec.entry.pk %}">{{ rec.created_date }}</a></th>{% endfor %}
   </tr>
   <tr id="row"><td>Глюкоза (натощак)</td>
   <td>
@@ -584,7 +584,7 @@
 <table style="width:100%">
   <tr>
     <th>Показатель</th><th>Ед. изм.</th><th>Референсные значения</th>
-    {% for rec in irons %}<th>{{ rec.created_date }}</th>{% endfor %}
+    {% for rec in irons %}<th><a href="{% url 'labentry_detail' pk=rec.entry.pk %}">{{ rec.created_date }}</a></th>{% endfor %}
   </tr>
   <tr id="row"><td>Сывороточное железо</td>
   <td>
@@ -640,7 +640,7 @@
 <table style="width:100%">
   <tr>
     <th>Показатель</th><th>Ед. изм.</th><th>Референсные значения</th>
-    {% for rec in micros %}<th>{{ rec.created_date }}</th>{% endfor %}
+    {% for rec in micros %}<th><a href="{% url 'labentry_detail' pk=rec.entry.pk %}">{{ rec.created_date }}</a></th>{% endfor %}
   </tr>
   <tr id="row"><td>Медь</td>
   <td>
@@ -710,7 +710,7 @@
 <table style="width:100%">
   <tr>
     <th>Показатель</th><th>Ед. изм.</th><th>Референсные значения</th>
-    {% for rec in inflamms %}<th>{{ rec.created_date }}</th>{% endfor %}
+    {% for rec in inflamms %}<th><a href="{% url 'labentry_detail' pk=rec.entry.pk %}">{{ rec.created_date }}</a></th>{% endfor %}
   </tr>
   <tr id="row"><td>C-реактивный белок</td><td>мг/л</td><td id="ref">&lt; 5</td>
     {% for rec in inflamms %}<th class="val" data="{{ rec.cReactiveProtein }}">{{ rec.cReactiveProtein }}</th>{% endfor %}
@@ -744,7 +744,7 @@
 <table style="width:100%">
   <tr>
     <th>Показатель</th><th>Ед. изм.</th><th>Референсные значения</th>
-    {% for rec in allergies %}<th>{{ rec.created_date }}</th>{% endfor %}
+    {% for rec in allergies %}<th><a href="{% url 'labentry_detail' pk=rec.entry.pk %}">{{ rec.created_date }}</a></th>{% endfor %}
   </tr>
   <tr id="row"><td>IgE общий</td><td>МЕ/мл</td><td id="ref">&lt; 100</td>
     {% for rec in allergies %}<th class="val" data="{{ rec.ttlIgE }}">{{ rec.ttlIgE }}</th>{% endfor %}
@@ -786,7 +786,7 @@
 <table style="width:100%">
   <tr>
     <th>Показатель</th><th>Ед. изм.</th><th>Референсные значения</th>
-    {% for rec in thyroids %}<th>{{ rec.created_date }}</th>{% endfor %}
+    {% for rec in thyroids %}<th><a href="{% url 'labentry_detail' pk=rec.entry.pk %}">{{ rec.created_date }}</a></th>{% endfor %}
   </tr>
   <tr id="row"><td>ТТГ</td><td>мЕд/л</td><td id="ref">0,4–4,0</td>
     {% for rec in thyroids %}<th class="val" data="{{ rec.TSH }}">{{ rec.TSH }}</th>{% endfor %}
@@ -859,7 +859,7 @@
 <table style="width:100%">
   <tr>
     <th>Показатель</th><th>Ед. изм.</th><th>Референсные значения</th>
-    {% for rec in hematologies %}<th>{{ rec.created_date }}</th>{% endfor %}
+    {% for rec in hematologies %}<th><a href="{% url 'labentry_detail' pk=rec.entry.pk %}">{{ rec.created_date }}</a></th>{% endfor %}
   </tr>
   <tr id="row"><td>Гемоглобин</td><td>г/л</td><td id="ref">♂ 130–170; ♀ 120–150</td>
     {% for rec in hematologies %}<th class="val" data="{{ rec.hemoglobin }}">{{ rec.hemoglobin }}</th>{% endfor %}
@@ -902,7 +902,7 @@
 <table style="width:100%">
   <tr>
     <th>Показатель</th><th>Ед. изм.</th><th>Референсные значения</th>
-    {% for rec in platelets %}<th>{{ rec.created_date }}</th>{% endfor %}
+    {% for rec in platelets %}<th><a href="{% url 'labentry_detail' pk=rec.entry.pk %}">{{ rec.created_date }}</a></th>{% endfor %}
   </tr>
   <tr id="row"><td>Тромбоциты</td><td>× 10^9/л</td><td id="ref">150–400</td>
     {% for rec in platelets %}<th class="val" data="{{ rec.platelets }}">{{ rec.platelets }}</th>{% endfor %}
@@ -935,7 +935,7 @@
 <table style="width:100%">
   <tr>
     <th>Показатель</th><th>Ед. изм.</th><th>Референсные значения</th>
-    {% for rec in leukocytes %}<th>{{ rec.created_date }}</th>{% endfor %}
+    {% for rec in leukocytes %}<th><a href="{% url 'labentry_detail' pk=rec.entry.pk %}">{{ rec.created_date }}</a></th>{% endfor %}
   </tr>
   <tr id="row"><td>Лейкоциты</td><td>× 10^9/л</td><td id="ref">4,0–9,0</td>
     {% for rec in leukocytes %}<th class="val" data="{{ rec.leukocytes }}">{{ rec.leukocytes }}</th>{% endfor %}
@@ -992,7 +992,7 @@
 <table style="width:100%">
   <tr>
     <th>Показатель</th><th>Ед. изм.</th><th>Референсные значения*</th>
-    {% for rec in hormons %}<th>{{ rec.created_date }}</th>{% endfor %}
+    {% for rec in hormons %}<th><a href="{% url 'labentry_detail' pk=rec.entry.pk %}">{{ rec.created_date }}</a></th>{% endfor %}
   </tr>
   <tr id="row"><td>ФСГ</td><td>мМЕ/мл</td><td id="ref">♂ 1–10; ♀ 2–15†</td>
     {% for rec in hormons %}<th class="val" data="{{ rec.FSH }}">{{ rec.FSH }}</th>{% endfor %}

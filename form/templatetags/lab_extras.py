@@ -6,7 +6,7 @@ SKIP_FIELDS = {
     "id", "pk",
     "patient",
     "created_date", "taken_at",
-    "author", "report",
+    "author", "report", "entry"
 }
 
 @register.filter

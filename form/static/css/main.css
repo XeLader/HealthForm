@@ -400,9 +400,14 @@ body {
 .doc-note { margin-top: 8px; font-size: 13px; }
 .doc-actions { display: flex; gap: 8px; align-items: start; }
 
-/* простые бейджи статуса */
 .badge { padding: 2px 8px; border-radius: 999px; font-size: 12px; border: 1px solid #e5e7eb; }
 .badge-new { background: #f3f4f6; }
 .badge-in_progress { background: #fff7ed; }
 .badge-done { background: #ecfeff; }
 .badge-verified { background: #ecfdf5; }
+
+.detail-table { width: 100%; border-collapse: collapse; }
+.detail-table td { padding: 8px 0; border-top: 1px solid #f3f4f6; vertical-align: top; }
+.detail-table tr:first-child td { border-top: none; }
+.detail-k { width: 48%; color: #6b7280; padding-right: 10px; }
+.detail-v { width: 52%; text-align: right; white-space: pre-wrap; }

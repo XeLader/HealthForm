@@ -51,6 +51,7 @@ urlpatterns = [
     path('invite/<uuid:token>/', views.accept_invite, name='accept_invite'),
     
     path('labdoc/<uuid:doc_id>/file/', views.labdoc_file, name='labdoc_file'),
+    path('labs/entry/<int:pk>/', views.labentry_detail, name='labentry_detail'),
     
 ]
 

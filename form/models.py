@@ -75,6 +75,7 @@ class LabKind(models.TextChoices):
 class Biochemistry(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True, default = 0)
     created_date = models.DateField(verbose_name = "Дата",default=timezone.now)
+    entry = models.OneToOneField("LabEntry", on_delete=models.SET_NULL, null=True, blank=True, related_name="biochemistry_obj")
     alat = models.DecimalField(verbose_name = "АлАТ", max_digits = 10, decimal_places=7)
     asat = models.DecimalField(verbose_name = "АсАТ", max_digits = 10, decimal_places=7)
     ldh = models.DecimalField(verbose_name = "ЛДГ", max_digits = 10, decimal_places=7)
@@ -83,6 +84,7 @@ class Biochemistry(models.Model):
 class ProteinMetabolism(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True, default = 0)
     created_date = models.DateTimeField(default=timezone.now)
+    entry = models.OneToOneField("LabEntry", on_delete=models.SET_NULL, null=True, blank=True, related_name="protein_obj")
     gammaGT = models.DecimalField(verbose_name = "Гамма‑ГТ", max_digits = 10, decimal_places=7)
     ttlProtein = models.DecimalField(verbose_name = "Общий белок", max_digits = 10, decimal_places=7)
     albumin = models.DecimalField(verbose_name = "Альбумин", max_digits = 10, decimal_places=7)
@@ -99,6 +101,7 @@ class ProteinMetabolism(models.Model):
 class LipidMetabolism(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True, default = 0)
     created_date = models.DateTimeField(default=timezone.now)
+    entry = models.OneToOneField("LabEntry", on_delete=models.SET_NULL, null=True, blank=True, related_name="lipid_obj")
     ttlBilirubin = models.DecimalField(verbose_name = "Общий билирубин", max_digits = 10, decimal_places=7)
     drctBilirubin = models.DecimalField(verbose_name = "Прямой билирубин", max_digits = 10, decimal_places=7)
     indrctBilirubin = models.DecimalField(verbose_name = "Непрямой билирубин", max_digits = 10, decimal_places=7)
@@ -111,12 +114,14 @@ class LipidMetabolism(models.Model):
 class CarbohydrateMetabolism(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True, default = 0)
     created_date = models.DateTimeField(default=timezone.now)
+    entry = models.OneToOneField("LabEntry", on_delete=models.SET_NULL, null=True, blank=True, related_name="carbohydrate_obj")
     fastingGlucose = models.DecimalField(verbose_name = "Глюкоза (натощак)", max_digits = 10, decimal_places=7) 
     glycatedHemoglobin = models.DecimalField(verbose_name = "Гликированный гемоглобин", max_digits = 10, decimal_places=7)
 
 class IronMetabolism(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True, default = 0)
     created_date = models.DateTimeField(default=timezone.now)
+    entry = models.OneToOneField("LabEntry", on_delete=models.SET_NULL, null=True, blank=True, related_name="iron_obj")
     serumIron = models.DecimalField(verbose_name = "Сывороточное железо", max_digits = 10, decimal_places=7)
     ferritin = models.DecimalField(verbose_name = "Ферритин", max_digits = 10, decimal_places=7)
     transferrin = models.DecimalField(verbose_name = "Трансферрин", max_digits = 10, decimal_places=7)
@@ -128,6 +133,7 @@ class IronMetabolism(models.Model):
 class Micronutrients(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True, default = 0)
     created_date = models.DateTimeField(default=timezone.now)
+    entry = models.OneToOneField("LabEntry", on_delete=models.SET_NULL, null=True, blank=True, related_name="micronutrients_obj")
     copper = models.DecimalField(verbose_name = "Медь", max_digits = 10, decimal_places=7)
     zinc = models.DecimalField(verbose_name = "Цинк", max_digits = 10, decimal_places=7)
     magnesium = models.DecimalField(verbose_name = "Магний", max_digits = 10, decimal_places=7)
@@ -140,6 +146,7 @@ class Micronutrients(models.Model):
 class InflammatoryMarkers(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True, default = 0)
     created_date = models.DateTimeField(default=timezone.now)
+    entry = models.OneToOneField("LabEntry", on_delete=models.SET_NULL, null=True, blank=True, related_name="inflammatory_obj")
     cReactiveProtein = models.DecimalField(verbose_name = "C‑реактивный белок", max_digits = 10, decimal_places=7)
     fibrinogen = models.DecimalField(verbose_name = "Фибриноген", max_digits = 10, decimal_places=7)
     ASLO = models.DecimalField(verbose_name = "АСЛО", max_digits = 10, decimal_places=7)
@@ -150,6 +157,7 @@ class InflammatoryMarkers(models.Model):
 class AllergiesInfections(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True, default = 0)
     created_date = models.DateTimeField(default=timezone.now)
+    entry = models.OneToOneField("LabEntry", on_delete=models.SET_NULL, null=True, blank=True, related_name="allergies_obj")
     ttlIgE = models.DecimalField(verbose_name = "IgE общий", max_digits = 10, decimal_places=7)
     IgA = models.DecimalField(verbose_name = "IgA", max_digits = 10, decimal_places=7)
     IgM = models.DecimalField(verbose_name = "IgM", max_digits = 10, decimal_places=7)
@@ -164,6 +172,7 @@ class AllergiesInfections(models.Model):
 class ThyroidFunction(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True, default = 0)
     created_date = models.DateTimeField(default=timezone.now)
+    entry = models.OneToOneField("LabEntry", on_delete=models.SET_NULL, null=True, blank=True, related_name="thyroid_obj")
     TSH = models.DecimalField(verbose_name = "ТТГ", max_digits = 10, decimal_places=7)
     freeT4 = models.DecimalField(verbose_name = "Т4 свободный", max_digits = 10, decimal_places=7)
     freeT3 = models.DecimalField(verbose_name = "Т3 свободный", max_digits = 10, decimal_places=7)
@@ -177,6 +186,7 @@ class ThyroidFunction(models.Model):
 class Hematology(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True, default = 0)
     created_date = models.DateTimeField(default=timezone.now)
+    entry = models.OneToOneField("LabEntry", on_delete=models.SET_NULL, null=True, blank=True, related_name="hematology_obj")
     hemoglobin = models.DecimalField(verbose_name = "Гемоглобин", max_digits = 10, decimal_places=7)
     hematocrit = models.DecimalField(verbose_name = "Гематокрит", max_digits = 10, decimal_places=7)
     redBloodCells = models.DecimalField(verbose_name = "Эритроциты", max_digits = 10, decimal_places=7)
@@ -189,6 +199,7 @@ class Hematology(models.Model):
 class Platelets(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True, default = 0)
     created_date = models.DateTimeField(default=timezone.now)
+    entry = models.OneToOneField("LabEntry", on_delete=models.SET_NULL, null=True, blank=True, related_name="platelets_obj")
     platelets = models.DecimalField(verbose_name = "Тромбоциты", max_digits = 10, decimal_places=7)
     MPV = models.DecimalField(verbose_name = "MPV (средний объём тромбоцитов)", max_digits = 10, decimal_places=7)
     PCT = models.DecimalField(verbose_name = "PCT (тромбокрит)", max_digits = 10, decimal_places=7)
@@ -198,6 +209,7 @@ class Platelets(models.Model):
 class Leukocytes(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True, default = 0)
     created_date = models.DateTimeField(default=timezone.now)
+    entry = models.OneToOneField("LabEntry", on_delete=models.SET_NULL, null=True, blank=True, related_name="leukocytes_obj")
     leukocytes = models.DecimalField(verbose_name = "Лейкоциты", max_digits = 10, decimal_places=7)
     neutrophilsPer = models.DecimalField(verbose_name = "Нейтрофилы (%)", max_digits = 10, decimal_places=7)
     neutrophilsAbs = models.DecimalField(verbose_name = "Нейтрофилы (абс.)", max_digits = 10, decimal_places=7)
@@ -215,6 +227,7 @@ class Leukocytes(models.Model):
 class HormonalLevels(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True, default = 0)
     created_date = models.DateTimeField(default=timezone.now)
+    entry = models.OneToOneField("LabEntry", on_delete=models.SET_NULL, null=True, blank=True, related_name="hormonal_obj")
     FSH = models.DecimalField(verbose_name = "ФСГ", max_digits = 10, decimal_places=7)
     LH = models.DecimalField(verbose_name = "ЛГ", max_digits = 10, decimal_places=7)
     estradiol = models.DecimalField(verbose_name = "Эстрадиол", max_digits = 10, decimal_places=7)

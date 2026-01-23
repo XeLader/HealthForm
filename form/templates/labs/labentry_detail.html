@@ -1,0 +1,93 @@
+{% extends "../form/base.html" %}
+{% load lab_extras %}
+
+{% block title %}Анализ — {{ entry.get_kind_display }}{% endblock %}
+
+{% block content %}
+<div class="page two-col">
+
+  <!-- LEFT: fields -->
+  <section class="card">
+    <header class="card-header">
+      <div>
+        <h2 class="card-title">Файл-источник</h2>
+        {% if primary_doc %}
+        <div class="muted">
+
+            {{ primary_doc.created_at|date:"d.m.Y H:i" }}
+            {% if primary_doc.original_name %}· {{ primary_doc.original_name }}{% endif %}
+        </div>
+      </div>
+        <div class="header-actions">
+          <a class="btn btn-secondary" href="{% url 'labdoc_fill' doc_id=primary_doc.id%}">Подробнее</a>
+        </div>
+       {% endif %}
+    </header>
+
+    <div class="card-body">
+      {% if primary_doc %}
+        <div class="pdf-frame-wrap">
+          <iframe class="pdf-frame" src="{% url 'labdoc_file' doc_id=primary_doc.id %}"></iframe>
+        </div>
+      {% else %}
+        <div class="muted">Этот анализ был внесён без PDF или связь не задана.</div>
+      {% endif %}
+    </div>
+  </section>
+
+
+  <!-- RIGHT: PDF preview -->
+ <section class="card">
+    <header class="card-header">
+      <div>
+        <h2 class="card-title">{{ entry.get_kind_display }}</h2>
+        <div class="muted">
+          Дата: <strong>{{ entry.taken_at|date:"d.m.Y" }}</strong>
+          · Пациент:
+          <a href="{% url 'patient_detail' pk=entry.patient.pk %}">{{ entry.patient.full_name }}</a>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        {% if primary_doc %}
+          <a class="btn btn-secondary" href="{% url 'labdoc_file' doc_id=primary_doc.id %}" target="_blank" rel="noopener">Открыть PDF</a>
+        {% endif %}
+      </div>
+    </header>
+
+    <div class="card-body">
+      {% with kv=obj|lab_kv %}
+        {% if kv %}
+          <table class="detail-table">
+            <tbody>
+              {% for k, v in kv %}
+                <tr>
+                  <td class="detail-k">{{ k }}</td>
+                  <td class="detail-v">{{ v }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <div class="muted">Нет заполненных полей.</div>
+        {% endif %}
+      {% endwith %}
+
+      {% if docs %}
+        <div class="divider"></div>
+        <div class="muted">Источник(и):</div>
+        <ul class="link-list">
+          {% for d in docs %}
+            <li>
+              <a href="{% url 'labdoc_fill' doc_id=d.id %}">
+                {{ d.created_at|date:"d.m.Y H:i" }} — {{ d.get_status_display }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+  </section>
+  
+ </div>
+{% endblock %}

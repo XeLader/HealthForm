@@ -9,7 +9,6 @@ from django.utils import timezone
 
 from .models import LabEntry, LabKind
 
-# Импортируй ВСЕ модели анализов:
 from .models import (
     Biochemistry,
     ProteinMetabolism,
@@ -60,8 +59,8 @@ def _taken_at(instance) -> timezone.datetime:
 def _sync_lab_entry(instance, kind: str) -> None:
     model_cls = instance.__class__
     ct = _get_ct(model_cls)
-
-    LabEntry.objects.update_or_create(
+    
+    entry, created = LabEntry.objects.update_or_create(
         content_type=ct,
         object_id=instance.pk,
         defaults={
@@ -70,6 +69,9 @@ def _sync_lab_entry(instance, kind: str) -> None:
             "taken_at": _taken_at(instance),
         },
     )
+    if (created):
+        instance.entry = entry
+        instance.save(update_fields=["entry"])
 
 
 def _delete_lab_entry(instance) -> None:

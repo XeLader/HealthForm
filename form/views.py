@@ -568,7 +568,7 @@ def hematology_new(request, pk):
     
     
     
-    
+
 @login_required()
 def platelets_new(request, pk):
     patient = get_object_or_404(Patient, pk=pk)
@@ -1246,3 +1246,30 @@ def patient_labdocs(request, pk):
         "patient": patient,
         "docs": docs,
     })
+    
+@login_required
+def labentry_detail(request, pk):
+    entry = get_object_or_404(LabEntry, pk=pk)
+
+    if not request.user.is_staff:
+        raise Http404()
+
+    obj = entry.content_object 
+    if obj is None:
+        raise Http404("Исходный объект анализа не найден")
+
+    docs = (
+        LabDocument.objects
+        .filter(entries=entry)
+        .order_by("-created_at")
+    )
+    primary_doc = docs.first()
+
+    context = {
+        "entry": entry,
+        "obj": obj,
+        "docs": docs,
+        "primary_doc": primary_doc,
+        "has_doc": primary_doc is not None,
+    }
+    return render(request, "labs/labentry_detail.html", context)
