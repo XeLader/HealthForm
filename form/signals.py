@@ -7,9 +7,9 @@ from django.db.models.signals import post_save, post_delete
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 
-from .models import LabEntry, LabKind
+from .models.labs import LabEntry, LabKind
 
-from .models import (
+from .models.labs import (
     Biochemistry,
     ProteinMetabolism,
     LipidMetabolism,
