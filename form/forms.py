@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from .models import *
+from .models.medicine import *
 from django.db import models
 
 
@@ -262,3 +263,75 @@ class LabDocumentUploadForm(forms.ModelForm):
         model = LabDocument
         fields = ["file", "note"]
 
+class MedicineCreateForm(forms.ModelForm):
+    mtype = forms.ModelChoiceField(
+        queryset=MedicineType.objects.order_by("name"),
+        required=False,
+        label="Тип (из списка)",
+        empty_label="— не выбран —",
+    )
+    effect = forms.ModelChoiceField(
+        queryset=MedicineEffect.objects.order_by("name"),
+        required=False,
+        label="Воздействие (из списка)",
+        empty_label="— не выбрано —",
+    )
+
+    mtype_new = forms.CharField(
+        required=False,
+        label="Тип (новый)",
+        max_length=100,
+        help_text="Если нужного типа нет — введите здесь, он будет создан.",
+    )
+    effect_new = forms.CharField(
+        required=False,
+        label="Воздействие (новое)",
+        max_length=100,
+        help_text="Если нужного воздействия нет — введите здесь, оно будет создано.",
+    )
+
+    class Meta:
+        model = Medicine
+        fields = ["title", "usage"] 
+        widgets = {
+            "usage": forms.Textarea(attrs={"rows": 4}),
+        }
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        inst = getattr(self, "instance", None)
+        if inst and inst.pk:
+            self.fields["mtype"].initial = inst.mtype_id
+            self.fields["effect"].initial = inst.effect_id
+
+            self.fields["mtype_new"].initial = ""
+            self.fields["effect_new"].initial = ""
+
+    def clean(self):
+        cleaned = super().clean()
+
+        mtype_new = (cleaned.get("mtype_new") or "").strip()
+        effect_new = (cleaned.get("effect_new") or "").strip()
+
+        cleaned["mtype_new"] = mtype_new
+        cleaned["effect_new"] = effect_new
+
+        return cleaned
+
+    def save(self, commit=True):
+        obj = super().save(commit=False)
+        cd = self.cleaned_data
+        if cd.get("mtype_new"):
+            obj.mtype, _ = MedicineType.objects.get_or_create(name=cd["mtype_new"])
+        else:
+            obj.mtype = cd.get("mtype")
+
+        if cd.get("effect_new"):
+            obj.effect, _ = MedicineEffect.objects.get_or_create(name=cd["effect_new"])
+        else:
+            obj.effect = cd.get("effect")
+
+        if commit:
+            obj.save()
+        return obj

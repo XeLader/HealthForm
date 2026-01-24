@@ -56,5 +56,9 @@ urlpatterns = [
     path('labdoc/<uuid:doc_id>/file/', labdoc_file, name='labdoc_file'),
     path('labs/entry/<int:pk>/', labentry_detail, name='labentry_detail'),
     
+    path("medicines/new/", medicine_create, name="medicine_create"),
+    path("medicines/<int:pk>/edit", medicine_edit, name="medicine_edit"),
+    
+    path("handbook/", handbook, name="handbook"),
 ]
 

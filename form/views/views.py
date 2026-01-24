@@ -85,9 +85,14 @@ def dashboard(request):
         "patients":patients,
         "nav_section": "dashboard",})
 
-
-
-
+@login_required
+def handbook(request):
+    meds = Medicine.objects.order_by("effect", "mtype", "title")
+    meds_count = Medicine.objects.count()
+    return render(request, 'form/handbook.html',{
+        "meds":meds,
+        "meds_count": meds_count,
+        "nav_section": "handbook",})
 
         
         

@@ -86,42 +86,6 @@ form.report-form {
   min-height: 80px;
 }
 
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  margin-right: 2%;
-}
-
-.form-row {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.form-label {
-  font-size: 14px;
-  font-weight: 600;
-  color: #374151; /* нейтральный тёмно-серый */
-}
-
-.form-row input,
-.form-row select,
-.form-row textarea {
-  width: 100%;
-  padding: 8px 10px;
-  font-size: 14px;
-  border-radius: 10px;
-  border: 1px solid #d1d5db;
-  background: #ffffff;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-.form-row textarea {
-  resize: vertical;
-  min-height: 80px;
-}
-
 .help {
   font-size: 12px;
   color: #6b7280;

@@ -1,0 +1,74 @@
+{% extends "../form/base.html" %}
+
+{% block title %}Новый препарат{% endblock %}
+
+{% block content %}
+<div class="page">
+  <section class="card">
+    <header class="card-header">
+      <div>
+        <h2 class="card-title">Добавить препарат</h2>
+        <div class="muted">Название обязательно. Тип и воздействие можно выбрать или создать по названию.</div>
+      </div>
+      <a class="btn btn-secondary" href="javascript:history.back()">Назад</a>
+    </header>
+
+    <div class="card-body">
+      <form method="post" class="form">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="errors">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <div class="form-row">
+          <label class="form-label" for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+          {{ form.title }}
+          {% if form.title.errors %}<div class="errors">{{ form.title.errors }}</div>{% endif %}
+        </div>
+
+        <div class="grid-2">
+          <div class="form-row">
+            <label class="form-label" for="{{ form.mtype.id_for_label }}">{{ form.mtype.label }}</label>
+            {{ form.mtype }}
+            {% if form.mtype.errors %}<div class="errors">{{ form.mtype.errors }}</div>{% endif %}
+          </div>
+
+          <div class="form-row">
+            <label class="form-label" for="{{ form.mtype_new.id_for_label }}">{{ form.mtype_new.label }}</label>
+            {{ form.mtype_new }}
+            {% if form.mtype_new.help_text %}<div class="muted">{{ form.mtype_new.help_text }}</div>{% endif %}
+            {% if form.mtype_new.errors %}<div class="errors">{{ form.mtype_new.errors }}</div>{% endif %}
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-row">
+            <label class="form-label" for="{{ form.effect.id_for_label }}">{{ form.effect.label }}</label>
+            {{ form.effect }}
+            {% if form.effect.errors %}<div class="errors">{{ form.effect.errors }}</div>{% endif %}
+          </div>
+
+          <div class="form-row">
+            <label class="form-label" for="{{ form.effect_new.id_for_label }}">{{ form.effect_new.label }}</label>
+            {{ form.effect_new }}
+            {% if form.effect_new.help_text %}<div class="muted">{{ form.effect_new.help_text }}</div>{% endif %}
+            {% if form.effect_new.errors %}<div class="errors">{{ form.effect_new.errors }}</div>{% endif %}
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label" for="{{ form.usage.id_for_label }}">{{ form.usage.label }}</label>
+          {{ form.usage }}
+          {% if form.usage.errors %}<div class="errors">{{ form.usage.errors }}</div>{% endif %}
+        </div>
+
+        <div class="form-actions">
+          <button class="btn" type="submit">Сохранить</button>
+        </div>
+      </form>
+    </div>
+  </section>
+</div>
+{% endblock %}
+

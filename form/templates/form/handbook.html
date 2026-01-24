@@ -1,0 +1,58 @@
+{% extends 'form/base.html' %}
+
+{% block title %}Справочники{% endblock %}
+
+{% block content %}
+<div class="page">
+  <section class="card">
+    <header class="card-header">
+      <div>
+        <h2 class="card-title">Справочники</h2>
+        <div class="muted">Раздел для внутренних справочных данных.</div>
+      </div>
+    </header>
+
+    <div class="card-body">
+      <div class="dashboard-row">
+
+        <!-- Medicines card -->
+        <section class="card card-nested">
+          <header class="card-header">
+            <div>
+              <h3 class="card-title">Препараты</h3>
+              <div class="muted">Всего: {{ meds_count }}</div>
+            </div>
+            <div class="header-actions">
+              <a class="btn" href="{% url 'medicine_create' %}">Добавить</a>
+            </div>
+          </header>
+
+          <div class="card-body">
+            {% if meds %}
+              <ol class="item-list">
+                {% for m in meds %}
+                  <li class="item-list-row">
+                    <div class="item-line">
+                      <a href="{% url 'medicine_edit' pk=m.pk%}" class="item-link">{{ m.title }}</a>
+                      <div class="muted">
+                        {% if m.mtype %}{{ m.mtype }}{% endif %}
+                        {% if m.mtype and m.effect %} · {% endif %}
+                        {% if m.effect %}{{ m.effect }}{% endif %}
+                      </div>
+                    </div>
+                  </li>
+                {% endfor %}
+              </ol>
+            {% else %}
+              <div class="muted">Пока нет препаратов.</div>
+            {% endif %}
+          </div>
+        </section>
+      </div>
+    </div>
+  </section>
+  
+
+</div>
+{% endblock %}
+

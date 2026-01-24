@@ -236,7 +236,11 @@
 
     <div class="actions">
       <button type="submit" class="btn btn-primary">Сохранить</button>
+      {% if patient %}
       <a href="{% url 'patient_detail' patient.pk %}" class="btn btn-secondary">Отмена</a>
+      {% else %}
+      <a href="{% url 'dashboard'%}" class="btn btn-secondary">Отмена</a>
+      {% endif %}
     </div>
   </form>
 {% endblock %}
