@@ -447,3 +447,39 @@ body {
 .detail-table tr:first-child td { border-top: none; }
 .detail-k { width: 48%; color: #6b7280; padding-right: 10px; }
 .detail-v { width: 52%; text-align: right; white-space: pre-wrap; }
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.data-table thead th {
+  text-align: left;
+  padding: 10px 12px;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 2px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.data-table tbody td {
+  padding: 10px 12px;
+  vertical-align: top;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.data-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.data-table .muted {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+

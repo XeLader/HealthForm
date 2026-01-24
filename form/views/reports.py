@@ -154,27 +154,40 @@ def report_edit(request, pk):
         form = ReportForm(instance=report)
     return render(request, 'form/report_edit.html', {'form': form,"nav_section": "reports", 'patient': report.patient})
    
+   
 @login_required
 def prescription_new(request, pk):
     patient = get_object_or_404(Patient, pk=pk)
+
+    type_id = request.GET.get("type") or ""
+    effect_id = request.GET.get("effect") or ""
+
+    meds_qs = Medicine.objects.select_related("mtype", "effect").order_by("title")
+    if type_id:
+        meds_qs = meds_qs.filter(mtype_id=type_id)
+    if effect_id:
+        meds_qs = meds_qs.filter(effect_id=effect_id)
+
     if request.method == "POST":
-        form = PrescriptionForm(request.POST)
+        form = PrescriptionForm(request.POST, medicines_qs=meds_qs)
         if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.create_date = timezone.now()
-            post.save()
-            return redirect('patient_detail', pk=post.pk)
+            obj = form.save(commit=False)
+            obj.patient = patient
+            obj.save()
+            return redirect("patient_detail", pk=patient.pk)
+        else:
+            print(form.errors) 
     else:
-        form = PrescriptionForm()
-    return render(request, 'form/analysis_form.html', {
+        form = PrescriptionForm(medicines_qs=meds_qs)
+
+    return render(request, "prescriptions/prescription_form.html", {
+        "patient": patient,
         "form": form,
-        "page_title": "Назначение",
-        "card_title": "назначение",
-        "cancel_url": request.META.get("HTTP_REFERER") or redirect("patient_detail", pk=patient.pk).url,
-        "nav_section": "patients",
+        "types": MedicineType.objects.order_by("name"),
+        "effects": MedicineEffect.objects.order_by("name"),
+        "selected_type": type_id,
+        "selected_effect": effect_id,
     })
-    
 @login_required
 def report_print_config(request, pk):
     report = get_object_or_404(Report, pk=pk)

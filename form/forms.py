@@ -77,9 +77,13 @@ class PatientForm(forms.ModelForm):
         }
         
 class PrescriptionForm(forms.ModelForm):
+    def __init__(self, *args, medicines_qs=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if medicines_qs is not None:
+            self.fields["medicine"].queryset = medicines_qs
     class Meta:
         model = Prescription
-        fields = ('patient', 'medicine', 'dosage' ,'regime', 'duration')
+        fields = ('medicine','regime', 'duration', 'comment')
         
         
 class BiochemistryForm(forms.ModelForm):

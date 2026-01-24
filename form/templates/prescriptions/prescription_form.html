@@ -1,0 +1,111 @@
+{% extends "../form/base.html" %}
+{% block title %}Новое назначение{% endblock %}
+
+{% block content %}
+<div class="page">
+  <section class="card">
+    <header class="card-header">
+      <div>
+        <h2 class="card-title">Назначение препарата</h2>
+        <div class="muted">Пациент: <a href="{% url 'patient_detail' pk=patient.pk %}">{{ patient.full_name }}</a></div>
+      </div>
+      <a class="btn btn-secondary" href="{% url 'patient_detail' pk=patient.pk %}">Назад</a>
+    </header>
+
+    <div class="card-body">
+
+      <!-- filters -->
+      <form method="get" class="filters grid-2">
+        <div class="form-row">
+          <label class="form-label">Тип</label>
+          <select name="type" onchange="this.form.submit()">
+            <option value="">Все</option>
+            {% for t in types %}
+              <option value="{{ t.id }}" {% if selected_type == t.id|stringformat:"s" %}selected{% endif %}>{{ t.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label">Воздействие</label>
+          <select name="effect" onchange="this.form.submit()">
+            <option value="">Все</option>
+            {% for e in effects %}
+              <option value="{{ e.id }}" {% if selected_effect == e.id|stringformat:"s" %}selected{% endif %}>{{ e.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </form>
+
+      <div class="divider"></div>
+
+      <!-- prescription form -->
+      <form method="post" class="form">
+        {% csrf_token %}
+
+        <div class="form-row">
+          <label class="form-label" for="id_medicine">Препарат</label>
+          {{ form.medicine }}
+          {% if form.medicine.errors %}<div class="errors">{{ form.medicine.errors }}</div>{% endif %}
+        </div>
+
+        <div class="grid-2">
+          <div class="form-row">
+            <label class="form-label" for="id_duration">Длительность</label>
+            {{ form.duration }}
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label" for="id_regime">Схема приёма</label>
+          {{ form.regime }}
+          <div class="muted">При выборе препарата схема автоматически подставится из “Применение”, но можно отредактировать.</div>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label" for="id_comment">Комментарий</label>
+          {{ form.comment }}
+        </div>
+
+        <div class="form-actions">
+          <button class="btn" type="submit">Сохранить</button>
+        </div>
+      </form>
+
+    </div>
+  </section>
+</div>
+
+
+<script>
+(function() {
+  const medSelect = document.getElementById("id_medicine");
+  const regimeField = document.getElementById("id_regime");
+  if (!medSelect || !regimeField) return;
+
+  async function loadUsage(medId) {
+    const resp = await fetch(`/medicines/${medId}/usage/`, {credentials: "same-origin"});
+    if (!resp.ok) return "";
+    const data = await resp.json();
+    return data.usage || "";
+  }
+
+  async function onChange() {
+    const medId = medSelect.value;
+    if (!medId) return;
+
+    // не затираем ручной ввод врача
+    if (regimeField.value.trim()) return;
+
+    const usage = await loadUsage(medId);
+    if (!regimeField.value.trim()) {
+      regimeField.value = usage;
+    }
+  }
+
+  medSelect.addEventListener("change", onChange);
+})();
+</script>
+
+{% endblock %}
+

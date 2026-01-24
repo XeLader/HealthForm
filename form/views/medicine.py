@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.http import JsonResponse, Http404
 
 from ..forms import MedicineCreateForm
 from ..models.medicine import Medicine
@@ -31,3 +32,12 @@ def medicine_edit(request, pk):
     else:
         form = MedicineCreateForm(instance=med)
     return render(request, "medicines/medicine_form.html", {"form": form, "med": med, "nav_section": "handbook"})
+    
+
+@login_required
+def medicine_usage(request, pk):
+    m = Medicine.objects.filter(pk=pk).values("usage").first()
+    if not m:
+        raise Http404()
+    return JsonResponse({"usage": m["usage"] or ""})
+

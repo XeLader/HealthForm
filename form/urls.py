@@ -58,6 +58,8 @@ urlpatterns = [
     
     path("medicines/new/", medicine_create, name="medicine_create"),
     path("medicines/<int:pk>/edit", medicine_edit, name="medicine_edit"),
+    path("medicines/<int:pk>/usage/", medicine_usage, name="medicine_usage"),
+
     
     path("handbook/", handbook, name="handbook"),
 ]

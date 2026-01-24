@@ -1056,42 +1056,62 @@
 </ol>
 </section>
 
- <section class="card" style="margin-top:20px;">
-    <header class="card-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-      <h2 class="card-title">Назначения</h2>
+<section class="card" style="margin-top:20px;">
+  <header class="card-header">
+    <h3 class="card-title">Назначения</h3>
       <a href="{% url 'prescription_new' pk=patient.pk %}" class="icon-button" title="Создать назначение">
         {% include "./icons/file-earmark-plus.svg" %}
       </a>
-    </header>
+  </header>
 
+  <div class="card-body">
     {% if prescriptions %}
-    	<div class = "resultsTable" style="width:100%" >
-	<table style="width:100%">
-	<tr>
-    <th>Препарат</th>
-    <th>Дозировка</th>
-    <th>режим</th>
-    <th>длительность</th>
-    <th>комментарий</th>
-  </tr>
-  {% for prescription in prescriptions %}
-  <tr>
-    <td>{{prescription.medicine.title}} </td>
-    <td>{{prescription.dosage}}</td>
-    <td>{{prescription.regime}}</td>
-    <td>{{prescription.duration}}</td>
-    <td>{{prescription.comment}}</td>
-  </tr>
-    {% endfor %}
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Препарат</th>
+              <th>Схема приёма</th>
+              <th>Длительность</th>
+              <th>Дата</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in prescriptions %}
+              <tr>
+                <td>
+                  <strong>{{ p.medicine.title }}</strong>
+                  {% if p.medicine.mtype or p.medicine.effect %}
+                    <div class="muted">
+                      {% if p.medicine.mtype %}{{ p.medicine.mtype }}{% endif %}
+                      {% if p.medicine.mtype and p.medicine.effect %} · {% endif %}
+                      {% if p.medicine.effect %}{{ p.medicine.effect }}{% endif %}
+                    </div>
+                  {% endif %}
+                </td>
 
-	  </table>
-	  </div>
+                <td>
+                  {{ p.regime|default:"—" }}
+                  {% if p.comment %}
+                    <div class="muted">{{ p.comment }}</div>
+                  {% endif %}
+                </td>
+
+                <td>{{ p.duration|default:"—" }}</td>
+
+                <td class="muted">
+                  {{ p.created_at|date:"d.m.Y" }}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     {% else %}
-      <p class="muted">Для этого пациента нет назначений.</p>
+      <div class="muted">Назначений пока нет.</div>
     {% endif %}
-  </section>
-
-
+  </div>
+</section>
 
 </article>
 

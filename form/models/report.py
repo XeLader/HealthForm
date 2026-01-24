@@ -56,11 +56,9 @@ class Prescription(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True, default = 0)
     medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
     regime = models.CharField(verbose_name = "Режим", max_length=200)
-    dosage = models.CharField(verbose_name = "Доза", max_length=200)
-    duration = models.CharField(verbose_name = "Длительность", max_length = 200)
-    comment = models.TextField(verbose_name = "Комментариий")
+    duration = models.CharField(verbose_name = "Длительность", max_length = 200, null=True)
+    comment = models.TextField(verbose_name = "Комментариий", null=True, blank=True)
     created_at = models.DateField(verbose_name = "Дата",default=timezone.now)
-
     def __str__(self):
         return  self.medicine.title
 
