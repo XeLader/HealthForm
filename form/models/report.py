@@ -252,6 +252,14 @@ class Report(models.Model):
     
     insp_Other = models.CharField("Прочее:", max_length = 150, default = "")
 
+    #Life Style
+    life_physAct = models.CharField(verbose_name = "Физическая активность", max_length=200, null=True)
+    life_sleepMode = models.CharField(verbose_name = "Режим сна", max_length=200, null=True)
+    life_stress = models.CharField(verbose_name = "Наличие стресса", max_length=200, null=True)
+    life_antibiotics = models.CharField(verbose_name = "Последний приём антибиотиков", max_length=200, null=True)
+    life_covid = models.BooleanField(verbose_name = "COVID-19", default = False)
+    life_vaccinationDate = models.DateTimeField(verbose_name = "Дата вакцинации", null=True)
+
     title = models.CharField(verbose_name = "Название", max_length=200)
     text = models.TextField(verbose_name = "Комментарий")
     created_date = models.DateTimeField(default=timezone.now)

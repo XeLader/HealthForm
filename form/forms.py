@@ -36,6 +36,9 @@ class InviteRegisterForm(forms.Form):
 
 
 class ReportForm(forms.ModelForm):
+    def lifeStyles(self):
+        return [self[name] for name in filter(lambda x: x.startswith('life_'), self.fields)]
+        
     class Meta:
         model = Report
         fields = ('patient', 'title', 'text', 'complaints', 'anamnesis', 'diet', 'mealscount', 'snacks', 'pref_Meat', 'pref_Fish',
@@ -44,12 +47,15 @@ class ReportForm(forms.ModelForm):
         'cardiovascular', 'oncological', 'diabetes', 'thyroid', 'autoimmune',
         'allergic', 'foodAllergy', 'medicineAllergy', 'seasonalAllergy', 'contactAllergy', 'noAllergy', 'insp_General', 'insp_Body', 'insp_Skin',
         "insp_lymph", 'insp_Thyroid', 'insp_Abdomen', 'insp_Liver', 'insp_Liver_protudes', 'insp_Musculoskeletal', 'insp_Other',
-        'next_date')
+        'next_date', 'life_physAct', 'life_sleepMode', 'life_stress', 'life_antibiotics', 'life_covid', 'life_vaccinationDate')
         widgets = {
             "insp_lymph": forms.CheckboxSelectMultiple,
         }
         
 class ReportFormForPatient(forms.ModelForm):
+    def lifeStyles(self):
+        return [self[name] for name in filter(lambda x: x.startswith('life_'), self.fields)]
+    
     class Meta:
         model = Report
         fields = ('title', 'text', 'complaints', 'anamnesis', 'diet', 'mealscount', 'snacks', 'pref_Meat', 'pref_Fish',
@@ -58,7 +64,7 @@ class ReportFormForPatient(forms.ModelForm):
         'cardiovascular', 'oncological', 'diabetes', 'thyroid', 'autoimmune',
         'allergic', 'foodAllergy', 'medicineAllergy', 'seasonalAllergy', 'contactAllergy', 'noAllergy', 'insp_General', 'insp_Body', 'insp_skin',
         'insp_lymph', 'insp_thyroid', 'insp_Abdomen', 'insp_Liver', 'insp_Liver_protudes', 'insp_musculoskeletal', 'insp_Other',
-        'next_date')
+        'next_date', 'life_physAct', 'life_sleepMode', 'life_stress', 'life_antibiotics', 'life_covid', 'life_vaccinationDate')
         
         widgets = {
             "insp_lymph": forms.CheckboxSelectMultiple,

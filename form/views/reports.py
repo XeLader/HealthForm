@@ -82,10 +82,17 @@ def report_detail(request, pk):
         "title": Report._meta.get_field("title").verbose_name,
         "text": Report._meta.get_field("text").verbose_name,
     }
+    
+    #Life style fields
+    fields_lifeStyle = {}
+    for field in Report._meta.get_fields():
+        if field.name.startswith("life_"):
+           fields_lifeStyle[field] = field.verbose_name
 
     return render(request, "form/report_detail.html", {
         "report": report,
         "fields_verbose": fields_verbose,
+        "fields_lifeStyle":fields_lifeStyle,
         "nav_section": "reports",
     })
 
@@ -105,11 +112,13 @@ def report_new(request):
         Preferable = ["pref_Meat", "pref_Fish", "pref_Dair", "pref_Dair", "pref_Eggs", "pref_Vegs", "pref_Frut", "pref_Groa", "pref_Swet", "pref_Fast", "pref_Cofe", "pref_Alco"]
         Intolerances = ["intol_Lact", "intol_Glut", "intol_Nuts", "intol_Sea", "intol_Other"]
         Allergies = ["foodAllergy", "medicineAllergy", "seasonalAllergy", "contactAllergy", "noAllergy"]
+        LifeStyle = [field.name for field in Report._meta.get_fields() if field.name.startswith("life_")]
     return render(request, 'form/report_edit.html', {
                                             'form': form,
                                             'prefs':Preferable,
                                             'intols':Intolerances, 
                                             'allergies': Allergies,
+                                            'lifeStyle': LifeStyle,
                                              "nav_section": "reports"})
     
 @login_required    
@@ -130,6 +139,7 @@ def report_new_for_patient(request, pk):
         Intolerances = ["intol_Lact", "intol_Glut", "intol_Nuts", "intol_Sea", "intol_Other"]
         Heredity = ["cardiovascular","oncological","diabetes","thyroid","autoimmune","allergic",]
         Allergies = ["foodAllergy", "medicineAllergy", "seasonalAllergy", "contactAllergy", "noAllergy"]
+        LifeStyle = [field.name for field in Report._meta.get_fields() if field.name.startswith("life_")]
     return render(request, 'form/report_edit.html', {
                                             'form': form,
                                             'patient': patient,
@@ -137,6 +147,7 @@ def report_new_for_patient(request, pk):
                                             'intols':Intolerances, 
                                             'herr':Heredity,
                                             'allergies': Allergies,
+                                            'lifeStyle': LifeStyle,
                                              "nav_section": "patients"})
 
 @login_required

@@ -230,7 +230,26 @@
         </div>
       </div>
 
-
+      
+        {# Блок 6: Образ жизни #}
+      <div class="card">
+        <div class="card-title">Образ жизнь:</div>
+        {% for field in form.lifeStyles %}
+        <div class="field"  style="margin-top:6px;">
+        <label>{{ field.label }}</label>
+        {% if field.label == "COVID-19" %}
+          <div style="align:left">
+              {{ field}}
+          </div>
+        {% else %}
+        {{ field }}
+        {% endif %}
+        {% if field.errors %}<div class="errors">{{ field.errors }}</div>{% endif %}
+        {% endfor %}
+      </div>
+     
+        
+      </div>
 
     </div>
 

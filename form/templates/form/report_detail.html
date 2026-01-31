@@ -278,8 +278,19 @@
         <div>{{ report.insp_Other|default:"—" }}</div>
       </div>
     </section>
+    
+    {# 8. Образ жизни #}
+    <section class="card">
+      <div class="card-title">Образ жизни</div>
+      {% for field , name in fields_lifeStyle.items %} 
+      <div class="field"  style="margin-top:6px;">
+        <label>{{ name }}</label>
+        <div> {{ field.value|default:"—" }} </div>
+      </div>
+      {% endfor %}
+    </section>
 
-    {# 8. Заключение #}
+    {# 9. Заключение #}
     <section class="card">
       <div class="card-title">Заключение</div>
       <div class="field">
