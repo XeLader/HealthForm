@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
+from django.views.generic import CreateView, UpdateView
 from django.urls import reverse
 from django import forms
 
@@ -94,7 +95,43 @@ def handbook(request):
         "meds_count": meds_count,
         "nav_section": "handbook",})
 
-        
-        
+class DiagnosticHypothesisCreateView(CreateView):
+    model = DiagnosticHypothesis
+    form_class = DiagnosticHypothesisForm
+    template_name = "form/hypothesis_form.html"
 
+    def dispatch(self, request, *args, **kwargs):
+        self.patient = get_object_or_404(Patient, pk=kwargs["patient_pk"])
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        hypothesis = form.save(commit=False)
+        hypothesis.patient = self.patient
+        hypothesis.save()
+        return redirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse("patient_detail", kwargs={"pk": self.patient.pk})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["patient"] = self.patient
+        return context
+
+        
+class DiagnosticHypothesisUpdateView(UpdateView):
+    model = DiagnosticHypothesis
+    form_class = DiagnosticHypothesisForm
+    template_name = "form/hypothesis_form.html"
+
+    def get_success_url(self):
+        return reverse(
+            "patient_detail",
+            kwargs={"pk": self.object.patient.pk}
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["patient"] = self.object.patient
+        return context
 

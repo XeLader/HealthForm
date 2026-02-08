@@ -62,5 +62,8 @@ urlpatterns = [
 
     
     path("handbook/", handbook, name="handbook"),
+
+    path("patient/<int:patient_pk>/diagnosis/new/", DiagnosticHypothesisCreateView.as_view(), name="diagnosis_create",),
+    path("diagnosis/<int:pk>/edit/",DiagnosticHypothesisUpdateView.as_view(),name="diagnosis_edit"),
 ]
 

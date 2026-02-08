@@ -211,6 +211,62 @@
     {% endif %}
   </section>
 
+  {# Блок со списком гипотиз #}
+  <section class="card" style="margin-top:20px;">
+
+  <header class="card-header card-header--with-action">
+    <div>
+      <h3 class="card-title">Диагностические гипотезы</h3>
+    </div>
+    <a href="{% url 'diagnosis_create' patient_pk=patient.pk %}"
+       class="icon-button" title="Создать гипотезу">
+      {% include "./icons/file-earmark-plus.svg" %}
+    </a>
+  </header>
+
+  <div class="card-body">
+
+    {% if hypotheses %}
+      <ol class="item-list" style="list-style:none;margin:0;padding:0;">
+
+        {% for h in hypotheses %}
+
+
+            <li class="item-card">
+              <div class="item-card-title">
+                {{ h.main_diagnosis }}
+              </div>
+
+              {% if h.comorbidities %}
+                <div class="item-card-text">
+                  Сопутствующие: {{ h.comorbidities }}
+                </div>
+              {% endif %}
+
+            <div class="item-card-meta">
+              <span class="muted">
+                {{ h.created_at|date:"d.m.Y" }}
+              </span>
+            </div>
+            <a href="{% url 'diagnosis_edit' h.pk %}"
+     class="btn btn-xs btn-outline-secondary">
+    Редактировать
+</a>
+
+          </li>
+        {% endfor %}
+
+      </ol>
+
+    {% else %}
+      <p class="muted">
+        Диагностические гипотезы ещё не добавлены
+      </p>
+    {% endif %}
+
+  </div>
+</section>
+
 
 
   <section class="card" style="margin-top:20px;">

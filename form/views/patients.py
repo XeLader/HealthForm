@@ -37,6 +37,7 @@ def patient_detail(request, pk):
     platelets = Platelets.objects.filter(patient = patient)
     leukocytes = Leukocytes.objects.filter(patient = patient)
     hormons = HormonalLevels.objects.filter(patient = patient)
+    hypotheses = DiagnosticHypothesis.objects.filter(patient=patient).order_by("-created_at")
     
     prescriptions = Prescription.objects.filter(patient = patient)
     return render(request, 'form/patient_detail.html',
@@ -57,6 +58,7 @@ def patient_detail(request, pk):
         'leukocytes':leukocytes,
         'hormons':hormons,
         'prescriptions': prescriptions,
+        "hypotheses": hypotheses,
         "nav_section": "patients"
         })
 

@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from .models import *
 from .models.medicine import *
+from .models.models import DiagnosticHypothesis
 from django.db import models
 
 
@@ -345,3 +346,25 @@ class MedicineCreateForm(forms.ModelForm):
         if commit:
             obj.save()
         return obj
+
+
+class DiagnosticHypothesisForm(forms.ModelForm):
+    class Meta:
+        model = DiagnosticHypothesis
+        fields = [
+            "main_diagnosis",
+            "comorbidities",
+            "comment",
+        ]
+        widgets = {
+            "main_diagnosis": forms.TextInput(attrs={
+                "class": "form-control"
+            }),
+            "comorbidities": forms.TextInput(attrs={
+                "class": "form-control"
+            }),
+            "comment": forms.Textarea(attrs={
+                "class": "form-control",
+                "rows": 4
+            }),
+        }

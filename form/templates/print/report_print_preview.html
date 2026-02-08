@@ -178,6 +178,36 @@
     </section>
   {% endif %}
 
+  {# Гипотезы #}
+  {% if hypotheses %}
+<section class="block">
+  <h2>Диагностическая гипотеза</h2>
+
+  {% for h in hypotheses %}
+    <div class="kv">
+    <div class="k">Основное заболевание</div>
+<div class="v">
+      {{ h.main_diagnosis }}
+</div>
+      {% if h.comorbidities %}
+        <div class="kv">
+          <div class="k">Сопутствующие:</div>
+          <div class="v">{{ h.comorbidities }}</div>
+      </div>
+
+      {% endif %}
+
+      {% if h.comment %}
+        <div class="kv">
+         <div class="k">Комментарий:</div>
+         <div class="v"> {{ h.comment }}</div>
+        </div>
+      {% endif %}
+    </div>
+  {% endfor %}
+</section>
+{% endif %}
+
   {# 8) Следующий приём #}
   {% if "followup" in sections %}
     <section class="block">
@@ -225,6 +255,9 @@
       {% endfor %}
       </section>
   {% endif %}
+
+
+
 
   {# Рецепты #}
   {% if rx_rows %}

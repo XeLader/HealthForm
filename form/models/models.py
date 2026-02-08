@@ -55,3 +55,40 @@ class Patient(models.Model):
     
     def __str__(self):
 	    return self.full_name
+
+class DiagnosticHypothesis(models.Model):
+    patient = models.ForeignKey(
+        Patient,
+        on_delete=models.CASCADE,
+        related_name="diagnostic_hypotheses",
+        verbose_name="Пациент"
+    )
+
+    main_diagnosis = models.CharField(
+        "Основное заболевание",
+        max_length=300
+    )
+
+    comorbidities = models.CharField(
+        "Сопутствующие заболевания",
+        max_length=500,
+        blank=True
+    )
+
+    comment = models.TextField(
+        "Комментарий",
+        blank=True
+    )
+
+    created_at = models.DateTimeField(
+        "Дата создания",
+        default=timezone.now
+    )
+
+    class Meta:
+        verbose_name = "Диагностическая гипотеза"
+        verbose_name_plural = "Диагностические гипотезы"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.main_diagnosis} ({self.patient})"

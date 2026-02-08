@@ -203,6 +203,7 @@ def prescription_new(request, pk):
 def report_print_config(request, pk):
     report = get_object_or_404(Report, pk=pk)
 
+    hypotheses = DiagnosticHypothesis.objects.filter(patient=report.patient).order_by("-created_at")
 
     labs_qs = LabEntry.objects.filter(patient=report.patient).order_by("-taken_at")
     rx_qs = Prescription.objects.filter(patient=report.patient).order_by("-created_at")
@@ -262,6 +263,7 @@ def report_print_config(request, pk):
 
     return render(request, "form/report_print_config.html", {
         "report": report,
+        "hypotheses": hypotheses[:1],
         "form": form,
         "page_title": "Настройка печати",
         "nav_section": "reports",
@@ -278,6 +280,7 @@ def report_print_config(request, pk):
 @login_required    
 def report_print_preview(request, pk):
     report = get_object_or_404(Report, pk=pk)
+    hypotheses = DiagnosticHypothesis.objects.filter(patient=report.patient).order_by("-created_at")
 
     sess_key = f"print_cfg_report_{report.pk}"
     cfg = request.session.get(sess_key)
@@ -324,6 +327,7 @@ def report_print_preview(request, pk):
 
     context = {
         "report": report,
+        "hypotheses": hypotheses[:1],
         "doc_type": doc_type,
         "sections": sections,
         "labs_grouped": labs_grouped,
