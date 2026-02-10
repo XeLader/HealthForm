@@ -40,6 +40,9 @@ def patient_detail(request, pk):
     hypotheses = DiagnosticHypothesis.objects.filter(patient=patient).order_by("-created_at")
     
     prescriptions = Prescription.objects.filter(patient = patient)
+
+    models = {"prescription":Prescription}
+
     return render(request, 'form/patient_detail.html',
         {'patient':patient, 
         'reports':reports,
@@ -59,6 +62,7 @@ def patient_detail(request, pk):
         'hormons':hormons,
         'prescriptions': prescriptions,
         "hypotheses": hypotheses,
+        "models":models,
         "nav_section": "patients"
         })
 

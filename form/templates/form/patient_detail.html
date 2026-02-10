@@ -1,5 +1,6 @@
 {% extends "form/base.html" %}
-{% load age_extras %} {# если фильтр возраста уже создан; иначе убери эту строку #}
+{% load age_extras %}
+{% load model_title %}
 
 {% block title %}Пациент {{ patient.full_name }}{% endblock %}
 
@@ -1114,7 +1115,7 @@
 
 <section class="card" style="margin-top:20px;">
   <header class="card-header">
-    <h3 class="card-title">Назначения</h3>
+    <h3 class="card-title">{{ models.prescription|model_title_plural }}</h3>
       <a href="{% url 'prescription_new' pk=patient.pk %}" class="icon-button" title="Создать назначение">
         {% include "./icons/file-earmark-plus.svg" %}
       </a>
@@ -1164,7 +1165,7 @@
         </table>
       </div>
     {% else %}
-      <div class="muted">Назначений пока нет.</div>
+      <div class="muted">Список пуст.</div>
     {% endif %}
   </div>
 </section>

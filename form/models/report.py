@@ -59,6 +59,11 @@ class Prescription(models.Model):
     duration = models.CharField(verbose_name = "Длительность", max_length = 200, null=True)
     comment = models.TextField(verbose_name = "Комментариий", null=True, blank=True)
     created_at = models.DateField(verbose_name = "Дата",default=timezone.now)
+
+    class Meta:
+        verbose_name = "Нутрицевтическая коррекция"
+        verbose_name_plural = "Нутрицевтические коррекции"
+
     def __str__(self):
         return  self.medicine.title
 
