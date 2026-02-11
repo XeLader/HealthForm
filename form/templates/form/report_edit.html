@@ -103,6 +103,11 @@
             {% endfor %}
             </div>
           </div>
+          <div class="field">
+            {{ form.comment_diet.label_tag }}
+            {{ form.comment_diet }}
+            {% if form.comment_diet.errors %}<div class="errors">{{ form.comment_diet.errors }}</div>{% endif %}
+          </div>
         </div>
       </div>
 

@@ -44,13 +44,17 @@ class ReportForm(forms.ModelForm):
         model = Report
         fields = ('patient', 'title', 'text', 'complaints', 'anamnesis', 'diet', 'mealscount', 'snacks', 'pref_Meat', 'pref_Fish',
         'pref_Dair', 'pref_Eggs', 'pref_Vegs', 'pref_Frut', 'pref_Groa', 'pref_Swet',
-        'pref_Fast', 'pref_Cofe', 'pref_Alco', 'intol_Lact', 'intol_Glut' ,'intol_Nuts' ,'intol_Sea' ,'intol_Other',
-        'cardiovascular', 'oncological', 'diabetes', 'thyroid', 'autoimmune',
-        'allergic', 'foodAllergy', 'medicineAllergy', 'seasonalAllergy', 'contactAllergy', 'noAllergy', 'insp_General', 'insp_Body', 'insp_Skin',
-        "insp_lymph", 'insp_Thyroid', 'insp_Abdomen', 'insp_Liver', 'insp_Liver_protudes', 'insp_Musculoskeletal', 'insp_Other',
+        'pref_Fast', 'pref_Cofe', 'pref_Alco', 'intol_Lact', 'intol_Glut' ,'intol_Nuts' ,'intol_Sea' ,'intol_Other', "comment_diet",
+        'cardiovascular', 'cardiovascular_label', 'oncological','oncological_label', 'diabetes', 'diabetes_label', 'thyroid', 'thyroid_label', 'autoimmune', 'autoimmune_label', 'heredity_Other',
+        'foodAllergy', 'medicineAllergy', 'seasonalAllergy', 'contactAllergy', 'noAllergy', 'insp_General', 'insp_Body', 'insp_Skin',
+        'insp_lymph', 'insp_thyroid', 'insp_Abdomen', 'insp_Liver', 'insp_Liver_protudes', 'insp_musculoskeletal', 'insp_Swelling', 'insp_Muscle', 'insp_Tongue','insp_Limbs', 'insp_Other',
         'next_date', 'life_physAct', 'life_sleepMode', 'life_stress', 'life_antibiotics', 'life_covid', 'life_vaccinationDate')
         widgets = {
             "insp_lymph": forms.CheckboxSelectMultiple,
+            "insp_thyroid": forms.CheckboxSelectMultiple,
+            "insp_skin": forms.CheckboxSelectMultiple,
+            "insp_musculoskeletal": forms.CheckboxSelectMultiple,
+            "insp_Tongue": forms.CheckboxSelectMultiple,
         }
         
 class ReportFormForPatient(forms.ModelForm):
@@ -61,10 +65,10 @@ class ReportFormForPatient(forms.ModelForm):
         model = Report
         fields = ('title', 'text', 'complaints', 'anamnesis', 'diet', 'mealscount', 'snacks', 'pref_Meat', 'pref_Fish',
         'pref_Dair', 'pref_Eggs', 'pref_Vegs', 'pref_Frut', 'pref_Groa', 'pref_Swet',
-        'pref_Fast', 'pref_Cofe', 'pref_Alco', 'intol_Lact', 'intol_Glut' ,'intol_Nuts' ,'intol_Sea' ,'intol_Other',
-        'cardiovascular', 'oncological', 'diabetes', 'thyroid', 'autoimmune',
-        'allergic', 'foodAllergy', 'medicineAllergy', 'seasonalAllergy', 'contactAllergy', 'noAllergy', 'insp_General', 'insp_Body', 'insp_skin',
-        'insp_lymph', 'insp_thyroid', 'insp_Abdomen', 'insp_Liver', 'insp_Liver_protudes', 'insp_musculoskeletal', 'insp_Other',
+        'pref_Fast', 'pref_Cofe', 'pref_Alco', 'intol_Lact', 'intol_Glut' ,'intol_Nuts' ,'intol_Sea' ,'intol_Other', "comment_diet",
+        'cardiovascular', 'cardiovascular_label', 'oncological','oncological_label', 'diabetes', 'diabetes_label', 'thyroid', 'thyroid_label', 'autoimmune', 'autoimmune_label', 'heredity_Other',
+        'foodAllergy', 'medicineAllergy', 'seasonalAllergy', 'contactAllergy', 'noAllergy', 'insp_General', 'insp_Body', 'insp_skin',
+        'insp_lymph', 'insp_thyroid', 'insp_Abdomen', 'insp_Liver', 'insp_Liver_protudes', 'insp_musculoskeletal', 'insp_Swelling', 'insp_Muscle', 'insp_Tongue','insp_Limbs', 'insp_Other',
         'next_date', 'life_physAct', 'life_sleepMode', 'life_stress', 'life_antibiotics', 'life_covid', 'life_vaccinationDate')
         
         widgets = {
@@ -72,6 +76,7 @@ class ReportFormForPatient(forms.ModelForm):
             "insp_thyroid": forms.CheckboxSelectMultiple,
             "insp_skin": forms.CheckboxSelectMultiple,
             "insp_musculoskeletal": forms.CheckboxSelectMultiple,
+            "insp_Tongue": forms.CheckboxSelectMultiple,
         }
         
         

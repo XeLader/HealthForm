@@ -52,6 +52,41 @@ class MuscoskeletalInspectOption(models.Model):
     def __str__(self):
         return self.label
 
+
+class AbdomenInspectOption(models.Model):
+    code = models.CharField(max_length=3, unique=True)
+    label = models.CharField(max_length=100)
+
+    class Meta:
+        verbose_name = "Опция осмотра живота"
+        verbose_name_plural = "Опции осмотра живота"
+
+    def __str__(self):
+        return self.label
+
+
+class TongueInspectOption(models.Model):
+    code = models.CharField(max_length=3, unique=True)
+    label = models.CharField(max_length=100)
+
+    class Meta:
+        verbose_name = "Опция осмотра языка"
+        verbose_name_plural = "Опции осмотра языка"
+
+    def __str__(self):
+        return self.label
+
+class HeredityOption(models.Model):
+    label = models.CharField(max_length=100)
+
+    class Meta:
+        verbose_name = "Наследственное заболевание"
+        verbose_name_plural = "Наследственные заболевания"
+
+    def __str__(self):
+        return self.label
+
+
 class Prescription(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True, default = 0)
     medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
@@ -66,6 +101,7 @@ class Prescription(models.Model):
 
     def __str__(self):
         return  self.medicine.title
+
 
 class Report(models.Model):
     NUTR_TYPE = {
@@ -124,7 +160,7 @@ class Report(models.Model):
     "PAL":"бледность",
     "PIG":"гиперпигментация",
     "JAN":"желтушность",
-    "EDM":"отёки",
+    "EDM":"чёрный акантоз",
     "NON":"-",
     }
 
@@ -139,10 +175,13 @@ class Report(models.Model):
     INSP_ABDOMEN = {
     "SFT":"мягкий",
     "MTN":"умеренно напряжённый",
-    "TNS":"напряжённый; безболезненный",
-    "PNF":"болезненный; перистальтика сохранена",
-    "WEA":"ослаблена",
-    "ABS":"отсутствует",
+    "TNS":"напряжённый",
+    "BLT":"вздутие",
+    "NPN":"безболезненный",
+    "PNF":"болезненный",
+    "SAV":"перистальтика сохранена",
+    "WEA":"перистальтика ослаблена",
+    "ABS":"перистальтика отсутствует",
     "NON":"-",
     }
 
@@ -160,10 +199,17 @@ class Report(models.Model):
     "NON":"-",
     }
 
+    INSP_TUNG = {
+    "PLQ":"налёт",
+    "MRK":"отпчетки зубов",
+    "GEO":"географический язык",
+    "CLR":"цвет",
+    }
+
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True, default = 0)
     complaints = models.CharField("Жалобы", max_length=1000)
-    anamnesis = models.CharField("Анамнез", max_length=1000)
+    anamnesis = models.CharField("Анамнез заболевания", max_length=1000)
     diet = models.CharField(verbose_name = "Тип питания", max_length=7, choices=NUTR_TYPE)
     mealscount = models.IntegerField(verbose_name = "Количество приёмов пищи в день")
     snacks = models.CharField(verbose_name = "Перекусы", max_length=1, choices=SNACK_OFT)
@@ -187,13 +233,26 @@ class Report(models.Model):
     intol_Sea = models.BooleanField("морепродукты")
     intol_Other = models.CharField("другое", max_length = 100)
 
+    #Diet comment
+    comment_diet = models.CharField(verbose_name = "Комментарий", max_length = 300, null=True)
+
     #Heredity
     cardiovascular = models.CharField(verbose_name = "Сердечно‑сосудистые заболевания", max_length=1, choices=YNU)
+    cardiovascular_label = models.OneToOneField(HeredityOption, on_delete=models.CASCADE, null=True, related_name = "cardiovascular+")
+
     oncological = models.CharField(verbose_name = "Онкологические заболевания", max_length=1, choices=YNU)
-    diabetes = models.CharField(verbose_name = "Онкологические заболевания", max_length=1, choices=YNU)
+    oncological_label = models.OneToOneField(HeredityOption, on_delete=models.CASCADE, null=True,  related_name = "oncological+")
+
+    diabetes = models.CharField(verbose_name = "Диабет", max_length=1, choices=YNU)
+    diabetes_label = models.OneToOneField(HeredityOption, on_delete=models.CASCADE, null=True,  related_name = "diabetes+")
+
     thyroid = models.CharField(verbose_name = "Заболевания щитовидной железы", max_length=1, choices=YNU)
+    thyroid_label = models.OneToOneField(HeredityOption, on_delete=models.CASCADE, null=True,  related_name = "thyroid+")
+
     autoimmune = models.CharField(verbose_name = "Аутоиммунные заболевания", max_length=1, choices=YNU)
-    allergic = models.CharField(verbose_name = "Аллергические заболевания", max_length=1, choices=YNU)
+    autoimmune_label = models.OneToOneField(HeredityOption, on_delete=models.CASCADE, null=True,  related_name = "autoimmune+")
+
+    heredity_Other = models.CharField("другое", max_length = 100, blank=True)
 
     #Allergies
     foodAllergy = models.CharField("Пищевая аллергия", max_length=150)
@@ -216,6 +275,17 @@ class Report(models.Model):
         help_text="Можно выбрать несколько состояний"
     )
     
+    insp_Swelling = models.CharField("Отёки", max_length=300, blank=True)
+    insp_Muscle = models.CharField("Мышечный тонус", max_length=300, blank=True)
+
+    insp_Tongue = models.ManyToManyField(
+        TongueInspectOption,
+        verbose_name = "Язык",
+        related_name="reports",
+        blank=True,
+        help_text="Можно выбрать несколько состояний"
+    )
+
     
     insp_Lymph = models.CharField("Лимфатические узлы", max_length=3, choices=INSP_LYMP_THYR, default = "NON")
     
@@ -239,7 +309,13 @@ class Report(models.Model):
     )
     
     insp_Abdomen = models.CharField("Живот", max_length=3, choices=INSP_ABDOMEN, default = "NON")
-    
+    insp_abdomen = models.ManyToManyField(
+        AbdomenInspectOption,
+        verbose_name = "Живот",
+        related_name="reports",
+        blank=True,
+        help_text="Можно выбрать несколько состояний"
+    )
     
     
     insp_Liver = models.CharField("Печень", max_length=3, choices=INSP_LIVER, default = "NON")
@@ -255,6 +331,7 @@ class Report(models.Model):
         help_text="Можно выбрать несколько состояний"
     )
     
+    insp_Limbs = models.CharField("Стопы, ладони, локти, ногти, волосы:", max_length = 150, default = "")
     insp_Other = models.CharField("Прочее:", max_length = 150, default = "")
 
     #Life Style
