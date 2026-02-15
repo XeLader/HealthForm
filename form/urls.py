@@ -4,6 +4,7 @@ from .views.medicine import *
 from .views.patients import *
 from .views.reports import *
 from .views.views import *
+from .views.foodplan import *
 from .views.survey import (
     CreateSurveyInviteView,
     PublicSurveySectionView,
@@ -65,5 +66,13 @@ urlpatterns = [
 
     path("patient/<int:patient_pk>/diagnosis/new/", DiagnosticHypothesisCreateView.as_view(), name="diagnosis_create",),
     path("diagnosis/<int:pk>/edit/",DiagnosticHypothesisUpdateView.as_view(),name="diagnosis_edit"),
+
+    path("patient/<int:patient_id>/foodplan/new/", foodplan_create, name="foodplan_new"),
+    path("foodplan/<int:foodplan_id>",  foodplan_detail, name="foodplan_detail"),
+    path("foodplan/<int:foodplan_id>/edit",  foodplan_edit, name="foodplan_edit"),
+    path("foodplan/template/new", foodplan_template_create, name="foodplan_template_new"),
+    path("foodplan/template/<int:foodplan_template_id>", foodplan_template_detail, name="foodplan_template_detail"),
+    path("foodplan/template/<int:foodplan_template_id>/edit", foodplan_template_edit, name="foodplan_template_edit"),
+    path("foodplan/get-template/<int:template_id>/", get_foodplan_template, name="get_foodplan_template"),
 ]
 

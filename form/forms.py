@@ -2,6 +2,8 @@ from django import forms
 from django.contrib.auth.models import User
 from .models import *
 from .models.medicine import *
+from .models.foodplan import *
+from .models.report import HeredityOption
 from .models.models import DiagnosticHypothesis
 from django.db import models
 
@@ -37,9 +39,20 @@ class InviteRegisterForm(forms.Form):
 
 
 class ReportForm(forms.ModelForm):
+
+
     def lifeStyles(self):
         return [self[name] for name in filter(lambda x: x.startswith('life_'), self.fields)]
-        
+
+
+    YNU = {
+    "U":"неизвестно",
+    "N":"нет",
+    "Y":"да",
+    }
+
+    cardiovascular = forms.ChoiceField(choices=YNU, widget=forms.RadioSelect())
+
     class Meta:
         model = Report
         fields = ('patient', 'title', 'text', 'complaints', 'anamnesis', 'diet', 'mealscount', 'snacks', 'pref_Meat', 'pref_Fish',
@@ -47,28 +60,79 @@ class ReportForm(forms.ModelForm):
         'pref_Fast', 'pref_Cofe', 'pref_Alco', 'intol_Lact', 'intol_Glut' ,'intol_Nuts' ,'intol_Sea' ,'intol_Other', "comment_diet",
         'cardiovascular', 'cardiovascular_label', 'oncological','oncological_label', 'diabetes', 'diabetes_label', 'thyroid', 'thyroid_label', 'autoimmune', 'autoimmune_label', 'heredity_Other',
         'foodAllergy', 'medicineAllergy', 'seasonalAllergy', 'contactAllergy', 'noAllergy', 'insp_General', 'insp_Body', 'insp_Skin',
-        'insp_lymph', 'insp_thyroid', 'insp_Abdomen', 'insp_Liver', 'insp_Liver_protudes', 'insp_musculoskeletal', 'insp_Swelling', 'insp_Muscle', 'insp_Tongue','insp_Limbs', 'insp_Other',
+        'insp_lymph', 'insp_thyroid', 'insp_abdomen', 'insp_Liver', 'insp_Liver_protudes', 'insp_musculoskeletal', 'insp_Swelling', 'insp_Muscle', 'insp_Tongue','insp_Limbs', 'insp_Other',
         'next_date', 'life_physAct', 'life_sleepMode', 'life_stress', 'life_antibiotics', 'life_covid', 'life_vaccinationDate')
         widgets = {
             "insp_lymph": forms.CheckboxSelectMultiple,
             "insp_thyroid": forms.CheckboxSelectMultiple,
             "insp_skin": forms.CheckboxSelectMultiple,
             "insp_musculoskeletal": forms.CheckboxSelectMultiple,
+            "insp_abdomen":forms.CheckboxSelectMultiple,
             "insp_Tongue": forms.CheckboxSelectMultiple,
+            "oncological": forms.RadioSelect,
+            "diabetes": forms.RadioSelect,
+            "thyroid": forms.RadioSelect,
+            "autoimmune": forms.RadioSelect,
         }
         
 class ReportFormForPatient(forms.ModelForm):
     def lifeStyles(self):
         return [self[name] for name in filter(lambda x: x.startswith('life_'), self.fields)]
+
+    def heredity(self):
+        pair={}
+        for name in ['cardiovascular', 'oncological', 'diabetes', 'thyroid', 'autoimmune']:
+            k = self[name]
+            pair[k] = self[name+"_label"]
+        return pair
     
+    cardiovascular_label = forms.CharField(
+        required=False,
+        label="Тип (новый)",
+        max_length=100,
+        help_text="Если да, то укажите какое.",
+    )
+
+    oncological_label = forms.CharField(
+        required=False,
+        label="Тип (новый)",
+        max_length=100,
+        help_text="Если да, то укажите какое.",
+    )
+
+
+    diabetes_label = forms.CharField(
+        required=False,
+        label="Тип (новый)",
+        max_length=100,
+        help_text="Если да, то укажите какое.",
+    )
+
+
+    thyroid_label = forms.CharField(
+        required=False,
+        label="Тип (новый)",
+        max_length=100,
+        help_text="Если да, то укажите какое.",
+    )
+
+
+    autoimmune_label = forms.CharField(
+        required=False,
+        label="Тип (новый)",
+        max_length=100,
+        help_text="Если да, то укажите какое.",
+    )
+
+
     class Meta:
         model = Report
         fields = ('title', 'text', 'complaints', 'anamnesis', 'diet', 'mealscount', 'snacks', 'pref_Meat', 'pref_Fish',
         'pref_Dair', 'pref_Eggs', 'pref_Vegs', 'pref_Frut', 'pref_Groa', 'pref_Swet',
         'pref_Fast', 'pref_Cofe', 'pref_Alco', 'intol_Lact', 'intol_Glut' ,'intol_Nuts' ,'intol_Sea' ,'intol_Other', "comment_diet",
-        'cardiovascular', 'cardiovascular_label', 'oncological','oncological_label', 'diabetes', 'diabetes_label', 'thyroid', 'thyroid_label', 'autoimmune', 'autoimmune_label', 'heredity_Other',
+        'cardiovascular', 'oncological', 'diabetes', 'thyroid', 'autoimmune', 'heredity_Other',
         'foodAllergy', 'medicineAllergy', 'seasonalAllergy', 'contactAllergy', 'noAllergy', 'insp_General', 'insp_Body', 'insp_skin',
-        'insp_lymph', 'insp_thyroid', 'insp_Abdomen', 'insp_Liver', 'insp_Liver_protudes', 'insp_musculoskeletal', 'insp_Swelling', 'insp_Muscle', 'insp_Tongue','insp_Limbs', 'insp_Other',
+        'insp_lymph', 'insp_thyroid', 'insp_abdomen', 'insp_Liver', 'insp_Liver_protudes', 'insp_musculoskeletal', 'insp_Swelling', 'insp_Muscle', 'insp_Tongue','insp_Limbs', 'insp_Other',
         'next_date', 'life_physAct', 'life_sleepMode', 'life_stress', 'life_antibiotics', 'life_covid', 'life_vaccinationDate')
         
         widgets = {
@@ -76,8 +140,71 @@ class ReportFormForPatient(forms.ModelForm):
             "insp_thyroid": forms.CheckboxSelectMultiple,
             "insp_skin": forms.CheckboxSelectMultiple,
             "insp_musculoskeletal": forms.CheckboxSelectMultiple,
+            "insp_abdomen":forms.CheckboxSelectMultiple,
             "insp_Tongue": forms.CheckboxSelectMultiple,
+            "cardiovascular": forms.RadioSelect,
+            "oncological": forms.RadioSelect,
+            "diabetes": forms.RadioSelect,
+            "thyroid": forms.RadioSelect,
+            "autoimmune": forms.RadioSelect,
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        inst = getattr(self, "instance", None)
+        if inst and inst.pk:
+            self.fields["cardiovascular_label"].initial = inst.cardiovascular_label_id
+            self.fields["oncological_label"].initial = inst.oncological_label_id
+            self.fields["diabetes_label"].initial = inst.diabetes_label_id
+            self.fields["thyroid_label"].initial = inst.thyroid_label_id
+            self.fields["autoimmune_label"].initial = inst.autoimmune_label_id
+
+
+    def clean(self):
+        cleaned = super().clean()
+
+        cardiovascular_label = (cleaned.get("cardiovascular_label") or "").strip()
+        oncological_label = (cleaned.get("oncological_label") or "").strip()
+        diabetes_label = (cleaned.get("diabetes_label") or "").strip()
+        thyroid_label = (cleaned.get("thyroid_label") or "").strip()
+        autoimmune_label = (cleaned.get("autoimmune_label") or "").strip()
+
+        cleaned["cardiovascular_label"] = cardiovascular_label
+        cleaned["oncological_label"] = oncological_label
+        cleaned["diabetes_label"] = diabetes_label
+        cleaned["thyroid_label"] = thyroid_label
+        cleaned["autoimmune_label"] = autoimmune_label
+
+        return cleaned
+
+    def save(self, commit=True):
+        obj = super().save(commit=False)
+        cd = self.cleaned_data
+        if cd.get("cardiovascular") == "Y":
+            obj.cardiovascular_label, _ = HeredityOption.objects.get_or_create(label=cd["cardiovascular_label"])
+
+
+        if  cd.get("oncological")== "Y":
+            obj.oncological_label, _ = HeredityOption.objects.get_or_create(label=cd["oncological_label"])
+
+
+
+        if cd.get("diabete")== "Y":
+            obj.cardiovascular_label, _ = HeredityOption.objects.get_or_create(label=cd["diabetes_label"])
+
+
+        if cd.get("thyroid")== "Y":
+            obj.thyroid_label, _ = HeredityOption.objects.get_or_create(label=cd["thyroid_label"])
+
+
+        if cd.get("autoimmune")== "Y":
+            obj.autoimmune_label, _ = HeredityOption.objects.get_or_create(label=cd["autoimmune_label"])
+
+        if commit:
+            obj.save()
+        return obj
+
         
         
 class PatientForm(forms.ModelForm):
@@ -372,4 +499,28 @@ class DiagnosticHypothesisForm(forms.ModelForm):
                 "class": "form-control",
                 "rows": 4
             }),
+        }
+
+class FoodplanForm(forms.ModelForm):
+    template = forms.ModelChoiceField(
+        queryset=FoodplanTemplate.objects.all(),
+        required=False,
+        label="Шаблон протокола"
+    )
+
+    class Meta:
+        model = Foodplan
+        fields = ["template", "title", "subtitle", "text"]
+        widgets = {
+            "text": forms.Textarea(attrs={"rows": 12}),
+        }
+
+
+class FoodplanTemplateForm(forms.ModelForm):
+    class Meta:
+        model = FoodplanTemplate
+        fields = ["title", "subtitle", "text", "comment"]
+        widgets = {
+            "comment": forms.Textarea(attrs={"rows": 12}),
+            "text": forms.Textarea(attrs={"rows": 30}),
         }

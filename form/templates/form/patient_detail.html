@@ -1,4 +1,4 @@
-{% extends "form/base.html" %}
+{% extends "base.html" %}
 {% load age_extras %}
 {% load model_title %}
 
@@ -268,6 +268,42 @@
   </div>
 </section>
 
+
+  {# Блок со списком протоколов питания #}
+  <section class="card" style="margin-top:20px;">
+    <header class="card-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <h2 class="card-title">Диетические рекомендации</h2>
+      <a href="{% url 'foodplan_new' patient_id=patient.pk %}" class="icon-button" title="Создать рекомендацию">
+        {% include "./icons/file-earmark-plus.svg" %}
+      </a>
+    </header>
+
+    {% if foodplans %}
+      <ol class="item-list" style="list-style:none;margin:0;padding:0;">
+        {% for form in foodplans %}
+          <li class="item-card">
+            <a href="{% url 'foodplan_detail' form.pk %}" class="item-card-title">
+              {{ form.title }}
+            </a>
+
+            <div class="item-card-meta">
+              <span class="muted">
+                {{ form.create_date|date:"d.m.Y H:i" }}
+              </span>
+            </div>
+
+            {% if form.subtitle %}
+              <div class="item-card-text">
+                {{ form.subtitle|truncatechars:160 }}
+              </div>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ol>
+    {% else %}
+      <p class="muted">Для этого пациента рекомендаций пока нет.</p>
+    {% endif %}
+  </section>
 
 
   <section class="card" style="margin-top:20px;">

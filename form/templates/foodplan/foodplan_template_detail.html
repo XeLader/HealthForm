@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+    <h1>Протокол питания</h1>
+    <div style="display:flex; gap:8px;">
+      <a href="{% url 'foodplan_template_edit' foodplan_template.pk %}" class="btn btn-secondary">
+        Редактировать
+      </a>
+      <a href="{% url 'handbook' %}" class="btn btn-secondary">
+        Назад
+      </a>
+    </div>
+  </div>
+
+<section class="card">
+      <div class="grid-2">
+
+        <div class="field">
+          <label>Название</label>
+            <div>{{ foodplan_template.title }}</div>
+        </div>
+
+        <div class="field">
+          <label>Описание</label>
+          <div>{{ foodplan_template.subtitle }}</div>
+        </div>
+
+        <div class="field">
+          <label>Комментарий</label>
+          <div>{{ foodplan_template.comment }}</div>
+        </div>
+
+        <div class="field">
+          <label>Протокол</label>
+          <div>
+            {{ foodplan_template.text }}
+          </div>
+        </div>
+</section>
+
+{% endblock %}

@@ -40,6 +40,7 @@ def patient_detail(request, pk):
     hypotheses = DiagnosticHypothesis.objects.filter(patient=patient).order_by("-created_at")
     
     prescriptions = Prescription.objects.filter(patient = patient)
+    foodplans = Foodplan.objects.filter(patient = patient)
 
     models = {"prescription":Prescription}
 
@@ -62,6 +63,7 @@ def patient_detail(request, pk):
         'hormons':hormons,
         'prescriptions': prescriptions,
         "hypotheses": hypotheses,
+        "foodplans": foodplans,
         "models":models,
         "nav_section": "patients"
         })

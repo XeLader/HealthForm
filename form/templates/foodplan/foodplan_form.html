@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Назначение протокола питания</h2>
+
+<div class="patient-info">
+    <strong>Пациент:</strong>
+    {{ patient.last_name }} {{ patient.first_name }}
+</div>
+
+<form method="post">
+    {% csrf_token %}
+
+    <div class="form-row">
+        <label>Шаблон:</label>
+        {{ form.template }}
+    </div>
+
+    <div class="form-row">
+        <label>Название:</label>
+        {{ form.title }}
+    </div>
+
+    <div class="form-row">
+        <label>Описание:</label>
+        {{ form.subtitle }}
+    </div>
+
+    <div class="form-row">
+        <label>Протокол:</label>
+        {{ form.text }}
+    </div>
+
+
+<div class="actions">
+      <button type="submit" class="btn btn-primary">Сохранить</button>
+      <a href="{% url 'patient_detail' patient.pk%}" class="btn btn-secondary">Отмена</a>
+</div>
+</form>
+
+<script>
+document.getElementById("id_template").addEventListener("change", function() {
+    const templateId = this.value;
+    if (!templateId) return;
+
+    fetch(`/foodplan/get-template/${templateId}/`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("id_title").value = data.title;
+            document.getElementById("id_subtitle").value = data.subtitle;
+            document.getElementById("id_text").value = data.text;
+        });
+});
+</script>
+
+{% endblock %}

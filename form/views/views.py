@@ -90,9 +90,13 @@ def dashboard(request):
 def handbook(request):
     meds = Medicine.objects.order_by("effect", "mtype", "title")
     meds_count = Medicine.objects.count()
+    foodplans_templates = FoodplanTemplate.objects.order_by("title")
+    foodplans_templates_count = FoodplanTemplate.objects.count()
     return render(request, 'form/handbook.html',{
         "meds":meds,
         "meds_count": meds_count,
+        "foodtemps":foodplans_templates,
+        "foodtemps_count":foodplans_templates_count,
         "nav_section": "handbook",})
 
 class DiagnosticHypothesisCreateView(CreateView):

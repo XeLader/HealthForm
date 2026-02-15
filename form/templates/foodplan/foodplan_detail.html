@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+    <h1>Протокол питания</h1>
+    <div style="display:flex; gap:8px;">
+      <a href="{% url 'foodplan_edit' foodplan.pk %}" class="btn btn-secondary">
+        Редактировать
+      </a>
+      {% if foodplan.patient %}
+        <a href="{% url 'patient_detail' foodplan.patient.pk %}" class="btn btn-secondary">
+          К пациенту
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+<section class="card">
+      <div class="grid-2">
+        <div class="field">
+          <label>Пациент</label>
+          <div>{{ foodplan.patient.full_name }}</div>
+        </div>
+
+        <div class="field">
+          <label>Название</label>
+            <div>{{ foodplan.title }}</div>
+        </div>
+
+        <div class="field">
+          <label>Описание</label>
+          <div>{{ foodplan.subtitle }}</div>
+        </div>
+
+        <div class="field">
+          <label>Протокол</label>
+          <div>
+            {{ foodplan.text }}
+          </div>
+        </div>
+    </section>
+
+{% endblock %}

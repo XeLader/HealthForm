@@ -1,4 +1,4 @@
-{% extends 'form/base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}Справочники{% endblock %}
 
@@ -45,6 +45,38 @@
               </ol>
             {% else %}
               <div class="muted">Пока нет препаратов.</div>
+            {% endif %}
+          </div>
+        </section>
+
+        <!-- Foodplans templates card -->
+        <section class="card card-nested">
+          <header class="card-header">
+            <div>
+              <h3 class="card-title">Шаблоны протоколов питания</h3>
+              <div class="muted">Всего: {{ foodtemps_count }}</div>
+            </div>
+            <div class="header-actions">
+              <a class="btn" href="{% url 'foodplan_template_new' %}">Добавить</a>
+            </div>
+          </header>
+
+          <div class="card-body">
+            {% if foodtemps %}
+              <ol class="item-list">
+                {% for f in foodtemps %}
+                  <li class="item-list-row">
+                    <div class="item-line">
+                      <a href="{% url 'foodplan_template_detail' foodplan_template_id=f.pk%}" class="item-link">{{ f.title }}</a>
+                      <div class="muted">
+                        {% if f.subtitle %}{{ f.subtitle }}{% endif %}
+                      </div>
+                    </div>
+                  </li>
+                {% endfor %}
+              </ol>
+            {% else %}
+              <div class="muted">Пока нет шаблонов.</div>
             {% endif %}
           </div>
         </section>

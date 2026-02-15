@@ -47,6 +47,7 @@ def report_detail(request, pk):
         "diet": Report._meta.get_field("diet").verbose_name,
         "mealscount": Report._meta.get_field("mealscount").verbose_name,
         "snacks": Report._meta.get_field("snacks").verbose_name,
+        "comment_diet": Report._meta.get_field("comment_diet").verbose_name,
 
         # Непереносимости
         "intol_Lact": Report._meta.get_field("intol_Lact").verbose_name,
@@ -61,7 +62,8 @@ def report_detail(request, pk):
         "diabetes": Report._meta.get_field("diabetes").verbose_name,
         "thyroid": Report._meta.get_field("thyroid").verbose_name,
         "autoimmune": Report._meta.get_field("autoimmune").verbose_name,
-        "allergic": Report._meta.get_field("allergic").verbose_name,
+
+        "heredity_Other": Report._meta.get_field("heredity_Other").verbose_name,
 
         # Аллергии
         "foodAllergy": Report._meta.get_field("foodAllergy").verbose_name,
@@ -73,9 +75,17 @@ def report_detail(request, pk):
         # Объективный статус
         "insp_General": Report._meta.get_field("insp_General").verbose_name,
         "insp_Body": Report._meta.get_field("insp_Body").verbose_name,
-        "insp_Abdomen": Report._meta.get_field("insp_Abdomen").verbose_name,
+        "insp_Skin": Report._meta.get_field("insp_skin").verbose_name,
+        "insp_Abdomen": Report._meta.get_field("insp_abdomen").verbose_name,
         "insp_Liver": Report._meta.get_field("insp_Liver").verbose_name,
         "insp_Liver_protudes": Report._meta.get_field("insp_Liver_protudes").verbose_name,
+        "insp_Swelling": Report._meta.get_field("insp_Swelling").verbose_name,
+        "insp_Muscle": Report._meta.get_field("insp_Muscle").verbose_name,
+        "insp_Tongue": Report._meta.get_field("insp_Tongue").verbose_name,
+        "insp_lymph": Report._meta.get_field("insp_lymph").verbose_name,
+        "insp_thyroid": Report._meta.get_field("insp_thyroid").verbose_name,
+        "insp_musculoskeletal": Report._meta.get_field("insp_musculoskeletal").verbose_name,
+        "insp_Limbs": Report._meta.get_field("insp_Limbs").verbose_name,
         "insp_Other": Report._meta.get_field("insp_Other").verbose_name,
 
         # Итоги
@@ -126,6 +136,8 @@ def report_new_for_patient(request, pk):
     patient = get_object_or_404(Patient, pk=pk)
     if request.method == "POST":
         form = ReportFormForPatient(request.POST)
+        print(request.POST)
+        print(form.errors)
         if form.is_valid():
             post = form.save(commit=False)
             post.patient = get_object_or_404(Patient, pk=pk)
@@ -133,13 +145,14 @@ def report_new_for_patient(request, pk):
             post.create_date = timezone.now()
             post.save()
             return redirect('patient_detail', pk=pk)
-    else:
-        form = ReportFormForPatient()
-        Preferable = ["pref_Meat", "pref_Fish", "pref_Dair", "pref_Dair", "pref_Eggs", "pref_Vegs", "pref_Frut", "pref_Groa", "pref_Swet", "pref_Fast", "pref_Cofe", "pref_Alco"]
-        Intolerances = ["intol_Lact", "intol_Glut", "intol_Nuts", "intol_Sea", "intol_Other"]
-        Heredity = ["cardiovascular","oncological","diabetes","thyroid","autoimmune","allergic",]
-        Allergies = ["foodAllergy", "medicineAllergy", "seasonalAllergy", "contactAllergy", "noAllergy"]
-        LifeStyle = [field.name for field in Report._meta.get_fields() if field.name.startswith("life_")]
+
+
+    form = ReportFormForPatient()
+    Preferable = ["pref_Meat", "pref_Fish", "pref_Dair", "pref_Dair", "pref_Eggs", "pref_Vegs", "pref_Frut", "pref_Groa", "pref_Swet", "pref_Fast", "pref_Cofe", "pref_Alco"]
+    Intolerances = ["intol_Lact", "intol_Glut", "intol_Nuts", "intol_Sea", "intol_Other"]
+    Heredity = ["cardiovascular","oncological","diabetes","thyroid","autoimmune","heredity_Other"]
+    Allergies = ["foodAllergy", "medicineAllergy", "seasonalAllergy", "contactAllergy", "noAllergy"]
+    LifeStyle = [field.name for field in Report._meta.get_fields() if field.name.startswith("life_")]
     return render(request, 'form/report_edit.html', {
                                             'form': form,
                                             'patient': patient,

@@ -135,9 +135,9 @@ class Report(models.Model):
     }
 
     YNU = {
-    "Y":"да",
-    "N":"нет",
     "U":"неизвестно",
+    "N":"нет",
+    "Y":"да",
     }
 
     INSP_GEN = {
@@ -237,22 +237,22 @@ class Report(models.Model):
     comment_diet = models.CharField(verbose_name = "Комментарий", max_length = 300, null=True)
 
     #Heredity
-    cardiovascular = models.CharField(verbose_name = "Сердечно‑сосудистые заболевания", max_length=1, choices=YNU)
+    cardiovascular = models.CharField(verbose_name = "Сердечно‑сосудистые заболевания", max_length=1, choices=YNU,  default="U")
     cardiovascular_label = models.OneToOneField(HeredityOption, on_delete=models.CASCADE, null=True, related_name = "cardiovascular+")
 
-    oncological = models.CharField(verbose_name = "Онкологические заболевания", max_length=1, choices=YNU)
+    oncological = models.CharField(verbose_name = "Онкологические заболевания", max_length=1, choices=YNU, default="U")
     oncological_label = models.OneToOneField(HeredityOption, on_delete=models.CASCADE, null=True,  related_name = "oncological+")
 
-    diabetes = models.CharField(verbose_name = "Диабет", max_length=1, choices=YNU)
+    diabetes = models.CharField(verbose_name = "Диабет", max_length=1, choices=YNU, default="U")
     diabetes_label = models.OneToOneField(HeredityOption, on_delete=models.CASCADE, null=True,  related_name = "diabetes+")
 
-    thyroid = models.CharField(verbose_name = "Заболевания щитовидной железы", max_length=1, choices=YNU)
+    thyroid = models.CharField(verbose_name = "Заболевания щитовидной железы", max_length=1, choices=YNU, default="U")
     thyroid_label = models.OneToOneField(HeredityOption, on_delete=models.CASCADE, null=True,  related_name = "thyroid+")
 
-    autoimmune = models.CharField(verbose_name = "Аутоиммунные заболевания", max_length=1, choices=YNU)
+    autoimmune = models.CharField(verbose_name = "Аутоиммунные заболевания", max_length=1, choices=YNU, default="U")
     autoimmune_label = models.OneToOneField(HeredityOption, on_delete=models.CASCADE, null=True,  related_name = "autoimmune+")
 
-    heredity_Other = models.CharField("другое", max_length = 100, blank=True)
+    heredity_Other = models.CharField("Другое", max_length = 100, blank=True)
 
     #Allergies
     foodAllergy = models.CharField("Пищевая аллергия", max_length=150)

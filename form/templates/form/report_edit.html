@@ -1,4 +1,4 @@
-{% extends 'form/base.html' %}
+{% extends 'base.html' %}
 {% block title %}Приём пациента{% endblock %}
 
 {% block content %}
@@ -116,15 +116,18 @@
         <div class="card-title">Укажите наличие заболеваний у ближайших родственников (отметьте подходящее):</div>
 
         <div class="grid-2">
-          <div class="field">
-            {% for field in form %}
-              {% if field.name in herr %}
-                {{ field.label_tag }}
-                {{ field }}
-                {% if field.errors %}<div class="errors">{{ field.errors }}</div>{% endif %}
-              {% endif %}
+
+            {% for k, v in form.heredity.items %}
+            <div class="field">
+                {{ k.label_tag }}
+                <div class="checkbox-group">
+                {{ k }}
+                {{ v }}
+                </div>
+                {% if k.errors %}<div class="errors">{{ k.errors }}</div>{% endif %}
+                {% if v.errors %}<div class="errors">{{ v.errors }}</div>{% endif %}
+            </div>
             {% endfor %}
-          </div>
         </div>
       </div>
       
@@ -225,11 +228,16 @@
             {% if form.insp_musculoskeletal.help_text %}<div class="help">{{ form.insp_musculoskeletal.help_text }}</div>{% endif %}
           </div>
           
-          
+          <div class="field">
+            {{ form.insp_Limbs.label_tag }}
+            {{ form.insp_Limbs }}
+            {% if form.insp_Limbs.errors %}<div class="errors">{{ form.insp_Limbs.errors }}</div>{% endif %}
+          </div>
+
           <div class="field">
             {{ form.insp_Other.label_tag }}
             {{ form.insp_Other }}
-            {% if form.insp_Other.errors %}<div class="errors">{{ form.insp_Liver_protudes.errors }}</div>{% endif %}
+            {% if form.insp_Other.errors %}<div class="errors">{{ form.insp_Other.errors }}</div>{% endif %}
           </div>
 
         </div>

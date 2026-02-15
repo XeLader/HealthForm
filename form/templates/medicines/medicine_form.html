@@ -1,4 +1,4 @@
-{% extends "../form/base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Новый препарат{% endblock %}
 
@@ -65,6 +65,7 @@
 
         <div class="form-actions">
           <button class="btn" type="submit">Сохранить</button>
+          <a href="{% url 'handbook'%}" class="btn btn-secondary">Отмена</a>
         </div>
       </form>
     </div>
