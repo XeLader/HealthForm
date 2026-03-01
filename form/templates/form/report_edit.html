@@ -1,9 +1,12 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Приём пациента{% endblock %}
 
 {% block content %}
   <h1>Приём пациента</h1>
 
+  <div id="caution"></div>
+  <input type="file" id="jsonUpload" accept=".json,.txt" />
   <form method="post">
     {% csrf_token %}
 
@@ -178,6 +181,25 @@
             {% if form.insp_skin.help_text %}<div class="help">{{ form.insp_skin.help_text }}</div>{% endif %}
           </div>
 
+
+          <div class="field">
+            <label>{{ form.insp_Swelling.label }}</label>
+            <div class="checkbox-group">
+              {{ form.insp_Swelling }}
+            </div>
+            {% if form.insp_Swelling.errors %}<div class="errors">{{ form.insp_Swelling.errors }}</div>{% endif %}
+            {% if form.insp_Swelling.help_text %}<div class="help">{{ form.insp_Swelling.help_text }}</div>{% endif %}
+          </div>
+
+          <div class="field">
+            <label>{{ form.insp_Muscle.label }}</label>
+            <div class="checkbox-group">
+              {{ form.insp_Muscle }}
+            </div>
+            {% if form.insp_Muscle.errors %}<div class="errors">{{ form.insp_Muscle.errors }}</div>{% endif %}
+            {% if form.insp_Muscle.help_text %}<div class="help">{{ form.insp_Muscle.help_text }}</div>{% endif %}
+          </div>
+
           <div class="field">
             <label>{{ form.insp_lymph.label }}</label>
             <div class="checkbox-group">
@@ -198,13 +220,15 @@
             {% if form.insp_thyroid.help_text %}<div class="help">{{ form.insp_thyroid.help_text }}</div>{% endif %}
           </div>
           
+
           <div class="field">
-            {{ form.insp_Abdomen.label_tag }}
-            {{ form.insp_Abdomen }}
-            {% if form.insp_Abdomen.errors %}<div class="errors">{{ form.insp_Abdomen.errors }}</div>{% endif %}
+            <label>{{ form.insp_abdomen.label }}</label>
+            <div class="checkbox-group">
+              {{ form.insp_abdomen }}
+            </div>
+            {% if form.insp_abdomen.errors %}<div class="errors">{{ form.insp_abdomen.errors }}</div>{% endif %}
+            {% if form.insp_abdomen.help_text %}<div class="help">{{ form.insp_abdomen.help_text }}</div>{% endif %}
           </div>
-          
-          
           
           <div class="field">
             {{ form.insp_Liver.label_tag }}
@@ -277,4 +301,6 @@
   </form>
 {% endblock %}
 
-
+{% block extra_js %}
+<script src="{% static 'form/js/features/llm_prefill_report.js' %}"></script>
+{% endblock %}

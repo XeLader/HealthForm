@@ -73,6 +73,8 @@ class ReportForm(forms.ModelForm):
             "diabetes": forms.RadioSelect,
             "thyroid": forms.RadioSelect,
             "autoimmune": forms.RadioSelect,
+            "complaints": forms.Textarea,
+            "anamnesis": forms.Textarea,
         }
         
 class ReportFormForPatient(forms.ModelForm):
@@ -147,6 +149,12 @@ class ReportFormForPatient(forms.ModelForm):
             "diabetes": forms.RadioSelect,
             "thyroid": forms.RadioSelect,
             "autoimmune": forms.RadioSelect,
+            "complaints": forms.Textarea,
+            "anamnesis": forms.Textarea,
+            "comment_diet": forms.Textarea,
+            "insp_Other": forms.Textarea,
+            "insp_Muscle": forms.Textarea,
+            "insp_Swelling": forms.Textarea,
         }
 
     def __init__(self, *args, **kwargs):

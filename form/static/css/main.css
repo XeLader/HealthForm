@@ -483,3 +483,9 @@ body {
   margin-top: 2px;
 }
 
+.llm-filled {
+  background-color: #eef6ff;
+  border: 1px solid #4a90e2;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.15);
+}
