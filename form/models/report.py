@@ -208,11 +208,11 @@ class Report(models.Model):
 
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True, default = 0)
-    complaints = models.CharField("Жалобы", max_length=2048)
-    anamnesis = models.CharField("Анамнез заболевания", max_length=2048)
-    diet = models.CharField(verbose_name = "Тип питания", max_length=7, choices=NUTR_TYPE)
-    mealscount = models.IntegerField(verbose_name = "Количество приёмов пищи в день")
-    snacks = models.CharField(verbose_name = "Перекусы", max_length=1, choices=SNACK_OFT)
+    complaints = models.CharField("Жалобы", max_length=2048, blank=True)
+    anamnesis = models.CharField("Анамнез заболевания", max_length=2048, blank=True)
+    diet = models.CharField(verbose_name = "Тип питания", max_length=7, choices=NUTR_TYPE, null=True, blank=True)
+    mealscount = models.IntegerField(verbose_name = "Количество приёмов пищи в день", blank=True, null=True)
+    snacks = models.CharField(verbose_name = "Перекусы", max_length=1, choices=SNACK_OFT, blank=True)
     #Preferable diet
     pref_Meat = models.BooleanField("мясо")
     pref_Fish = models.BooleanField("рыба") 
@@ -231,10 +231,10 @@ class Report(models.Model):
     intol_Glut = models.BooleanField("глютен")
     intol_Nuts = models.BooleanField("орехи")
     intol_Sea = models.BooleanField("морепродукты")
-    intol_Other = models.CharField("другое", max_length = 512)
+    intol_Other = models.CharField("другое", max_length = 512, blank=True)
 
     #Diet comment
-    comment_diet = models.CharField(verbose_name = "Комментарий", max_length = 2048, null=True)
+    comment_diet = models.CharField(verbose_name = "Комментарий", max_length = 2048, null=True, blank=True)
 
     #Heredity
     cardiovascular = models.CharField(verbose_name = "Сердечно‑сосудистые заболевания", max_length=1, choices=YNU,  default="U")
@@ -243,7 +243,7 @@ class Report(models.Model):
     oncological = models.CharField(verbose_name = "Онкологические заболевания", max_length=1, choices=YNU, default="U")
     oncological_label = models.OneToOneField(HeredityOption, on_delete=models.CASCADE, null=True,  related_name = "oncological+")
 
-    diabetes = models.CharField(verbose_name = "Диабет", max_length=1, choices=YNU, default="U")
+    diabetes = models.CharField(verbose_name = "Диабет", max_length=1, choices=YNU, default="U", null=True)
     diabetes_label = models.OneToOneField(HeredityOption, on_delete=models.CASCADE, null=True,  related_name = "diabetes+")
 
     thyroid = models.CharField(verbose_name = "Заболевания щитовидной железы", max_length=1, choices=YNU, default="U")
@@ -255,11 +255,11 @@ class Report(models.Model):
     heredity_Other = models.CharField("Другое", max_length = 1024, blank=True)
 
     #Allergies
-    foodAllergy = models.CharField("Пищевая аллергия", max_length=512)
-    medicineAllergy = models.CharField("Медикаментозная аллергия", max_length=512)
-    seasonalAllergy = models.CharField("Сезонная аллергия", max_length=512)
-    contactAllergy = models.CharField("Контактная аллергия", max_length=512)
-    noAllergy = models.CharField("Отсутствие аллергии", max_length=512)
+    foodAllergy = models.CharField("Пищевая аллергия", max_length=512, blank=True)
+    medicineAllergy = models.CharField("Медикаментозная аллергия", max_length=512, blank=True)
+    seasonalAllergy = models.CharField("Сезонная аллергия", max_length=512, blank=True)
+    contactAllergy = models.CharField("Контактная аллергия", max_length=512, blank=True)
+    noAllergy = models.CharField("Отсутствие аллергии", max_length=512, blank=True)
 
     #Inspection data
     insp_General = models.CharField("Общее состояние пациента", max_length=3, choices=INSP_GEN, default = "NON")
@@ -331,19 +331,19 @@ class Report(models.Model):
         help_text="Можно выбрать несколько состояний"
     )
     
-    insp_Limbs = models.CharField("Стопы, ладони, локти, ногти, волосы:", max_length = 512, default = "")
-    insp_Other = models.CharField("Прочее:", max_length = 1024, default = "")
+    insp_Limbs = models.CharField("Стопы, ладони, локти, ногти, волосы:", max_length = 512, default = "", blank=True)
+    insp_Other = models.CharField("Прочее:", max_length = 1024, default = "", blank=True)
 
     #Life Style
-    life_physAct = models.CharField(verbose_name = "Физическая активность", max_length=1024, null=True)
-    life_sleepMode = models.CharField(verbose_name = "Режим сна", max_length=1024, null=True)
-    life_stress = models.CharField(verbose_name = "Наличие стресса", max_length=1024, null=True)
-    life_antibiotics = models.CharField(verbose_name = "Последний приём антибиотиков", max_length=1024, null=True)
+    life_physAct = models.CharField(verbose_name = "Физическая активность", max_length=1024, null=True, blank=True)
+    life_sleepMode = models.CharField(verbose_name = "Режим сна", max_length=1024, null=True, blank=True)
+    life_stress = models.CharField(verbose_name = "Наличие стресса", max_length=1024, null=True, blank=True)
+    life_antibiotics = models.CharField(verbose_name = "Последний приём антибиотиков", max_length=1024, null=True, blank=True)
     life_covid = models.BooleanField(verbose_name = "COVID-19", default = False)
-    life_vaccinationDate = models.DateTimeField(verbose_name = "Дата вакцинации", null=True)
+    life_vaccinationDate = models.DateTimeField(verbose_name = "Дата вакцинации", null=True, blank=True)
 
     title = models.CharField(verbose_name = "Название", max_length=200)
-    text = models.TextField(verbose_name = "Комментарий")
+    text = models.TextField(verbose_name = "Комментарий", null=True, blank=True)
     created_date = models.DateTimeField(default=timezone.now)
     next_date = models.DateTimeField(default=timezone.now, verbose_name = "Следующий приём")
     def __str__(self):
