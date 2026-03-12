@@ -149,7 +149,7 @@ def report_new_for_patient(request, pk):
 
     form = ReportFormForPatient()
     Preferable = ["pref_Meat", "pref_Fish", "pref_Dair", "pref_Dair", "pref_Eggs", "pref_Vegs", "pref_Frut", "pref_Groa", "pref_Swet", "pref_Fast", "pref_Cofe", "pref_Alco"]
-    Intolerances = ["intol_Lact", "intol_Glut", "intol_Nuts", "intol_Sea", "intol_Other"]
+    Intolerances = ["intol_Lact", "intol_Glut", "intol_Nuts", "intol_Sea"]
     Heredity = ["cardiovascular","oncological","diabetes","thyroid","autoimmune","heredity_Other"]
     Allergies = ["foodAllergy", "medicineAllergy", "seasonalAllergy", "contactAllergy", "noAllergy"]
     LifeStyle = [field.name for field in Report._meta.get_fields() if field.name.startswith("life_")]

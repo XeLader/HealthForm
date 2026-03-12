@@ -12,6 +12,22 @@
 
     <div class="cards">
 
+
+      {# Блок 1: Данные пациента #}
+      <div class="card">
+        <div class="card-title">Данные пациента</div>
+        <div class="grid-2">
+          <div class="field">
+            <b>{{ patient.full_name }}</b>
+            {{ patient.date_of_birth }}
+          </div>
+          <div class="field">
+            Рост: {{ patient.growth }} см.<br>
+            Вес: {{ patient.weight }} кг.
+          </div>
+        </div>
+      </div>
+
       <div class="card">
         <div class="card-title">Общие данные</div>
         <div class="grid-2">
@@ -20,11 +36,6 @@
             {{ form.title }}
             {% if form.title.errors %}<div class="errors">{{ form.title.errors }}</div>{% endif %}
           </div>
-          <div class="field">
-            {{ form.text.label_tag }}
-            {{ form.text }}
-            {% if form.text.errors %}<div class="errors">{{ form.text.errors }}</div>{% endif %}
-          </div>
           
           <div class="field">
             {{ form.next_date.label_tag }}
@@ -32,17 +43,13 @@
             {% if form.next_date.errors %}<div class="errors">{{ form.next_date.errors }}</div>{% endif %}
           </div>
         </div>
-      </div>
-
-      {# Блок 1: Данные пациента #}
-      <div class="card">
-        <div class="card-title">Данные пациента</div>
-        <div class="grid-2">
-          <div class="field">
-            {{ patient.full_name }}
-          </div>
+        <div class="field">
+            {{ form.text.label_tag }}
+            {{ form.text }}
+            {% if form.text.errors %}<div class="errors">{{ form.text.errors }}</div>{% endif %}
         </div>
       </div>
+
 
       {# Блок 2: жалобы и анамнез #}
       <div class="card">
@@ -86,11 +93,14 @@
             <div class="checkbox-group">
             {% for field in form %}
               {% if field.name in prefs %}
-                {{ field.label_tag }}
+                <div>
                 {{ field }}
+                {{ field.label}}
                 {% if field.errors %}<div class="errors">{{ field.errors }}</div>{% endif %}
+                </div>
               {% endif %}
             {% endfor %}
+
             </div>
           </div>
           
@@ -99,11 +109,18 @@
             <div class="checkbox-group">
             {% for field in form %}
               {% if field.name in intols %}
-                {{ field.label_tag }}
+              <div>
                 {{ field }}
+                {{ field.label}}
                 {% if field.errors %}<div class="errors">{{ field.errors }}</div>{% endif %}
+              </div>
               {% endif %}
             {% endfor %}
+            <div>
+            {{form.intol_Other.label_tag}}
+            {{form.intol_Other}}
+            {% if form.intol_Other.errors %}<div class="errors">{{ form.intol_Other.errors }}</div>{% endif %}
+            </div>
             </div>
           </div>
           <div class="field">
@@ -119,19 +136,26 @@
         <div class="card-title">Укажите наличие заболеваний у ближайших родственников (отметьте подходящее):</div>
 
         <div class="grid-2">
-
             {% for k, v in form.heredity.items %}
             <div class="field">
                 {{ k.label_tag }}
                 <div class="checkbox-group">
                 {{ k }}
-                {{ v }}
+                <div>
+                {{ v.help_text }}{{ v }}
+                </div>
                 </div>
                 {% if k.errors %}<div class="errors">{{ k.errors }}</div>{% endif %}
                 {% if v.errors %}<div class="errors">{{ v.errors }}</div>{% endif %}
             </div>
             {% endfor %}
+            <div class="field">
+              {{ form.heredity_Other.label_tag }}
+              {{ form.heredity_Other }}
+            </div>
         </div>
+
+
       </div>
       
       
@@ -158,7 +182,7 @@
       <div class="card">
         <div class="card-title">Данные осмотра:</div>
 
-        <div class="grid-2">
+        <div class="grid-1">
            <div class="field">
             {{ form.insp_General.label_tag }}
             {{ form.insp_General }}
@@ -184,7 +208,7 @@
 
           <div class="field">
             <label>{{ form.insp_Swelling.label }}</label>
-            <div class="checkbox-group">
+            <div>
               {{ form.insp_Swelling }}
             </div>
             {% if form.insp_Swelling.errors %}<div class="errors">{{ form.insp_Swelling.errors }}</div>{% endif %}
@@ -193,7 +217,7 @@
 
           <div class="field">
             <label>{{ form.insp_Muscle.label }}</label>
-            <div class="checkbox-group">
+            <div>
               {{ form.insp_Muscle }}
             </div>
             {% if form.insp_Muscle.errors %}<div class="errors">{{ form.insp_Muscle.errors }}</div>{% endif %}
@@ -224,24 +248,35 @@
           <div class="field">
             <label>{{ form.insp_abdomen.label }}</label>
             <div class="checkbox-group">
-              {{ form.insp_abdomen }}
+            {% for field in form.insp_abdomen %}
+              <div>
+              {{field}}
+              {{field.label}}
+              </div>
+            {% endfor %}
             </div>
             {% if form.insp_abdomen.errors %}<div class="errors">{{ form.insp_abdomen.errors }}</div>{% endif %}
             {% if form.insp_abdomen.help_text %}<div class="help">{{ form.insp_abdomen.help_text }}</div>{% endif %}
           </div>
           
           <div class="field">
-            {{ form.insp_Liver.label_tag }}
-            {{ form.insp_Liver }}
+            {{ form.insp_Liver.label}}
+            <div class="checkbox-group">
+            {% for field in form.insp_Liver %}
+              <div>
+              {{ field.label }}
+              {{ field }}
+              </div>
+            {% endfor %}
+              <div>
+                {{ form.insp_Liver_protudes.label_tag }}
+                {{ form.insp_Liver_protudes }} см
+              </div>
+            </div>
             {% if form.insp_Liver.errors %}<div class="errors">{{ form.insp_Liver.errors }}</div>{% endif %}
-          </div>
-          
-          
-          <div class="field">
-            {{ form.insp_Liver_protudes.label_tag }}
-            {{ form.insp_Liver_protudes }} см
             {% if form.insp_Liver_protudes.errors %}<div class="errors">{{ form.insp_Liver_protudes.errors }}</div>{% endif %}
           </div>
+          
 
           <div class="field">
             <label>{{ form.insp_musculoskeletal.label }}</label>
@@ -256,6 +291,14 @@
             {{ form.insp_Limbs.label_tag }}
             {{ form.insp_Limbs }}
             {% if form.insp_Limbs.errors %}<div class="errors">{{ form.insp_Limbs.errors }}</div>{% endif %}
+          </div>
+
+          <div class="field">
+            {{ form.insp_Tongue.label_tag }}
+            <div class="checkbox-group">
+            {{ form.insp_Tongue }}
+            </div>
+            {% if form.insp_Tongue.errors %}<div class="errors">{{ form.insp_Tongue.errors }}</div>{% endif %}
           </div>
 
           <div class="field">

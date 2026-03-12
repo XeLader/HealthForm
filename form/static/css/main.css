@@ -83,7 +83,11 @@ form.report-form {
 
 .field textarea {
   resize: vertical;
+  width: 100%;
+  font-size: 14px;
   min-height: 80px;
+  max-height: 164px;
+  box-sizing: border-box;
 }
 
 .form {
@@ -134,12 +138,21 @@ form.report-form {
 }
 
 .checkbox-group {
+  font-size: 14px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   border-radius: 8px;
   border: 1px solid #e5e7eb;
   padding: 8px 10px;
   background: #fff;
   max-height: 150px;
   overflow-y: auto;
+}
+.checkbox-group input[type="text"],
+.checkbox-group input[type="number"] {
+  width: 50%;
+  padding: 2px 10px;
+  font-size: 14px;
 }
 
 .actions {
