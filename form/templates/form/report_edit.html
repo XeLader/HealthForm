@@ -5,13 +5,16 @@
 {% block content %}
   <h1>Приём пациента</h1>
 
-  <div id="caution"></div>
-  <input type="file" id="jsonUpload" accept=".json,.txt" />
+
+
   <form method="post">
     {% csrf_token %}
 
     <div class="cards">
 
+      <label id="drop-zone">
+      JavaScript отключён. Функция загрузки файла консультации недоступна.
+      </label>
 
       {# Блок 1: Данные пациента #}
       <div class="card">

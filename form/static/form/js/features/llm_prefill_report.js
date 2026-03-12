@@ -1,23 +1,59 @@
-document
-  .getElementById("jsonUpload")
-  .addEventListener("change", handleFileUpload);
+const dropZone = document.getElementById("drop-zone");
+dropZone.innerHTML="Перетащите json файл консультации или кликните здесь."
+newNode = document.createElement("input");
+newNode.type = "file";
+newNode.id ="jsonUpload";
+newNode.accept=".json,.txt"
+dropZone.appendChild(newNode)
 
-document.getElementById("caution").innerHTML = "JS is connected!";
+document.getElementById("jsonUpload").addEventListener("change", (e) => {
+  handleFileUpload(e.target.files[0]);
+  });
 
-function safeParseJson(rawText) {
-  const firstBraceIndex = rawText.indexOf("{");
+dropZone.addEventListener("drop", dropHandler);
 
-  if (firstBraceIndex === -1) {
-    throw new Error("No JSON object found");
+window.addEventListener("drop", (e) => {
+  if ([...e.dataTransfer.items].some((item) => item.kind === "file")) {
+    e.preventDefault();
   }
+});
 
-  const cleanJson = rawText.slice(firstBraceIndex);
-  JSON.parse(cleanJson);
-  return JSON.parse(cleanJson);
+dropZone.addEventListener("dragover", (e) => {
+  const fileItems = [...e.dataTransfer.items].filter(
+    (item) => item.kind === "file",
+  );
+  if (fileItems.length > 0) {
+    e.preventDefault();
+    if (true) {
+      e.dataTransfer.dropEffect = "copy";
+    } else {
+      e.dataTransfer.dropEffect = "none";
+    }
+  }
+});
+
+window.addEventListener("dragover", (e) => {
+  const fileItems = [...e.dataTransfer.items].filter(
+    (item) => item.kind === "file",
+  );
+  if (fileItems.length > 0) {
+    e.preventDefault();
+    if (!dropZone.contains(e.target)) {
+      e.dataTransfer.dropEffect = "none";
+    }
+  }
+});
+
+
+function dropHandler(ev) {
+  ev.preventDefault();
+  const files = [...ev.dataTransfer.items]
+  .map((item) => item.getAsFile())
+  .filter((file) => file);
+  handleFileUpload(files[0]);
 }
 
-function handleFileUpload(event) {
-  const file = event.target.files[0];
+function handleFileUpload(file) {
   if (!file) return;
 
   const reader = new FileReader();
@@ -35,6 +71,19 @@ function handleFileUpload(event) {
   reader.readAsText(file);
 }
 
+function safeParseJson(rawText) {
+  const firstBraceIndex = rawText.indexOf("{");
+
+  if (firstBraceIndex === -1) {
+    throw new Error("No JSON object found");
+  }
+
+  const cleanJson = rawText.slice(firstBraceIndex);
+  JSON.parse(cleanJson);
+  return JSON.parse(cleanJson);
+}
+
+
 function markAsLlmFilled(element) {
   element.classList.add("llm-filled");
 }
@@ -44,13 +93,18 @@ function processLLMData(data) {
   processHeredity(data);
   processAnamnesis(data);
   processDiet(data);
-  processHeredity(data);
+  processInsp(data);
+  processAllergies(data);
+  processLifestyle(data);
+  dropZone.innerHTML = "Файл успешно загружен!";
+  dropZone.classList.add("llm-filled");
 }
 
 function processComplains(data) {
   const text = data.complaints;
   const field = document.getElementById("id_"+"complaints");
   field.value = text;
+  markAsLlmFilled(field);
 }
 
 function processAnamnesis(data) {
@@ -88,7 +142,6 @@ function processHeredity(data) {
     field = document.getElementById("id_"+"cardiovascular_label");
     field.value = details;
   }
-  markAsLlmFilled(radio);
 
   details = data.heredity.oncological.details;
   code = data.heredity.oncological.status;
@@ -100,7 +153,6 @@ function processHeredity(data) {
     field = document.getElementById("id_"+"oncological_label");
     field.value = details;
   }
-  markAsLlmFilled(radio);
 
   details = data.heredity.diabetes.details;
   code = data.heredity.diabetes.status;
@@ -112,7 +164,6 @@ function processHeredity(data) {
     field = document.getElementById("id_"+"diabetes_label");
     field.value = details;
   }
-  markAsLlmFilled(radio);
 
 
   details = data.heredity.thyroid.details;
@@ -125,7 +176,6 @@ function processHeredity(data) {
     field = document.getElementById("id_"+"thyroid_label");
     field.value = details;
   }
-  markAsLlmFilled(radio);
 
 
   details = data.heredity.autoimmune.details;
@@ -138,7 +188,12 @@ function processHeredity(data) {
     field = document.getElementById("id_"+"autoimmune_label");
     field.value = details;
   }
-  markAsLlmFilled(radio);
+
+  field = document.getElementById("id_"+"heredity_Other");
+  text =  data.heredity.other;
+  if(text){
+    field.value = text;
+  }
 }
 
 function processDiet(data) {
@@ -163,7 +218,6 @@ function processDiet(data) {
     else {
       select.value = code;
     }
-    markAsLlmFilled(select);
   }
 
   code = data.diet.type;
@@ -177,13 +231,11 @@ function processDiet(data) {
     else {
       select.value = code;
     }
-    markAsLlmFilled(select);
   }
 
   text = data.diet.meals_per_day;
   field = document.getElementById("id_"+"mealscount");
   field.value = text;
-  markAsLlmFilled(field);
 
   code = data.diet.preferences.meat;
   field = document.getElementById("id_"+"pref_Meat");
@@ -254,7 +306,7 @@ function processDiet(data) {
   field.value = text;
 }
 
-function processHeredity(data){
+function processInsp(data){
   const allowedLiverCodes = ["NRM", "PRO", "NON"];
   const allowedGeneralCodes = ["SAT", "MOD", "SEV", "NON"];
   const allowedBodyCodes = ["AST", "NRM", "HYP", "NON"];
@@ -299,7 +351,6 @@ const allowedTongue = new Map([
     else {
       select.value = code;
     }
-    markAsLlmFilled(select);
   }
 
   code = data.inspection?.body_type;
@@ -312,7 +363,6 @@ const allowedTongue = new Map([
     else {
       select.value = code;
     }
-    markAsLlmFilled(select);
   }
 
   code = data.inspection?.liver;
@@ -324,8 +374,16 @@ const allowedTongue = new Map([
     }
     else {
       select.value = code;
+      if (code == "PRO")
+      {
+        select = document.getElementById("id_"+"insp_Liver_protudes");
+        text = data.inspection.liver_protrusion_cm;
+        if (text)
+        {
+          select.value = text;
+        }
+      }
     }
-    markAsLlmFilled(select);
   }
 
   if (Array.isArray(data.inspection?.skin)) {
@@ -336,7 +394,6 @@ const allowedTongue = new Map([
       );
       if (checkbox){
        checkbox.checked = true;};
-       markAsLlmFilled(document.getElementById("id_"+"insp_skin"));
       }
     });
   }
@@ -381,9 +438,6 @@ const allowedTongue = new Map([
     });
  }
 
-  text = data.inspection.liver_protrusion_cm;
-  field = document.getElementById("id_"+"insp_Liver_protudes");
-  field.value = text;
 
   text = data.inspection.limbs_description;
   field = document.getElementById("id_"+"insp_Limbs");
@@ -392,6 +446,54 @@ const allowedTongue = new Map([
   text = data.inspection.other;
   field = document.getElementById("id_"+"insp_Other");
   field.value = text;
+}
 
+function processAllergies(data)
+{
+  text = data.allergies.food;
+  field = document.getElementById("id_"+"foodAllergy");
+  field.value = text;
 
+  text = data.allergies.medicine;
+  field = document.getElementById("id_"+"medicineAllergy");
+  field.value = text;
+
+  text = data.allergies.seasonal;
+  field = document.getElementById("id_"+"seasonalAllergy");
+  field.value = text;
+
+  text = data.allergies.contact;
+  field = document.getElementById("id_"+"contactAllergy");
+  field.value = text;
+
+  text = data.allergies.no_allergy;
+  field = document.getElementById("id_"+"noAllergy");
+  field.value = text;
+}
+
+function processLifestyle(data)
+{
+  text = data.lifestyle.physical_activity;
+  field = document.getElementById("id_"+"life_physAct");
+  field.value = text;
+
+  text = data.lifestyle.sleep_mode;
+  field = document.getElementById("id_"+"life_sleepMode");
+  field.value = text;
+
+  text = data.lifestyle.stress;
+  field = document.getElementById("id_"+"life_stress");
+  field.value = text;
+
+  text = data.lifestyle.last_antibiotics;
+  field = document.getElementById("id_"+"life_antibiotics");
+  field.value = text;
+
+  text = data.lifestyle.covid_history;
+  field = document.getElementById("id_"+"life_covid");
+  field.checked = text;
+
+  text = data.lifestyle.vaccination_date;
+  field = document.getElementById("id_"+"life_vaccinationDate");
+  field.value = text;
 }

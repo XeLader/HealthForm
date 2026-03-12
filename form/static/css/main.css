@@ -502,3 +502,20 @@ body {
   transition: all 0.2s ease;
   box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.15);
 }
+
+#drop-zone {
+display: flex;
+align-items: center;
+justify-content: center;
+max-width: 100%;
+height: 50px;
+padding: 1em;
+border: 1px solid #cccccc;
+border-radius: 4px;
+color: slategray;
+cursor: pointer;
+}
+
+#jsonUpload {
+display: none;
+}
