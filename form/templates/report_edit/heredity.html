@@ -1,0 +1,24 @@
+{# Блок 4: Наследственность #}
+<div class="card">
+<div class="card-title">Укажите наличие заболеваний у ближайших родственников (отметьте подходящее):
+</div>
+<div class="grid-2">
+{% for k, v in form.heredity.items %}
+<div class="field">
+{{ k.label_tag }}
+<div class="checkbox-group">
+{{ k }}
+<div>
+{{ v.help_text }}{{ v }}
+</div>
+</div>
+{% if k.errors %}<div class="errors">{{ k.errors }}</div>{% endif %}
+{% if v.errors %}<div class="errors">{{ v.errors }}</div>{% endif %}
+</div>
+{% endfor %}
+<div class="field">
+{{ form.heredity_Other.label_tag }}
+{{ form.heredity_Other }}
+</div>
+</div>
+</div>

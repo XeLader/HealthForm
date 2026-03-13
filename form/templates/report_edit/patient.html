@@ -1,0 +1,38 @@
+{# Блок 1: Данные пациента #}
+<div class="card">
+  <div class="card-title">Данные пациента</div>
+    <div class="grid-2">
+      <div class="field">
+        <b>{{ patient.full_name }}</b>
+        {{ patient.date_of_birth }}
+      </div>
+      <div class="field">
+        Рост: {{ patient.growth }} см.<br>
+        Вес: {{ patient.weight }} кг.
+      </div>
+    </div>
+</div>
+<div class="card">
+  <div class="card-title">Общие данные</div>
+    <div class="grid-2">
+      <div class="field">
+        {{ form.title.label_tag }}
+        {{ form.title }}
+        {% if form.title.errors %}
+          <div class="errors">{{ form.title.errors }}</div>
+        {% endif %}
+      </div>
+      <div class="field">
+        {{ form.next_date.label_tag }}
+        {{ form.next_date }}
+        {% if form.next_date.errors %}
+          <div class="errors">{{ form.next_date.errors }}</div>
+        {% endif %}
+      </div>
+    </div>
+  <div class="field">
+    {{ form.text.label_tag }}
+    {{ form.text }}
+    {% if form.text.errors %}<div class="errors">{{ form.text.errors }}</div>{% endif %}
+  </div>
+</div>

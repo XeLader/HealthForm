@@ -20,7 +20,7 @@
     </div>
   </div>
 
-  <div class="cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:16px;">
+  <div class="cards">
 
     {# 1. Общие сведения #}
     <section class="card">
@@ -44,6 +44,14 @@
           <div>{{ report.created_date|date:"d.m.Y H:i" }}</div>
         </div>
 
+        <div class="field">
+        <label>{{ fields_verbose.title }}</label>
+        <div>{{ report.title }}</div>
+      </div>
+      <div class="field" style="margin-top:8px;">
+        <label>{{ fields_verbose.text }}</label>
+        <div style="white-space:pre-wrap;">{{ report.text }}</div>
+      </div>
         <div class="field">
           <label>Следующий приём</label>
           <div>{{ report.next_date|date:"d.m.Y H:i" }}</div>
@@ -70,91 +78,95 @@
       <div class="grid-2">
         <div class="field">
           <label>{{ fields_verbose.diet }}</label>
+          {% if report.get_diet_display %}
           <div>{{ report.get_diet_display }}</div>
+          {% else %}
+            <span class="muted">Не указано</span>
+          {% endif %}
         </div>
         <div class="field">
           <label>{{ fields_verbose.mealscount }}</label>
-          <div>{{ report.mealscount }}</div>
+          {% if report.mealscount %}
+            <div>{{ report.mealscount }}</div>
+          {% else %}
+            <span class="muted">Не указано</span>
+          {% endif %}
         </div>
         <div class="field">
           <label>{{ fields_verbose.snacks }}</label>
-          <div>{{ report.get_snacks_display }}</div>
+          {% if report.get_snacks_display %}
+            <div>{{ report.get_snacks_display }}</div>
+          {% else %}
+            <span class="muted">Не указано</span>
+          {% endif %}
         </div>
       </div>
 
       <hr style="margin:12px 0;border:none;border-top:1px solid #e5e7eb;">
 
       <div class="field">
-        <label>Предпочтительные продукты</label>
+        <label>Предпочитаемые продукты</label>
         <div>
-          {% if report.pref_Meat or report.pref_Fish or report.pref_Dair or report.pref_Eggs or report.pref_Vegs or report.pref_Frut or report.pref_Groa or report.pref_Swet or report.pref_Fast or report.pref_Cofe or report.pref_Alco %}
-            {% if report.pref_Meat %}мясо{% endif %}
-            {% if report.pref_Fish %}{% if report.pref_Meat %}, {% endif %}рыба{% endif %}
-            {% if report.pref_Dair %}{% if report.pref_Meat or report.pref_Fish %}, {% endif %}молочные продукты{% endif %}
-            {% if report.pref_Eggs %}{% if report.pref_Meat or report.pref_Fish or report.pref_Dair %}, {% endif %}яйца{% endif %}
-            {% if report.pref_Vegs %}{% if report.pref_Meat or report.pref_Fish or report.pref_Dair or report.pref_Eggs %}, {% endif %}овощи{% endif %}
-            {% if report.pref_Frut %}{% if report.pref_Meat or report.pref_Fish or report.pref_Dair or report.pref_Eggs or report.pref_Vegs %}, {% endif %}фрукты{% endif %}
-            {% if report.pref_Groa %}{% if report.pref_Meat or report.pref_Fish or report.pref_Dair or report.pref_Eggs or report.pref_Vegs or report.pref_Frut %}, {% endif %}крупы{% endif %}
-            {% if report.pref_Swet %}{% if report.pref_Meat or report.pref_Fish or report.pref_Dair or report.pref_Eggs or report.pref_Vegs or report.pref_Frut or report.pref_Groa %}, {% endif %}сладкое{% endif %}
-            {% if report.pref_Fast %}{% if report.pref_Meat or report.pref_Fish or report.pref_Dair or report.pref_Eggs or report.pref_Vegs or report.pref_Frut or report.pref_Groa or report.pref_Swet %}, {% endif %}фаст-фуд{% endif %}
-            {% if report.pref_Cofe %}{% if report.pref_Meat or report.pref_Fish or report.pref_Dair or report.pref_Eggs or report.pref_Vegs or report.pref_Frut or report.pref_Groa or report.pref_Swet or report.pref_Fast %}, {% endif %}напитки с кофе{% endif %}
-            {% if report.pref_Alco %}{% if report.pref_Meat or report.pref_Fish or report.pref_Dair or report.pref_Eggs or report.pref_Vegs or report.pref_Frut or report.pref_Groa or report.pref_Swet or report.pref_Fast or report.pref_Cofe %}, {% endif %}алкоголь{% endif %}
+          {% if pref_Diet_count %}
+            {% for pref in pref_Diet %}
+              {{ pref }}
+            {% endfor %}
           {% else %}
             <span class="muted">Не указано</span>
           {% endif %}
         </div>
       </div>
-    </section>
 
-    {# 4. Непереносимости #}
-    <section class="card">
-      <div class="card-title">Непереносимость продуктов</div>
+      <hr style="margin:12px 0;border:none;border-top:1px solid #e5e7eb;">
+
       <div class="field">
-        <label>Непереносимости</label>
-        <div>
-          {% if report.intol_Lact or report.intol_Glut or report.intol_Nuts or report.intol_Sea or report.intol_Other %}
-            <ul style="margin:0;padding-left:18px;">
+        <label>Неперносимости</label>
+        {% if report.intol_Lact or report.intol_Glut or report.intol_Nuts or report.intol_Sea or report.intol_Other %}
+          <ul style="margin:0;padding-left:18px;">
               {% if report.intol_Lact %}<li>{{ fields_verbose.intol_Lact }}</li>{% endif %}
               {% if report.intol_Glut %}<li>{{ fields_verbose.intol_Glut }}</li>{% endif %}
               {% if report.intol_Nuts %}<li>{{ fields_verbose.intol_Nuts }}</li>{% endif %}
               {% if report.intol_Sea %}<li>{{ fields_verbose.intol_Sea }}</li>{% endif %}
-              {% if report.intol_Other %}<li>{{ fields_verbose.intol_Other }}: {{ report.intol_Other }}</li>{% endif %}
-            </ul>
+              {% if report.intol_Other %}<li>{{ report.intol_Other }}</li>{% endif %}
+          </ul>
           {% else %}
             <span class="muted">Не указано</span>
           {% endif %}
+      </div>
+
+      {% if report.comment_diet %}
+      <hr style="margin:12px 0;border:none;border-top:1px solid #e5e7eb;">
+
+      <div class="field">
+        <label>Дополнительно</label>
+        <div>
+          {{ report.comment_diet}}
         </div>
       </div>
+      {% endif %}
     </section>
+
 
     {# 5. Наследственность #}
     <section class="card">
       <div class="card-title">Наследственность</div>
-      <div class="grid-2">
+      <div class="grid-1">
+      {% for k, v in heredity.items %}
         <div class="field">
-          <label>{{ fields_verbose.cardiovascular }}</label>
-          <div>{{ report.get_cardiovascular_display }}</div>
+          <label>{{ k }}</label>
+          <div>{{ v }}</div>
         </div>
-        <div class="field">
-          <label>{{ fields_verbose.oncological }}</label>
-          <div>{{ report.get_oncological_display }}</div>
+      {% endfor %}
+      {% if report.heredity_Other %}
+      <hr style="margin:12px 0;border:none;border-top:1px solid #e5e7eb;">
+
+      <div class="field">
+        <label>Дополнительно</label>
+        <div>
+          {{ report.heredity_Other}}
         </div>
-        <div class="field">
-          <label>{{ fields_verbose.diabetes }}</label>
-          <div>{{ report.get_diabetes_display }}</div>
-        </div>
-        <div class="field">
-          <label>{{ fields_verbose.thyroid }}</label>
-          <div>{{ report.get_thyroid_display }}</div>
-        </div>
-        <div class="field">
-          <label>{{ fields_verbose.autoimmune }}</label>
-          <div>{{ report.get_autoimmune_display }}</div>
-        </div>
-        <div class="field">
-          <label>{{ fields_verbose.allergic }}</label>
-          <div>{{ report.get_allergic_display }}</div>
-        </div>
+      </div>
+      {% endif %}
       </div>
     </section>
 
@@ -196,8 +208,16 @@
           <div>{{ report.get_insp_Body_display }}</div>
         </div>
         <div class="field">
-          <label>{{ fields_verbose.insp_Abdomen }}</label>
-          <div>{{ report.get_insp_Abdomen_display }}</div>
+          <label>{{ fields_verbose.insp_Limbs }}</label>
+          <div>{{ report.insp_Limbs|default:"-" }}</div>
+        </div>
+        <div class="field">
+          <label>{{ fields_verbose.insp_Swelling }}</label>
+          <div>{{ report.insp_Swelling|default:"-" }}</div>
+        </div>
+        <div class="field">
+          <label>{{ fields_verbose.insp_Muscle }}</label>
+          <div>{{ report.insp_Muscle|default:"-" }}</div>
         </div>
         <div class="field">
           <label>{{ fields_verbose.insp_Liver }}</label>
@@ -218,6 +238,21 @@
             {% if report.insp_skin.all %}
               <ul style="margin:0;padding-left:18px;">
                 {% for opt in report.insp_skin.all %}
+                  <li>{{ opt }}</li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <span class="muted">Не указано</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Язык</label>
+          <div>
+            {% if report.insp_Lymph.all %}
+              <ul style="margin:0;padding-left:18px;">
+                {% for opt in report.insp_Lymph.all %}
                   <li>{{ opt }}</li>
                 {% endfor %}
               </ul>
@@ -271,8 +306,23 @@
             {% endif %}
           </div>
         </div>
+        <div class="field">
+          <label>Опорно‑двигательный аппарат</label>
+          <div>
+            {% if report.insp_abdomen.all %}
+              <ul style="margin:0;padding-left:18px;">
+                {% for opt in report.insp_abdomen.all %}
+                  <li>{{ opt }}</li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <span class="muted">Не указано</span>
+            {% endif %}
+          </div>
+        </div>
       </div>
 
+      <hr style="margin:12px 0;border:none;border-top:1px solid #e5e7eb;">
       <div class="field" style="margin-top:8px;">
         <label>{{ fields_verbose.insp_Other }}</label>
         <div>{{ report.insp_Other|default:"—" }}</div>
@@ -282,25 +332,12 @@
     {# 8. Образ жизни #}
     <section class="card">
       <div class="card-title">Образ жизни</div>
-      {% for field , name in fields_lifeStyle.items %} 
+      {% for name, value  in fields_lifeStyle.items %}
       <div class="field"  style="margin-top:6px;">
         <label>{{ name }}</label>
-        <div> {{ field.value|default:"—" }} </div>
+        <div> {{ value|default:"—" }} </div>
       </div>
       {% endfor %}
-    </section>
-
-    {# 9. Заключение #}
-    <section class="card">
-      <div class="card-title">Заключение</div>
-      <div class="field">
-        <label>{{ fields_verbose.title }}</label>
-        <div>{{ report.title }}</div>
-      </div>
-      <div class="field" style="margin-top:8px;">
-        <label>{{ fields_verbose.text }}</label>
-        <div style="white-space:pre-wrap;">{{ report.text }}</div>
-      </div>
     </section>
 
   </div>

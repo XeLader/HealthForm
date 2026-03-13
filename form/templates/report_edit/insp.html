@@ -1,0 +1,131 @@
+{# Блок 6: Данные осмотра #}
+<div class="card">
+<div class="card-title">Данные осмотра:</div>
+
+<div class="grid-1">
+<div class="field">
+{{ form.insp_General.label_tag }}
+{{ form.insp_General }}
+{% if form.insp_General.errors %}<div class="errors">{{ form.insp_General.errors }}</div>{% endif %}
+</div>
+
+<div class="field">
+{{ form.insp_Body.label_tag }}
+{{ form.insp_Body }}
+{% if form.insp_Body.errors %}<div class="errors">{{ form.insp_Body.errors }}</div>{% endif %}
+</div>
+
+
+<div class="field">
+<label>{{ form.insp_skin.label }}</label>
+<div class="checkbox-group">
+{{ form.insp_skin }}
+</div>
+{% if form.insp_skin.errors %}<div class="errors">{{ form.insp_skin.errors }}</div>{% endif %}
+{% if form.insp_skin.help_text %}<div class="help">{{ form.insp_skin.help_text }}</div>{% endif %}
+</div>
+
+
+<div class="field">
+<label>{{ form.insp_Swelling.label }}</label>
+<div>
+{{ form.insp_Swelling }}
+</div>
+{% if form.insp_Swelling.errors %}<div class="errors">{{ form.insp_Swelling.errors }}</div>{% endif %}
+{% if form.insp_Swelling.help_text %}<div class="help">{{ form.insp_Swelling.help_text }}</div>{% endif %}
+</div>
+
+<div class="field">
+<label>{{ form.insp_Muscle.label }}</label>
+<div>
+{{ form.insp_Muscle }}
+</div>
+{% if form.insp_Muscle.errors %}<div class="errors">{{ form.insp_Muscle.errors }}</div>{% endif %}
+{% if form.insp_Muscle.help_text %}<div class="help">{{ form.insp_Muscle.help_text }}</div>{% endif %}
+</div>
+
+<div class="field">
+<label>{{ form.insp_lymph.label }}</label>
+<div class="checkbox-group">
+{{ form.insp_lymph }}
+</div>
+{% if form.insp_lymph.errors %}<div class="errors">{{ form.insp_lymph.errors }}</div>{% endif %}
+{% if form.insp_lymph.help_text %}<div class="help">{{ form.insp_lymph.help_text }}</div>{% endif %}
+</div>
+
+
+
+<div class="field">
+<label>{{ form.insp_thyroid.label }}</label>
+<div class="checkbox-group">
+{{ form.insp_thyroid }}
+</div>
+{% if form.insp_thyroid.errors %}<div class="errors">{{ form.insp_thyroid.errors }}</div>{% endif %}
+{% if form.insp_thyroid.help_text %}<div class="help">{{ form.insp_thyroid.help_text }}</div>{% endif %}
+</div>
+
+
+<div class="field">
+<label>{{ form.insp_abdomen.label }}</label>
+<div class="checkbox-group">
+{% for field in form.insp_abdomen %}
+<div>
+{{field}}
+{{field.label}}
+</div>
+{% endfor %}
+</div>
+{% if form.insp_abdomen.errors %}<div class="errors">{{ form.insp_abdomen.errors }}</div>{% endif %}
+{% if form.insp_abdomen.help_text %}<div class="help">{{ form.insp_abdomen.help_text }}</div>{% endif %}
+</div>
+
+<div class="field">
+{{ form.insp_Liver.label}}
+<div class="checkbox-group">
+{% for field in form.insp_Liver %}
+<div>
+{{ field.label }}
+{{ field }}
+</div>
+{% endfor %}
+<div>
+{{ form.insp_Liver_protudes.label_tag }}
+{{ form.insp_Liver_protudes }} см
+</div>
+</div>
+{% if form.insp_Liver.errors %}<div class="errors">{{ form.insp_Liver.errors }}</div>{% endif %}
+{% if form.insp_Liver_protudes.errors %}<div class="errors">{{ form.insp_Liver_protudes.errors }}</div>{% endif %}
+</div>
+
+
+<div class="field">
+<label>{{ form.insp_musculoskeletal.label }}</label>
+<div class="checkbox-group">
+{{ form.insp_musculoskeletal }}
+</div>
+{% if form.insp_musculoskeletal.errors %}<div class="errors">{{ form.insp_musculoskeletal.errors }}</div>{% endif %}
+{% if form.insp_musculoskeletal.help_text %}<div class="help">{{ form.insp_musculoskeletal.help_text }}</div>{% endif %}
+</div>
+
+<div class="field">
+{{ form.insp_Limbs.label_tag }}
+{{ form.insp_Limbs }}
+{% if form.insp_Limbs.errors %}<div class="errors">{{ form.insp_Limbs.errors }}</div>{% endif %}
+</div>
+
+<div class="field">
+{{ form.insp_Tongue.label_tag }}
+<div class="checkbox-group">
+{{ form.insp_Tongue }}
+</div>
+{% if form.insp_Tongue.errors %}<div class="errors">{{ form.insp_Tongue.errors }}</div>{% endif %}
+</div>
+
+<div class="field">
+{{ form.insp_Other.label_tag }}
+{{ form.insp_Other }}
+{% if form.insp_Other.errors %}<div class="errors">{{ form.insp_Other.errors }}</div>{% endif %}
+</div>
+
+</div>
+</div>

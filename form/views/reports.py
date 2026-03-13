@@ -92,17 +92,50 @@ def report_detail(request, pk):
         "title": Report._meta.get_field("title").verbose_name,
         "text": Report._meta.get_field("text").verbose_name,
     }
+
+    fields_heredity = {}
+    for field_name in Report.heredity_fields:
+        field = Report._meta.get_field(field_name)
+        field_value = field.value_from_object(report)
+        if field_value == "Y":
+            label = get_object_or_404(HeredityOption, pk = Report._meta.get_field(field_name+"_label").value_from_object(report)).label
+            fields_heredity[field.verbose_name] = label
+        elif field_value == "N":
+            fields_heredity[field.verbose_name] = "Нет"
     
     #Life style fields
     fields_lifeStyle = {}
+    #Diet Preferables
+    pref_Diet = []
+
     for field in Report._meta.get_fields():
         if field.name.startswith("life_"):
-           fields_lifeStyle[field] = field.verbose_name
+            fields_lifeStyle[field.verbose_name] = field.value_from_object(report)
+        elif field.name.startswith("pref_"):
+            if field.value_from_object(report):
+                pref_Diet.append(field.verbose_name)
+
+    if fields_lifeStyle["COVID-19"]:
+        fields_lifeStyle["COVID-19"] = "Перенесён"
+    else:
+        fields_lifeStyle.pop("COVID-19")
+
+    pref_Diet_count = (len(pref_Diet) > 0)
+    if pref_Diet_count:
+        pref_Diet[0] = pref_Diet[0].capitalize()
+        for i in range(len(pref_Diet)-1):
+            pref_Diet[i] = pref_Diet[i] + ', '
+        pref_Diet[-1] += '.'
+
+
 
     return render(request, "form/report_detail.html", {
         "report": report,
         "fields_verbose": fields_verbose,
         "fields_lifeStyle":fields_lifeStyle,
+        "pref_Diet_count":pref_Diet_count,
+        "pref_Diet":pref_Diet,
+        "heredity":fields_heredity,
         "nav_section": "reports",
     })
 
@@ -167,16 +200,30 @@ def report_new_for_patient(request, pk):
 def report_edit(request, pk):
     report = get_object_or_404(Report, pk=pk)
     if request.method == "POST":
-        form = ReportForm(request.POST, instance=report)
+        form = ReportFormForPatient(request.POST, instance=report)
+        print(form.errors)
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
             post.published_date = timezone.now()
             post.save()
             return redirect('report_detail', pk=post.pk)
-    else:
-        form = ReportForm(instance=report)
-    return render(request, 'form/report_edit.html', {'form': form,"nav_section": "reports", 'patient': report.patient})
+
+    form = ReportFormForPatient(instance=report)
+    Preferable = ["pref_Meat", "pref_Fish", "pref_Dair", "pref_Dair", "pref_Eggs", "pref_Vegs", "pref_Frut", "pref_Groa", "pref_Swet", "pref_Fast", "pref_Cofe", "pref_Alco"]
+    Intolerances = ["intol_Lact", "intol_Glut", "intol_Nuts", "intol_Sea"]
+    Heredity = ["cardiovascular","oncological","diabetes","thyroid","autoimmune","heredity_Other"]
+    Allergies = ["foodAllergy", "medicineAllergy", "seasonalAllergy", "contactAllergy", "noAllergy"]
+    LifeStyle = [field.name for field in Report._meta.get_fields() if field.name.startswith("life_")]
+    return render(request, 'form/report_edit.html', {
+                                        'form': form,
+                                        'patient': report.patient,
+                                        'prefs':Preferable,
+                                        'intols':Intolerances,
+                                        'herr':Heredity,
+                                        'allergies': Allergies,
+                                        'lifeStyle': LifeStyle,
+                                        'nav_section': "patients"})
    
    
 @login_required

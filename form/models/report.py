@@ -237,6 +237,8 @@ class Report(models.Model):
     comment_diet = models.CharField(verbose_name = "Комментарий", max_length = 2048, null=True, blank=True)
 
     #Heredity
+    heredity_fields = ["cardiovascular", "oncological", "diabetes", "thyroid", "autoimmune"]
+
     cardiovascular = models.CharField(verbose_name = "Сердечно‑сосудистые заболевания", max_length=1, choices=YNU,  default="U")
     cardiovascular_label = models.OneToOneField(HeredityOption, on_delete=models.CASCADE, null=True, related_name = "cardiovascular+")
 

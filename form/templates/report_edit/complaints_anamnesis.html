@@ -1,0 +1,14 @@
+{# Блок 2: жалобы и анамнез #}
+<div class="card">
+<div class="card-title">Жалобы и анамнез</div>
+<div class="field">
+{{ form.complaints.label_tag }}
+{{ form.complaints }}
+{% if form.complaints.errors %}<div class="errors">{{ form.complaints.errors }}</div>{% endif %}
+</div>
+<div class="field" style="margin-top:10px;">
+{{ form.anamnesis.label_tag }}
+{{ form.anamnesis }}
+{% if form.anamnesis.errors %}<div class="errors">{{ form.anamnesis.errors }}</div>{% endif %}
+</div>
+</div>

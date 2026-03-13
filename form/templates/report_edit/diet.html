@@ -1,0 +1,61 @@
+{# Блок 3: Диетологический анамнез #}
+<div class="card">
+<div class="card-title">Диетологический анамнез</div>
+<div class="grid-1">
+<div class="field">
+<div class="field" style="margin-top:10px;">
+{{ form.diet.label_tag }}
+{{ form.diet }}
+{% if form.diet.errors %}<div class="errors">{{ form.diet.errors }}</div>{% endif %}
+</div>
+</div>
+<div class="field">
+{{ form.mealscount.label_tag }}
+{{ form.mealscount }}
+{% if form.mealscount.errors %}<div class="errors">{{ form.mealscount.errors }}</div>{% endif %}
+</div>
+<div class="field">
+{{ form.snacks.label_tag }}
+{{ form.snacks }}
+{% if form.snacks.errors %}<div class="errors">{{ form.snacks.errors }}</div>{% endif %}
+</div>
+<div class="field">
+<label>Предпочтения</label>
+<div class="checkbox-group">
+{% for field in form %}
+{% if field.name in prefs %}
+<div>
+{{ field }}
+{{ field.label}}
+{% if field.errors %}<div class="errors">{{ field.errors }}</div>{% endif %}
+</div>
+{% endif %}
+{% endfor %}
+</div>
+</div>
+<div class="field">
+<label>Наличие непереносимости:</label>
+<div class="checkbox-group">
+{% for field in form %}
+{% if field.name in intols %}
+<div>
+{{ field }}
+{{ field.label}}
+{% if field.errors %}<div class="errors">{{ field.errors }}</div>{% endif %}
+</div>
+{% endif %}
+{% endfor %}
+<div>
+{{form.intol_Other.label_tag}}
+{{form.intol_Other}}
+{% if form.intol_Other.errors %}<div class="errors">{{ form.intol_Other.errors }}</div>{% endif %}
+</div>
+</div>
+</div>
+<div class="field">
+{{ form.comment_diet.label_tag }}
+{{ form.comment_diet }}
+{% if form.comment_diet.errors %}<div class="errors">{{ form.comment_diet.errors }}</div>{% endif %}
+</div>
+</div>
+</div>

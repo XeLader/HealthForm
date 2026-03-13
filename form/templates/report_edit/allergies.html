@@ -1,0 +1,15 @@
+{# Блок 5: Аллергологический анамнез #}
+<div class="card">
+<div class="card-title">Аллергологический анамнез:</div>
+<div class="grid-1">
+{% for field in form %}
+{% if field.name in allergies %}
+<div class="field">
+{{ field.label_tag }}
+{{ field }}
+{% if field.errors %}<div class="errors">{{ field.errors }}</div>{% endif %}
+</div>
+{% endif %}
+{% endfor %}
+</div>
+</div>
