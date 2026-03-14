@@ -13,7 +13,7 @@ from ..forms import *
 
 
 def build_preview_pairs(obj, limit=6):
-    skip = {"id", "patient", "created_date"}
+    skip = {"id", "patient", "created_date", "entry"}
     pairs = []
     for f in obj._meta.fields:
         if f.name in skip:
@@ -263,67 +263,70 @@ def prescription_new(request, pk):
 def report_print_config(request, pk):
     report = get_object_or_404(Report, pk=pk)
 
-    hypotheses = DiagnosticHypothesis.objects.filter(patient=report.patient).order_by("-created_at")
-
+    hypotheses_qs = DiagnosticHypothesis.objects.filter(patient=report.patient).order_by("-created_at")
     labs_qs = LabEntry.objects.filter(patient=report.patient).order_by("-taken_at")
-    rx_qs = Prescription.objects.filter(patient=report.patient).order_by("-created_at")
+    prescript_qs = Prescription.objects.filter(patient=report.patient).order_by("-created_at")
+    foodplans_qs = Foodplan.objects.filter(patient=report.patient).order_by("-created_date")
     
     lab_previews = {}
-    rx_previews = {}
+    prescript_previews = {}
     lab_links = {}
     
     for le in labs_qs[:100]:
         obj = le.content_object
         lab_previews[le.pk] = build_preview_pairs(obj, limit=8)
         
-    for rx in rx_qs[:100]:
-        rx_previews[rx.pk] = {
-        "regime": rx.regime,
-        "duration": rx.duration,
-        "comment": rx.comment,
+    for prescript in prescript_qs[:100]:
+        prescript_previews[rx.pk] = {
+        "regime": prescript.regime,
+        "duration": prescript.duration,
+        "comment": prescript.comment,
     }
 
     if request.method == "POST":
         form = ReportPrintConfigForm(
             request.POST,
             labs_queryset=labs_qs,
-            rx_queryset=rx_qs,
+            prescript_queryset=prescript_qs,
+            hypoth_queryset = hypotheses_qs,
+            foodplan_queryset = foodplans_qs
         )
         sess_key = f"print_cfg_report_{report.pk}"
-        selected_rx = set(request.POST.getlist("rx"))
-        selected_labs = set(request.POST.getlist("labs"))
         if form.is_valid():
             cfg = form.cleaned_payload()
-            rx_ids = [int(x) for x in request.POST.getlist("rx")]
-            cfg["rx_ids"] = rx_ids
             request.session[sess_key] = cfg
             return redirect("report_print_preview", pk=report.pk)
     else:
         sess_key = f"print_cfg_report_{report.pk}"
         saved = request.session.get(sess_key, {})
         selected_labs = set(str(x) for x in saved.get("labs_ids", []))
-        selected_rx = set(str(x) for x in saved.get("rx_ids", []))
+        selected_prescripts = set(str(x) for x in saved.get("prescripts_ids", []))
         if saved:
             form = ReportPrintConfigForm(
                 initial={
                     "doc_type": saved.get("doc_type", ReportPrintConfigForm.DocType.PATIENT),
                     "sections": saved.get("sections", []),
                     "labs": saved.get("labs_ids", []),
-                    "prescriptions": saved.get("rx_ids", []),
+                    "prescriptions": saved.get("prescripts_ids", []),
                 },
                 labs_queryset=labs_qs,
-                rx_queryset=rx_qs,
+                prescript_queryset=prescript_qs,
+                hypoth_queryset = hypotheses_qs,
+                foodplan_queryset = foodplans_qs,
             )
         else:
             form = ReportPrintConfigForm(
                 labs_queryset=labs_qs,
-                rx_queryset=rx_qs,
+                prescript_queryset=prescript_qs,
+                hypoth_queryset = hypotheses_qs,
+                foodplan_queryset = foodplans_qs,
                 initial_doc_type=ReportPrintConfigForm.DocType.PATIENT,
             )
 
     return render(request, "form/report_print_config.html", {
         "report": report,
-        "hypotheses": hypotheses[:1],
+        "hypotheses_qs": hypotheses_qs,
+        "foodplans_qs": foodplans_qs,
         "form": form,
         "page_title": "Настройка печати",
         "nav_section": "reports",
@@ -331,9 +334,9 @@ def report_print_config(request, pk):
         "lab_previews": lab_previews,
         "lab_links": lab_links,
         "selected_labs": selected_labs,
-        "rx_qs": rx_qs,
-        "selected_rx": selected_rx,
-        "rx_previews": rx_previews,
+        "prescript_qs": prescript_qs,
+        "selected_prescripts": selected_prescripts,
+        "prescript_previews": prescript_previews,
     })
     
 
@@ -353,6 +356,9 @@ def report_print_preview(request, pk):
     labs_grouped = []
 
     labs_ids = cfg.get("labs_ids", [])
+    hypotheses_ids = cfg.get("hypotheses_ids",[])
+    prescripts_ids = cfg.get("prescripts_ids",[])
+    foodplans_ids = cfg.get("foodplans_ids",[])
     
     if labs_ids:
             qs = (
@@ -362,37 +368,64 @@ def report_print_preview(request, pk):
                 .order_by("kind", "-taken_at")
             )
 
-            buckets = defaultdict(list)
+            buckets = {}
+            dates = defaultdict(list)
             kind_titles = {}
             for entry in qs:
-                buckets[entry.kind].append(entry)
+                pairs = build_preview_pairs(entry.content_object)
+                dates[entry.kind].append(getattr(entry, "taken_at", None))
+                if not entry.kind in buckets:
+                    buckets[entry.kind] = {}
+                for f in pairs:
+                    if not f[0] in buckets[entry.kind]:
+                        buckets[entry.kind][f[0]] = []
+                    buckets[entry.kind][f[0]].append(f[1])
                 kind_titles[entry.kind] = entry.get_kind_display()
+
 
             for kind in sorted(buckets.keys(), key=lambda k: kind_titles.get(k, k)):
                 labs_grouped.append({
                     "kind": kind,
                     "title": kind_titles.get(kind, kind),
                     "items": buckets[kind],
+                    "dates": dates[kind],
                 })
+            print(labs_grouped)
 
-    rx_rows = []
-    rx_ids = cfg.get("rx_ids", [])
-    if rx_ids:
-        rx_rows = (
+    prescripts_rows = []
+    if prescripts_ids:
+        prescripts_rows = (
             Prescription.objects
             .filter(pk__in=rx_ids, patient=report.patient)
             .order_by("-created_at")
         )
 
+    hypotheses_rows = []
+    if hypotheses_ids:
+        hypotheses_rows = (
+            DiagnosticHypothesis.objects
+            .filter(pk__in=hypotheses_ids, patient=report.patient)
+            .order_by("-created_at")
+        )
+
+    foodplans_rows = []
+    if foodplans_ids:
+        foodplans_rows = (
+            Foodplan.objects
+            .filter(pk__in=foodplans_ids, patient=report.patient)
+            .order_by("-created_date")
+        )
+
 
     context = {
         "report": report,
-        "hypotheses": hypotheses[:1],
+        "hypotheses": hypotheses_rows,
         "doc_type": doc_type,
         "sections": sections,
         "labs_grouped": labs_grouped,
-        "rx_rows": rx_rows,
+        "prescripts_row": prescripts_rows,
+        "foodplans_rows": foodplans_rows,
     }
-
+    print(labs_grouped)
     return render(request, "print/report_print_preview.html", context)
     

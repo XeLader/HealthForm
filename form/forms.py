@@ -322,7 +322,9 @@ class ReportPrintConfigForm(forms.Form):
         ("heredity", "Наследственность"),
         ("allergies", "Аллергический анамнез"),
         ("inspection", "Объективный статус"),
-        ("conclusion", "Заключение (текст/рекомендации)"),
+        ("conclusion", "Заключение"),
+        ("foodplan", "Рекомендации"),
+        ("medecine", "Назначения"),
         ("followup", "Следующий приём (дата)"),
     ]
 
@@ -337,7 +339,7 @@ class ReportPrintConfigForm(forms.Form):
                 "followup",
             ],
             "include_labs": True,
-            "include_rx": True,
+            "include_prescripts": True,
         },
         DocType.CLINIC: {
             "sections": [
@@ -348,6 +350,8 @@ class ReportPrintConfigForm(forms.Form):
                 "allergies",
                 "inspection",
                 "conclusion",
+                "foodplan",
+                "medecine",
                 "followup",
             ],
         },
@@ -369,7 +373,9 @@ class ReportPrintConfigForm(forms.Form):
 
 
 
-    def __init__(self, *args, labs_queryset=None, rx_queryset=None, initial_doc_type=None, **kwargs):
+    def __init__(self, *args, labs_queryset=None, prescript_queryset=None, hypoth_queryset = None,
+                 foodplan_queryset = None, initial_doc_type=None, **kwargs):
+
         super().__init__(*args, **kwargs)
 
         if initial_doc_type in self.PRESETS and not self.is_bound:
@@ -385,10 +391,25 @@ class ReportPrintConfigForm(forms.Form):
                 widget=forms.CheckboxSelectMultiple,
             )
 
-        if rx_queryset is not None:
+        if prescript_queryset is not None:
             self.fields["prescriptions"] = forms.ModelMultipleChoiceField(
                 label="Рецепты",
-                queryset=rx_queryset,
+                queryset=prescript_queryset,
+                required=False,
+                widget=forms.CheckboxSelectMultiple,
+            )
+        if hypoth_queryset is not None:
+            self.fields["hypotheses"] = forms.ModelMultipleChoiceField(
+                label="Заключения",
+                queryset=hypoth_queryset,
+                required=False,
+                widget=forms.CheckboxSelectMultiple,
+            )
+
+        if foodplan_queryset is not None:
+            self.fields["foodplans"] = forms.ModelMultipleChoiceField(
+                label="Рекомендации",
+                queryset=foodplan_queryset,
                 required=False,
                 widget=forms.CheckboxSelectMultiple,
             )
@@ -407,7 +428,13 @@ class ReportPrintConfigForm(forms.Form):
             data["labs_ids"] = [obj.pk for obj in self.cleaned_data.get("labs", [])]
 
         if "prescriptions" in self.fields:
-            data["rx_ids"] = [obj.pk for obj in self.cleaned_data.get("prescriptions", [])]
+            data["prescripts_ids"] = [obj.pk for obj in self.cleaned_data.get("prescriptions", [])]
+
+        if "hypotheses" in self.fields:
+            data["hypotheses_ids"] = [obj.pk for obj in self.cleaned_data.get("hypotheses", [])]
+
+        if "foodplans" in self.fields:
+            data["foodplans_ids"] = [obj.pk for obj in self.cleaned_data.get("foodplans", [])]
 
         return data
         

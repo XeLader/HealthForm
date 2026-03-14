@@ -163,20 +163,40 @@
     </section>
   {% endif %}
 
-  {# 7) Заключение #}
-  {% if "conclusion" in sections %}
-    <section class="block">
-      <h2>Заключение</h2>
-      <div class="kv">
-        <div class="k">Название</div>
-        <div class="v">{{ report.title }}</div>
-      </div>
-      <div class="kv" style="margin-top:10px;">
-        <div class="k">Комментарий</div>
-        <div class="v text">{{ report.text|default:"—" }}</div>
-      </div>
-    </section>
+    {# Анализы #}
+  {% if labs_grouped %}
+      <section class="block">
+        <h2>Анализы</h2>
+      {% for group in labs_grouped %}
+            <div class="lab-card">
+              <div class="lab-card-head">
+                <div class="lab-card-date">{{ group.title }}</div>
+              </div>
+                  <table class="lab-table">
+                    <thead>
+                      <tr>
+                      <th></th>
+                      {% for date in group.dates %}
+                      <th>{{date|date:"d.m.Y"}}</th>
+                      {% endfor %}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for k, v in group.items.items %}
+                        <tr>
+                          <td class="lab-k">{{ k }}</td>
+                          {% for val in v %}
+                          <td class="lab-v">{{ val }}</td>
+                          {% endfor %}
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+            </div>
+          {% endfor %}
+      </section>
   {% endif %}
+
 
   {# Гипотезы #}
   {% if hypotheses %}
@@ -208,59 +228,24 @@
 </section>
 {% endif %}
 
-  {# 8) Следующий приём #}
-  {% if "followup" in sections %}
-    <section class="block">
-      <h2>Следующий приём</h2>
-      <div class="kv">
-        <div class="k">Дата</div>
-        <div class="v">{{ report.next_date|date:"d.m.Y H:i" }}</div>
-      </div>
-    </section>
-  {% endif %}
+{# Рекомендации #}
+  {% if foodplans_rows %}
+<section class="block">
+  <h2>Рекомендации</h2>
 
-  {# Анализы #}
-  {% if labs_grouped %}
-      <section class="block">
-        <h2>Анализы</h2>
-      {% for group in labs_grouped %}
-        <div class="lab-group">
-          <div class="lab-group-title">{{ group.title }}</div>
-
-          {% for entry in group.items %}
-            <div class="lab-card">
-              <div class="lab-card-head">
-                <div class="lab-card-date">{{ entry.taken_at|date:"d.m.Y" }}</div>
-              </div>
-
-              {% with kv=entry.content_object|lab_kv %}
-                {% if kv %}
-                  <table class="lab-table">
-                    <tbody>
-                      {% for k, v in kv %}
-                        <tr>
-                          <td class="lab-k">{{ k }}</td>
-                          <td class="lab-v">{{ v }}</td>
-                        </tr>
-                      {% endfor %}
-                    </tbody>
-                  </table>
-                {% else %}
-                  <div class="muted">Нет заполненных показателей.</div>
-                {% endif %}
-              {% endwith %}
-            </div>
-          {% endfor %}
-        </div>
-      {% endfor %}
-      </section>
-  {% endif %}
-
-
-
+  {% for fp in foodplans_rows %}
+    <div class="kv">
+    <div class="k">{{ fp.title }}</div>
+<div class="v">
+      {{ fp.text }}
+</div>
+    </div>
+  {% endfor %}
+</section>
+{% endif %}
 
   {# Рецепты #}
-  {% if rx_rows %}
+  {% if prescripts_rows %}
       <section class="block">
         <h2>Рецепты</h2>
         <table class="rx-table">
@@ -275,19 +260,30 @@
           </tr>
         </thead>
         <tbody>
-          {% for rx in rx_rows %}
+          {% for pr in prescripts_rows %}
             <tr>
-              <td><strong>{{ rx.medicine }}</strong></td>
-              <td>{{ rx.dosage|default:"—" }}</td>
-              <td>{{ rx.regime|default:"—" }}</td>
-              <td>{{ rx.duration|default:"—" }}</td>
-              <td class="rx-comment">{{ rx.comment|default:"" }}</td>
-              <td style="text-align:right;">{{ rx.created_at|date:"d.m.Y" }}</td>
+              <td><strong>{{ pr.medicine }}</strong></td>
+              <td>{{ pr.dosage|default:"—" }}</td>
+              <td>{{ pr.regime|default:"—" }}</td>
+              <td>{{ pr.duration|default:"—" }}</td>
+              <td class="rx-comment">{{ pr.comment|default:"" }}</td>
+              <td style="text-align:right;">{{ pr.created_at|date:"d.m.Y" }}</td>
             </tr>
           {% endfor %}
         </tbody>
       </table>
     {% endif %}
+
+      {# 8) Следующий приём #}
+  {% if "followup" in sections %}
+    <section class="block">
+      <h2>Следующий приём</h2>
+      <div class="kv">
+        <div class="k">Дата</div>
+        <div class="v">{{ report.next_date|date:"d.m.Y H:i" }}</div>
+      </div>
+    </section>
+  {% endif %}
 
 {% endblock %}
 

@@ -83,17 +83,44 @@
     </section>
 {% endif %}
 
-{% if rx_qs %}
+{% if hypotheses_qs %}
+<section class="card">
+<div class="card-title">Диагностические гипотезы</div>
+<div class="lab-picker">
+{% for hp in hypotheses_qs %}
+<label class="lab-row">
+            <input
+              type="checkbox"
+              name="hypotheses"
+              value="{{ hp.pk }}"
+              {% if hp.pk|stringformat:"s" in selected_hypotheses %}checked{% endif %}
+            >
+<div class="lab-main">
+<div class="lab-title">
+{{ hp.main_diagnosis }}
+</div>
+<div class="lab-sub muted">
+{{ hp.created_at|date:"d.m.Y" }}
+{% if hp.comment %} · {{ hp.comment }}{% endif %}
+</div>
+</div>
+</label>
+{% endfor %}
+</div>
+</section>
+{% endif %}
+
+{% if prescript_qs %}
       <section class="card">
           <div class="card-title">{{ form.prescriptions.label }}</div>
           <div class="lab-picker">
-        {% for rx in rx_qs %}
+        {% for prescript in prescript_qs %}
           <label class="lab-row">
             <input
               type="checkbox"
-              name="rx"
-              value="{{ rx.pk }}"
-              {% if rx.pk|stringformat:"s" in selected_rx %}checked{% endif %}
+              name="prescripts"
+              value="{{ prescript.pk }}"
+              {% if prescript.pk|stringformat:"s" in selected_prescript %}checked{% endif %}
             >
 
             <div class="lab-main">
@@ -123,10 +150,38 @@
         {% endfor %}
       </div>
       </section>
-      {% endif %}
-    </div>
+{% endif %}
 
-    <div class="actions">
+{% if foodplans_qs %}
+<section class="card">
+<div class="card-title">Диетологические рекомендации</div>
+<div class="lab-picker">
+{% for fp in foodplans_qs %}
+<label class="lab-row">
+            <input
+              type="checkbox"
+              name="foodplans"
+              value="{{ fp.pk }}"
+              {% if fp.pk|stringformat:"s" in selected_foodplans %}checked{% endif %}
+            >
+<div class="lab-main">
+<div class="lab-title">
+{{ fp.title }}
+</div>
+<div class="lab-sub muted">
+{{ fp.created_date|date:"d.m.Y" }}
+{% if fp.subtitle %} · {{ fp.subtitle }}{% endif %}
+</div>
+</div>
+</label>
+{% endfor %}
+</div>
+</section>
+{% endif %}
+
+</div>
+
+<div class="actions">
       <button type="submit" class="btn btn-primary">Предпросмотр</button>
     </div>
   </form>
