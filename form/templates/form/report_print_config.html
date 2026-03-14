@@ -125,11 +125,11 @@
 
             <div class="lab-main">
               <div class="lab-title">
-                {{ rx.medicine }}{% if rx.dosage %} · {{ rx.dosage }}{% endif %}
+                {{ prescript.medicine }}{% if prescript.dosage %} · {{ prescript.dosage }}{% endif %}
               </div>
               <div class="lab-sub muted">
-                {{ rx.created_at|date:"d.m.Y" }}
-                {% if rx.regime %} · {{ rx.regime }}{% endif %}
+                {{ prescript.created_at|date:"d.m.Y" }}
+                {% if prescript.regime %} · {{ prescript.regime }}{% endif %}
               </div>
             </div>
           </label>
@@ -137,7 +137,7 @@
           <details class="lab-preview">
             <summary class="muted">Детали</summary>
             <div class="alb-preview-body">
-              {% with p=rx_previews|get_item:rx.pk %}
+              {% with p=prescript_previews|get_item:prescript.pk %}
                 {% if p.regime %}<div class="kv"><div class="k">Режим</div><div class="v">{{ p.regime }}</div></div>{% endif %}
                 {% if p.duration %}<div class="kv"><div class="k">Длительность</div><div class="v">{{ p.duration }}</div></div>{% endif %}
                 {% if p.comment %}<div class="kv"><div class="k">Комментарий</div><div class="v">{{ p.comment }}</div></div>{% endif %}

@@ -392,7 +392,7 @@ class ReportPrintConfigForm(forms.Form):
             )
 
         if prescript_queryset is not None:
-            self.fields["prescriptions"] = forms.ModelMultipleChoiceField(
+            self.fields["prescripts"] = forms.ModelMultipleChoiceField(
                 label="Рецепты",
                 queryset=prescript_queryset,
                 required=False,
@@ -427,15 +427,14 @@ class ReportPrintConfigForm(forms.Form):
         if "labs" in self.fields:
             data["labs_ids"] = [obj.pk for obj in self.cleaned_data.get("labs", [])]
 
-        if "prescriptions" in self.fields:
-            data["prescripts_ids"] = [obj.pk for obj in self.cleaned_data.get("prescriptions", [])]
+        if "prescripts" in self.fields:
+            data["prescripts_ids"] = [obj.pk for obj in self.cleaned_data.get("prescripts", [])]
 
         if "hypotheses" in self.fields:
             data["hypotheses_ids"] = [obj.pk for obj in self.cleaned_data.get("hypotheses", [])]
 
         if "foodplans" in self.fields:
             data["foodplans_ids"] = [obj.pk for obj in self.cleaned_data.get("foodplans", [])]
-
         return data
         
 class LabDocumentUploadForm(forms.ModelForm):

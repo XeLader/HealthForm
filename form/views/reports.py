@@ -98,7 +98,10 @@ def report_detail(request, pk):
         field = Report._meta.get_field(field_name)
         field_value = field.value_from_object(report)
         if field_value == "Y":
-            label = get_object_or_404(HeredityOption, pk = Report._meta.get_field(field_name+"_label").value_from_object(report)).label
+            try:
+                label = HeredityOption.objects.get(pk = Report._meta.get_field(field_name+"_label").value_from_object(report)).label
+            except HeredityOption.DoesNotExist:
+                label = "Присутствуют. Без подробностей."
             fields_heredity[field.verbose_name] = label
         elif field_value == "N":
             fields_heredity[field.verbose_name] = "Нет"
@@ -277,7 +280,7 @@ def report_print_config(request, pk):
         lab_previews[le.pk] = build_preview_pairs(obj, limit=8)
         
     for prescript in prescript_qs[:100]:
-        prescript_previews[rx.pk] = {
+        prescript_previews[prescript.pk] = {
         "regime": prescript.regime,
         "duration": prescript.duration,
         "comment": prescript.comment,
@@ -390,13 +393,12 @@ def report_print_preview(request, pk):
                     "items": buckets[kind],
                     "dates": dates[kind],
                 })
-            print(labs_grouped)
 
     prescripts_rows = []
     if prescripts_ids:
         prescripts_rows = (
             Prescription.objects
-            .filter(pk__in=rx_ids, patient=report.patient)
+            .filter(pk__in=prescripts_ids, patient=report.patient)
             .order_by("-created_at")
         )
 
@@ -423,9 +425,9 @@ def report_print_preview(request, pk):
         "doc_type": doc_type,
         "sections": sections,
         "labs_grouped": labs_grouped,
-        "prescripts_row": prescripts_rows,
+        "prescripts_rows": prescripts_rows,
         "foodplans_rows": foodplans_rows,
     }
-    print(labs_grouped)
+    print(prescripts_rows)
     return render(request, "print/report_print_preview.html", context)
     
