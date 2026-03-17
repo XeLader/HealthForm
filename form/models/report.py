@@ -342,12 +342,12 @@ class Report(models.Model):
     life_stress = models.CharField(verbose_name = "Наличие стресса", max_length=1024, null=True, blank=True)
     life_antibiotics = models.CharField(verbose_name = "Последний приём антибиотиков", max_length=1024, null=True, blank=True)
     life_covid = models.BooleanField(verbose_name = "COVID-19", default = False)
-    life_vaccinationDate = models.DateTimeField(verbose_name = "Дата вакцинации", null=True, blank=True)
+    life_vaccinationDate = models.CharField(verbose_name = "Дата вакцинации", max_length=100, null=True, blank=True)
 
     title = models.CharField(verbose_name = "Название", max_length=200)
     text = models.TextField(verbose_name = "Комментарий", null=True, blank=True)
     created_date = models.DateTimeField(default=timezone.now)
-    next_date = models.DateTimeField(default=timezone.now, verbose_name = "Следующий приём")
+    next_date = models.CharField(default="", verbose_name = "Следующий приём", max_length=100, null=True, blank=True)
     def __str__(self):
         return self.title
  

@@ -19,6 +19,7 @@
 <div class="field">
 {{ form.heredity_Other.label_tag }}
 {{ form.heredity_Other }}
+{% if form.heredity_Other.errors %}<div class="errors">{{ form.heredity_Other.errors }}</div>{% endif %}
 </div>
 </div>
 </div>
